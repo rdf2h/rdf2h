@@ -191,6 +191,12 @@ rdf.parseTurtle(matchersTurtle, function (matchers) {
                 rendering the current resource applying only matchers that come 
                 after the matcher that resulted in the current template.</li>
         </ol>
+        <h3>Prefixes</h3>
+        <p>For many serialization formats RDF2h learns the prefixes when rdf-ex
+        parses data and matchers, so no explicit registration is necessary to
+        be able to use them in templates. They can be registered explicitely with:</p>
+        <pre class="code">RDF2h.prefixMap["ex"] = "http://example.org/onology/"</pre>
+        <h3>Examples</h3>
         <p>For practical examples it is recommended to study the ones provided
         on the <a href="index.html">try it out page</a>.</p>
         <h2>License</h2>
