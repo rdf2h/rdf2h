@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>This will be replaced when the data is loaded</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/libs/rdf-ext/rdf-ext.js" type="text/javascript"></script>
+        <script src="js/libs/jquery/jquery.js"></script>
+        <script src="js/libs/mustache.js/mustache.js"></script>
+        <script src="rdf2h.js"></script>
+        <script id="data" type="text/turtle">
+    @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.
+            <> dc:title "Hello world" .
+        </script>
+        <script id="matchers" type="text/turtle">
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .
+@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.
+[ a r2h:Matcher ;
+  r2h:triplePattern [    
+    r2h:subject r2h:this;
+    r2h:predicate dc:title;
+  ];
+  r2h:template [ 
+    r2h:context r2h:Default;
+    r2h:mustache <#title-template>
+  ]
+].
+
+        </script>
+        <script id="title-template" type="text/x-mustache-template">
+    <head>
+      <title>{{dc:title}}</title>
+    </heaad>
+    <body>
+        <h1>{{dc:title}}</h1>
+    </body>
+        </script>
+            
+        <script type="text/javascript">
+$(function () {
+    var matchersTtl = $("#matchers").text();
+    rdf.parseTurtle(matchersTtl, function (matchers) {
+        console.log(matchers.toString());
+        rdf.parseTurtle($("#data").text(), function (data) {
+            console.log(data.toString());
+            var rendered = new RDF2h(matchers).render(data, rdf.createNamedNode(window.location.toString()));
+            $("html").html(rendered);
+        }, window.location.toString());
+    }, window.location.toString());
+})
+        </script>
+    </head>
+    <body>
+
+
+    </body>
+</html>

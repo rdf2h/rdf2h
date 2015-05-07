@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>RDF2h Manual</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="images/logo.png">
+        <!-- <link rel="stylesheet" href="css/style.css"> -->
+        <style>
+            body {
+                margin: 5em;
+                max-width: 80em;
+                padding-bottom: 0em;
+            }
+            .code {
+                //color: #BBBBBB;
+                color: black;
+                //background: #000000;
+                background: lightgray;
+                margin: 0em;
+                padding-left: 2em;
+                padding-right: 2em;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>RDF2h Manual</h1>
+        <p>RDF2h is a tool for recursively rendering RDF resources using 
+            flexible matchers and mustache templates. This document describe 
+            how to do it. If you want to check things out right in your browser
+            <a href="index.html">go here</a>.
+        </p>
+        <h2>Including RDF2h in your page</h2>
+        <p>RDF2h depends on 
+            <a href="https://github.com/zazukoians/rdf-ext">rdf-ext</a>
+            as well as on <a href="https://github.com/janl/mustache.js">mustache.js</a>.
+            So you have to include the following in the head of your HTML page 
+            (adapt the paths to much the location of the scripts):</p>
+
+        <div class="code">
+        &lt;script src="js/libs/rdf-ext/rdf-ext.js">&lt;/script><br/>
+        &lt;script src="js/libs/mustache.js/mustache.js">&lt;/script><br/>
+        &lt;script src="rdf2h.js">&lt;/script>
+        </div>
+        <p>RDF2h does not depend on <a href="http://jquery.com/">jQuery</a>, 
+            however some of the examples in this manual use jQuery, so you may 
+            want to include it too.
+        </p>
+        <div class="code">
+        &lt;script src="js/libs/jquery/jquery.j">&lt;/script><br/>
+        </div>
+        <h2>Invoking RDF2h</h2>
+        <p>RDF2h is instantiated with a graph describing the matchers, the 
+            matchers are used to match resources with a suitable template, see 
+            the section about <a href="#matchers">defining matchers</a> for more 
+            details.</p>
+        <p>Given an instance of RDF2h the render method is invoked with the 
+            following arguments:</p>
+        <ul>
+            <li>The data graph that contains the resource to be rendered</li>
+            <li>The resource to be rendered</li>
+            <li>Optionally: the rendering context</li>
+        </ul>
+        <p>This is a minimum example rendering a resource described by a single
+            triple</p>
+        <pre class="code">
+var dataTurtle = '@prefix dc: &lt;http://dublincore.org/2012/06/14/dcelements#>. \n\
+    &lt;http://example.org/> dc:title "An example".'
+var matchersTurtle = '@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+    @prefix r2h: &lt;http://rdf2h.github.io/2015/rdf2h#> .\n\
+    @prefix dc: &lt;http://dublincore.org/2012/06/14/dcelements#>.\n\
+    [ a r2h:Matcher ;\n\
+      r2h:triplePattern [\n\
+        r2h:subject r2h:this;\n\
+        r2h:predicate dc:title;\n\
+      ];\n\
+      r2h:template [ \n\
+        r2h:context r2h:Default;\n\
+        r2h:mustache "The title: {{dc:title}}"\n\
+      ]\n\
+    ].'
+rdf.parseTurtle(matchersTurtle, function (matchers) {
+    rdf.parseTurtle(dataTurtle, function (data) {
+        var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
+        alert(renderingResult);
+    });
+});</pre>
+        <p>The following code uses jQuery to load the turtle code describing the
+            matchers from an element with id <code>matchers</code> and the data
+            from en an element with id <code>data</code>. If the data is to be 
+            included in the HTML document it is typically contained in script 
+            elements of type <code>text/turtle</code>. For example:
+        </p>
+        <pre class="code">&lt;script id="data" type="text/turtle">
+    @prefix dc: &lt;http://dublincore.org/2012/06/14/dcelements#>.
+        &lt;> dc:title "Hello world" .
+&lt;/script></pre>
+        <p>
+            Note that the above turtle contains a relative IRI without 
+            providing a base IRI so it has to be provided as an argument to the 
+            parser. The following invocations assumes the matcher
+            graph to be in an element with id <code>matchers</code> and the data
+            to be in an element with id <code>data</code>, the result of the 
+            rendering will be added to an element with id <code>html</code>, note
+            that the window.location is passed both as the base-IRI to the parser
+            as well as as the IRI of the resource to be rendered.
+        </p>
+        <pre class="code">rdf.parseTurtle($("#matchers").text(), function (matchers) {
+    rdf.parseTurtle($("#data").text(), function (data) {
+        var rendered = new RDF2h(matchers).render(data, rdf.createNamedNode(window.location.toString()));
+        $("html").html(rendered);
+    }, window.location.toString());
+}, window.location.toString());</pre>
+        <a name="matchers"><h2>Defining Matchers</h2></a>
+        <p>
+            The matcher graph defines instances of <code>r2h:Matcher</code> that 
+            associate an arbitrary number of triple-patterns to one or more 
+            templates. More than one template may be provided to render the resource
+            differently in different contexts.<br/>
+            Currently only triples directly containing the matched resource can
+            be used, so every triple pattern contains the special resource 
+            <code>r2h:this</code> as subject or as object, i.e. as the value of 
+            the <code>r2h:subject</code> or the <code>r2h:object</code> property 
+            of the triple pattern.<br/>
+            To check if a Matcher matches a specified resource RDF2h will check if 
+            the data graph contains a tripe with the resource at the position 
+            indicated by <code>r2h:this</code> in the triple pattern and the other
+            specified elements of the triple. For a matcher to match each triple 
+            pattern must match at least one triple.<br/>
+            The matcher described by the following graph describes a Matcher
+            that matches resources of type <code>s:Event</code> that have a
+            <code>dc:title</code> property.
+        </p>
+        <pre class="code">@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix r2h: &lt;http://rdf2h.github.io/2015/rdf2h#> .
+@prefix dc: &lt;http://dublincore.org/2012/06/14/dcelements#>.
+@prefix s: &lt;http://schema.org/> .
+[ a r2h:Matcher ;
+  r2h:triplePattern [    
+    r2h:subject r2h:this;
+    r2h:predicate dc:title;
+  ];
+  r2h:triplePattern [    
+    r2h:subject r2h:this;
+    r2h:predicate rdf:type;
+    r2h:object s:Event;
+  ];
+  r2h:template [ 
+    r2h:context r2h:Default;
+    r2h:mustache "The event title: {{dc:title}}"
+  ]
+].</pre>
+        <h3>Order of matchers</h3>
+        <p>As multiple Matchers might match a resource RDF2h will put all 
+            matchers in an ordered list. The first mathching matcher will be 
+            used. The matcher graph can determine the order of the matcher by 
+            using the <code>r2h:before</code> predicate which expresses that
+            the subject should be matched before the object. It is up to the
+            matcher graph if it defines a complete list of matchers of just 
+            specifies some ordering constraints. The ordering of the matchers is
+            not defined among matchers that do not appear in <code>r2h:before</code>
+            statements or which are in a circular (unsatisfiable) <code>r2h:before</code>
+            construct.</p>
+        <h2>Templates</h2>
+        <p>Templates are defined using 
+            <a href="https://github.com/janl/mustache.js">mustache.js</a>, they 
+        can be expressed as RDF literals in the matcher graph or refrences by URI
+        (typically an URI with fragment identifier identifying a script element 
+        within the HTML document). The keys used are the following:</p>
+
+        <ol>
+            <li>The <a href="http://www.w3.org/TR/curie/">CURIE</a> of the 
+                property of the resource being rendered. This evaluates to the 
+                property values.</li>
+            <li>The full URI of the property of the resource being rendered 
+                between angle brackets (&lt; >). This evaluates to the 
+                property values.</li>
+            <li>Any of the above followed by by "&lt;-" to indicate that the 
+                property is to be followed in reverse direction, i.e. this will 
+                evaluate to the subject of triples with the resource being rendered
+                as object and the specified property as predicate.</li>
+            <li>Any of the above prefixed by "+" which evaluates to 
+                <code>true</code> if the expression without the "+" would 
+                evaluate to at least one value, to <code>false</code> otherwise</li>
+            <li>A single dot (".") denoting the current resource</li>
+            <li>The string ":render " followed by one of the above expression
+                denoting a resource and optionally a context. This expression will
+                evaluate to the results of rendering the specified resource.</li>
+            <li>The string ":continue". This will evaluate to the results of 
+                rendering the current resource applying only matchers that come 
+                after the matcher that resulted in the current template.</li>
+        </ol>
+        <p>For practical examples it is recommended to study the ones provided
+        on the <a href="index.html">try it out page</a>.</p>
+        <h2>License</h2>
+        <p>RDF2h was created at <a href="http://www.ti.bfh.ch/">Bern University of 
+                Applied Sciences</a> by <a href="https://github.com/retog">Reto Gmür</a>, inspired
+            by <a href="http://www.uduvudu.org">Uduvudu</a> and ideas of 
+            <a href="https://github.com/ktk">Adrian Gschwend</a>
+            and <a href="https://github.com/l00mi">Michael Luggen</a>. Many thanks to 
+            <a href=""https://www.bergnet.org/people/bergi/card#me">Thomas Bergwinkl</a>
+            for <a href="https://github.com/zazukoians/rdf-ext">Rrdf-ext</a>
+            and his continuous support.</p>
+        <p>It is licensed under the MIT license of which a copy is included.</p>
+    </body>
+</html>

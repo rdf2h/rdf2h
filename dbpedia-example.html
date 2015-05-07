@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Remote resource renderer</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/libs/rdf-ext/rdf-ext.js" type="text/javascript"></script>
+        <script src="js/libs/jquery/jquery.js"></script>
+        <script src="js/libs/mustache.js/mustache.js"></script>
+        <script src="rdf2h.js"></script>
+        <script id="matchers" type="text/turtle">
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+            @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .
+            @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.
+            [ a r2h:Matcher ;
+                    r2h:triplePattern [    
+                    r2h:subject r2h:this;
+                    r2h:predicate rdfs:label;
+                ];
+                r2h:template [ 
+                    r2h:context r2h:Default;
+                    r2h:mustache '''<h1>{{rdfs:label}}</h1>
+                    {{#rdfs:comment}}
+                            <p>Comment: {{.}}</p>
+                    {{/rdfs:comment}}'''
+                ]
+            ].
+
+        </script>
+
+        <script type="text/javascript">
+$(function () {
+    var matchersTtl = $("#matchers").text();
+    rdf.parseTurtle(matchersTtl, function (matchers) {
+        console.log(matchers.toString());
+        var store = new rdf.LdpStore();
+        $("#go").on("click", function () {
+            store.match(
+                    $("#graph").val(),
+                    null,
+                    null,
+                    null,
+                    function (data) {
+                        console.log(data.toString());
+                        var rendered = new RDF2h(matchers).render(data, rdf.createNamedNode($("#resource").val()));
+                        $("#result").html(rendered);
+                    });
+        });
+    }, window.location.toString());
+});
+
+        </script>
+    </head>
+    <body>
+        Resource: <input type="text" id="resource" value="http://dbpedia.org/resource/Berlin" /><br/>
+        Graph: <input type="text" id="graph" value="http://dbpedia.org/data/Berlin.ttl" /><br/>
+        <button id="go">Go</button>
+        <div id="result"></div>
+    </body>
+</html>
