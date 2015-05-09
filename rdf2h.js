@@ -10,13 +10,29 @@ function RDF2h(matcherGraph) {
     var unorderedMatchers = matcherType.in("http://www.w3.org/1999/02/22-rdf-syntax-ns#type").nodes();
     this.matchers = [];
     var self = this;
+    function getLaterNodes(cfn) {
+        var laterNodes = cfn.out("http://rdf2h.github.io/2015/rdf2h#before").nodes();
+        for (var i = 0; i < laterNodes.length; i++) {
+            var laterNode = cf.node(laterNodes[i]);
+            var transitives = getLaterNodes(laterNode);
+            for (var j = 0; j < transitives.length; j++) {
+                var transitive = transitives[j];
+                if (!laterNodes.some(function(e) { 
+                            return (transitive.equals(e));
+                        })) {  
+                    laterNodes.push(transitive);
+                }
+            }
+        }
+        return laterNodes;
+    }
     while (unorderedMatchers.length > 0) {
         var matcherToPlace = unorderedMatchers.pop();
-        var isBeforeNodes = cf.node(matcherToPlace).out("http://rdf2h.github.io/2015/rdf2h#before").nodes();
+        var laterNodes = getLaterNodes(cf.node(matcherToPlace));
         function getInsertPosition() {
             for (var i = 0; i < self.matchers.length; i++) {
                 //TODO check transitively
-                if (isBeforeNodes.some(function(e) { return (self.matchers[i].equals(e))})) {  
+                if (laterNodes.some(function(e) { return (self.matchers[i].equals(e))})) {  
                 //if (matcherGraph.filter(matcherToPlace, rdf.createNamedNode("http://rdf2h.github.io/2015/rdf2h#before"), self.matchers[i])) {
                     return i;
                 }
