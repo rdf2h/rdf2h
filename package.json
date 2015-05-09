@@ -1,0 +1,16 @@
+{
+    "name": "RDF2h",
+    "version": "0.0.1",
+    "author": "Reto Gmür",
+    "description": "Library to render RDF resources.",
+    "dependencies": {
+        "rdf-ext": "*",
+        "mustache": "*"
+    },
+    "devDependencies": {
+        "browserify": "latest"
+    },
+    "scripts": {
+        "build-js": "mkdir -p dist && browserify -d js/main.js > dist/rdf2h.js"
+    }
+}
