@@ -32,16 +32,14 @@
             <a href="index.html">go here</a>.
         </p>
         <h2>Including RDF2h in your page</h2>
-        <p>RDF2h depends on 
+        <p>RDF2h provides a js file aggregating its dependencies ( 
             <a href="https://github.com/zazukoians/rdf-ext">rdf-ext</a>
-            as well as on <a href="https://github.com/janl/mustache.js">mustache.js</a>.
-            So you have to include the following in the head of your HTML page 
-            (adapt the paths to much the location of the scripts):</p>
+            and <a href="https://github.com/janl/mustache.js">mustache.js</a>),
+            so you have to include the following in the head of your HTML page 
+            (adapt the paths to much the location of the file):</p>
 
         <div class="code">
-        &lt;script src="js/libs/rdf-ext/rdf-ext.js">&lt;/script><br/>
-        &lt;script src="js/libs/mustache.js/mustache.js">&lt;/script><br/>
-        &lt;script src="rdf2h.js">&lt;/script>
+        &lt;script src="dist/rdf2h.js">&lt;/script>
         </div>
         <p>RDF2h does not depend on <a href="http://jquery.com/">jQuery</a>, 
             however some of the examples in this manual use jQuery, so you may 
