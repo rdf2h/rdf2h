@@ -11,6 +11,6 @@
         "browserify": "latest"
     },
     "scripts": {
-        "build-js": "mkdir -p dist && browserify -d js/main.js > dist/rdf2h.js"
+        "install": "mkdir -p dist && browserify -d js/rdf2h.js > dist/rdf2h.js"
     }
 }

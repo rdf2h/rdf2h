@@ -230,4 +230,11 @@ RDF2h.resolveCurie = function(curie) {
     }
 
 };
-module.exports = RDF2h;
+
+if (typeof window !== 'undefined') {
+    window.RDF2h = RDF2h;
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = RDF2h;
+}
