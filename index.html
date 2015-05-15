@@ -32,8 +32,8 @@
 
                 var showSample = function (exampleId) {
                     $('#resource').val($("#" + exampleId.replace("-sample", "-resource")).text().trim());
-                    $('#matchers').text($("#" + exampleId.replace("-sample", "-matchers")).text().trim());
-                    $('#data').text($("#" + exampleId.replace("-sample", "-data")).text().trim());
+                    $('#matchers').val($("#" + exampleId.replace("-sample", "-matchers")).text().trim());
+                    $('#data').val($("#" + exampleId.replace("-sample", "-data")).text().trim());
                     $("#output-window").text("");
                     $("#output-window-html").html("");
                 }
