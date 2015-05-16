@@ -141,6 +141,13 @@ RDF2h.Renderee.prototype.toString = function () {
     return this.node.toString();
 }
 
+RDF2h.prototype.getRenderer = function (renderee) {
+    var template = this.getTemplate(renderee);
+    return function (renderee) {
+        return Mustache.render(template, renderee);
+    };
+}
+
 RDF2h.prototype.getTemplate = function (renderee) {
     var cf = rdf.cf.Graph(this.matcherGraph);
 
@@ -216,9 +223,9 @@ RDF2h.prototype.render = function (graph, node, mode, startMatcherIndex) {
         this.startMatcherIndex = 0;
     } else {
         this.startMatcherIndex = startMatcherIndex;
-    }
-    var template = this.getTemplate(renderee);
-    return Mustache.render(template, renderee);
+    } 
+    var renderer = this.getRenderer(renderee);
+    return renderer(renderee);
 }
 
 RDF2h.prefixMap = rdf.prefixes.addAll({
