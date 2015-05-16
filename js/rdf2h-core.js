@@ -142,13 +142,6 @@ RDF2h.Renderee.prototype.toString = function () {
 }
 
 RDF2h.prototype.getRenderer = function (renderee) {
-    var template = this.getTemplate(renderee);
-    return function (renderee) {
-        return Mustache.render(template, renderee);
-    };
-}
-
-RDF2h.prototype.getTemplate = function (renderee) {
     var cf = rdf.cf.Graph(this.matcherGraph);
 
     function matchPattern(cfTriplePattern) {
@@ -192,6 +185,11 @@ RDF2h.prototype.getTemplate = function (renderee) {
         var id = templateURI.substring(pageURIPrefix.length);
         return document.getElementById(id).textContent;
     }
+    function templateRenderer(template) {
+        return function (renderee) {
+            return Mustache.render(template, renderee);
+        };
+    }
     for (var i = this.startMatcherIndex; i < this.matchers.length; i++) {
         var matcher = this.matchers[i];
         var cfMatcher = cf.node(matcher);
@@ -204,15 +202,15 @@ RDF2h.prototype.getTemplate = function (renderee) {
                     out("http://rdf2h.github.io/2015/rdf2h#mustache").
                     nodes()[0];
             if (templateNode.interfaceName === "NamedNode") {
-                return resolveTemplateNode(templateNode.nominalValue)
+                return templateRenderer(resolveTemplateNode(templateNode.nominalValue));
             }
-            return templateNode.toLocaleString();
+            return templateRenderer(templateNode.toLocaleString());
         }
     }
     if (this.startMatcherIndex === 0) {
-        return '<div class="missingTemplate">No template found for &lt;{{.}}&gt;</div>';
+        return templateRenderer('<div class="missingTemplate">No template found for &lt;{{.}}&gt;</div>');
     } else {
-        return '<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt;</div>';
+        return templateRenderer('<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt;</div>');
     }
 }
 
