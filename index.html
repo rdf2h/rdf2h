@@ -98,7 +98,7 @@
                             <p>Occasionally the logicless templating provided by 
                                 Mustache is not enough, <a href="#sorting-sample" 
                                 class="sample-link">The sorting example</a> uses
-                                javaScript for rendering rather than Mustache.</p>
+                                a JavaScript template for doing the sorting.</p>
                             
                             <h2>External examples</h2>
                             
@@ -516,7 +516,22 @@ dbr:Sibylle_Pasche db:birthPlace dbr:Lucerne; foaf:givenName "Sibylle".
 @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .
 @prefix s: <http://schema.org/> .
 
-[ a r2h:Matcher ;
+[a r2h:Matcher ;
+  r2h:triplePattern [
+    r2h:subject r2h:this;
+    r2h:predicate s:knows;
+  ];
+  r2h:template [ 
+    r2h:context r2h:Default;
+    r2h:mustache '''
+<h3>{{.}} knows (sorted):</h3>
+<ul>{{{:continue}}}
+</ul>
+    '''
+  ];
+  r2h:before <sortedKnows>
+].
+<sortedKnows> a r2h:Matcher ;
   r2h:triplePattern [
     r2h:subject r2h:this;
     r2h:predicate s:knows;
@@ -524,20 +539,28 @@ dbr:Sibylle_Pasche db:birthPlace dbr:Lucerne; foaf:givenName "Sibylle".
   r2h:template [ 
     r2h:context r2h:Default;
     r2h:javaScript '''function(n) {
-        var result = "<h3>Knows (sorted):</h3>\\n<ul>\\n";
+        var result = "";
         var known = n.graphNode.out(RDF2h.resolveCurie("s:knows")).toArray();
         known.sort(function(a,b) {
-           return a.out(RDF2h.resolveCurie("s:givenName")).toString().localeCompare(b.out(RDF2h.resolveCurie("s:givenName")).toString());
+           var gn = RDF2h.resolveCurie("s:givenName");
+           return a.out(gn).toString().localeCompare(b.out(gn).toString());
         });
         known.forEach(function(k) {
-            result += "\\t<li>"+k.out(RDF2h.resolveCurie("s:givenName"))+"</li>\\n";
+            result += n.rdf2h.render(n.graph, k.nodes()[0], n.mode);
         });
-        result += "</ul>";
         return result;
     }'''
-  ]
-].
-
+  ].
+<person> a r2h:Matcher ;
+  r2h:triplePattern [
+    r2h:subject r2h:this;
+    r2h:predicate s:givenName;
+  ];
+  r2h:template [ 
+    r2h:context r2h:Default;
+    r2h:mustache '''
+<li>{{s:givenName}}</li>'''
+  ].
         </script>
 
         <script id="sorting-data" type="text/turtle">
