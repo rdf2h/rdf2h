@@ -195,16 +195,20 @@ RDF2h.prototype.getRenderer = function (renderee) {
         var cfMatcher = cf.node(matcher);
         if (matches(cfMatcher)) {
             renderee.currentMatcherIndex = i;
-            //TODO check the context of template
             //r2h:template seems not to work here
-            var templateNode = cfMatcher.
-                    out("http://rdf2h.github.io/2015/rdf2h#template").
-                    out("http://rdf2h.github.io/2015/rdf2h#mustache").
-                    nodes()[0];
-            if (templateNode.interfaceName === "NamedNode") {
-                return templateRenderer(resolveTemplateNode(templateNode.nominalValue));
+            var templateNodes = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#template").nodes();
+            for (var j = 0; j < templateNodes.length; j++) {
+                var templateNode = templateNodes[j];
+                var cfTemplate = cf.node(templateNode);
+                //TODO check the context of template
+                var mustacheNode = cfTemplate.
+                        out("http://rdf2h.github.io/2015/rdf2h#mustache").
+                        nodes()[0];
+                if (mustacheNode.interfaceName === "NamedNode") {
+                    return templateRenderer(resolveTemplateNode(mustacheNode.nominalValue));
+                }
+                return templateRenderer(mustacheNode.toLocaleString());
             }
-            return templateRenderer(templateNode.toLocaleString());
         }
     }
     if (this.startMatcherIndex === 0) {
@@ -212,6 +216,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
     } else {
         return templateRenderer('<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt;</div>');
     }
+
 }
 
 RDF2h.prototype.render = function (graph, node, mode, startMatcherIndex) {
@@ -221,7 +226,7 @@ RDF2h.prototype.render = function (graph, node, mode, startMatcherIndex) {
         this.startMatcherIndex = 0;
     } else {
         this.startMatcherIndex = startMatcherIndex;
-    } 
+    }
     var renderer = this.getRenderer(renderee);
     return renderer(renderee);
 }
