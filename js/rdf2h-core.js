@@ -201,6 +201,12 @@ RDF2h.prototype.getRenderer = function (renderee) {
                 var templateNode = templateNodes[j];
                 var cfTemplate = cf.node(templateNode);
                 //TODO check the context of template
+                var jsNode = cfTemplate.
+                        out("http://rdf2h.github.io/2015/rdf2h#javaScript").
+                        nodes()[0];
+                if (jsNode) {
+                    return eval("var f = "+jsNode.nominalValue+";f");
+                }
                 var mustacheNode = cfTemplate.
                         out("http://rdf2h.github.io/2015/rdf2h#mustache").
                         nodes()[0];

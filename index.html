@@ -93,7 +93,12 @@
                             
                             <p>The :continue directive can be used to apply 
                                 multiple templates to the same resource: <a href="#continue-sample" 
-                                class="sample-link">The continue example</a> renders a small DBpedia extract.
+                                class="sample-link">The continue example</a> renders a small DBpedia extract.</p>
+                            
+                            <p>Occasionally the logicless templating provided by 
+                                Mustache is not enough, <a href="#sorting-sample" 
+                                class="sample-link">The sorting example</a> uses
+                                javaScript for rendering rather than Mustache.</p>
                             
                             <h2>External examples</h2>
                             
@@ -496,6 +501,56 @@ the same name.'''.
 
 dbr:Robert_Wuellner db:birthPlace dbr:Lucerne; foaf:givenName "Robert".
 dbr:Sibylle_Pasche db:birthPlace dbr:Lucerne; foaf:givenName "Sibylle".
+
+        </script>
+        
+        
+                
+        <script id="sorting-resource" type="text/iri">
+            http://example.org/beta
+        </script>
+
+        <script id="sorting-matchers" type="text/turtle">
+@base <http://styles.example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .
+@prefix s: <http://schema.org/> .
+
+[ a r2h:Matcher ;
+  r2h:triplePattern [
+    r2h:subject r2h:this;
+    r2h:predicate s:knows;
+  ];
+  r2h:template [ 
+    r2h:context r2h:Default;
+    r2h:javaScript '''function(n) {
+        var result = "<h3>Knows (sorted):</h3>\\n<ul>\\n";
+        var known = n.graphNode.out(RDF2h.resolveCurie("s:knows")).toArray();
+        known.sort(function(a,b) {
+           return a.out(RDF2h.resolveCurie("s:givenName")).toString().localeCompare(b.out(RDF2h.resolveCurie("s:givenName")).toString());
+        });
+        known.forEach(function(k) {
+            result += "\\t<li>"+k.out(RDF2h.resolveCurie("s:givenName"))+"</li>\\n";
+        });
+        result += "</ul>";
+        return result;
+    }'''
+  ]
+].
+
+        </script>
+
+        <script id="sorting-data" type="text/turtle">
+@base <http://example.org/> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix s: <http://schema.org/> .
+@prefix eg: <http://example.org/ontology/> .
+
+<beta> s:knows
+[ s:givenName "Bob"],
+[ s:givenName "Alice"],
+[ s:givenName "Carl"].
+
 
         </script>
         
