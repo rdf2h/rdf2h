@@ -164,7 +164,7 @@ rdf.parseTurtle(matchersTurtle, function (matchers) {
             statements or which are in a circular (unsatisfiable) <code>r2h:before</code>
             construct.</p>
         <h2>Templates</h2>
-        <p>Templates are defined using 
+        <p>Templates are normally defined using 
             <a href="https://github.com/janl/mustache.js">mustache.js</a>, they 
         can be expressed as RDF literals in the matcher graph or refrences by URI
         (typically an URI with fragment identifier identifying a script element 
@@ -192,6 +192,23 @@ rdf.parseTurtle(matchersTurtle, function (matchers) {
                 rendering the current resource applying only matchers that come 
                 after the matcher that resulted in the current template.</li>
         </ol>
+        <p>As an alternative to defining templates with mustache a javascript function.</p>
+        <pre class="code">
+            r2h:javaScript '''function(n) {
+                var result = "";
+                var known = n.graphNode.out(RDF2h.resolveCurie("s:knows")).toArray();
+                known.sort(function(a,b) {
+                   var gn = RDF2h.resolveCurie("s:givenName");
+                   return a.out(gn).toString().localeCompare(b.out(gn).toString());
+                });
+                known.forEach(function(k) {
+                    result += n.rdf2h.render(n.graph, k.nodes()[0], n.mode);
+                });
+                return result;
+            }'''
+        </pre>
+        <p>The argument `n` , has the properties `graph`, `node` and the clownface 
+            node/graph as `graphNode`.</p>
         <h3>Prefixes</h3>
         <p>For many serialization formats RDF2h learns the prefixes when rdf-ex
         parses data and matchers, so no explicit registration is necessary to
