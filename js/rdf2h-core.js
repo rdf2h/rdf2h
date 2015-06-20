@@ -72,6 +72,9 @@ function RDF2h(matcherGraph) {
                 var splits = name.split(" ");
                 var nodePath = splits[1];
                 var subMode = splits[2];
+                if (subMode) {
+                    subMode = RDF2h.resolveCurie(subMode);
+                }
                 if (!subMode) {
                     subMode = mode;
                 }
@@ -164,7 +167,20 @@ RDF2h.prototype.getRenderer = function (renderee) {
             console.error("Triple pattern must have r2h:this as subject or object");
         }
     }
+    function matchesMode(cfMatcher) {
+        var modes = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#mode").nodes();
+        if (modes.length === 0) {
+            //console.log("matcher "+cfMatcher+" specifies no mode, thus accepting it for "+renderee.mode);
+            return true;
+        }
+        return modes.some(function(mode) {
+            return renderee.mode == mode;
+        });
+    }
     function matches(cfMatcher) {
+        if (!matchesMode(cfMatcher)) {
+            return false;
+        }
         var triplePatterns = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#triplePattern").nodes();
         for (var i = 0; i < triplePatterns.length; i++) {
             var cfTp = cf.node(triplePatterns[i]);
