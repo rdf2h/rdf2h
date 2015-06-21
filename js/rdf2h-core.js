@@ -221,7 +221,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
                         out("http://rdf2h.github.io/2015/rdf2h#javaScript").
                         nodes()[0];
                 if (jsNode) {
-                    return eval("var f = "+jsNode.nominalValue+";f");
+                    return eval("var f = "+jsNode.nominalValue+";");
                 }
                 var mustacheNode = cfTemplate.
                         out("http://rdf2h.github.io/2015/rdf2h#mustache").
