@@ -545,7 +545,7 @@ dbr:Sibylle_Pasche db:birthPlace dbr:Lucerne; foaf:givenName "Sibylle".
            return a.out(gn).toString().localeCompare(b.out(gn).toString());
         });
         known.forEach(function(k) {
-            result += n.rdf2h.render(n.graph, k.nodes()[0], n.mode);
+            result += n.rdf2h.render(n.graph, k.nodes()[0], n.context);
         });
         return result;
     }'''

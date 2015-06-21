@@ -55,7 +55,7 @@ function RDF2h(matcherGraph) {
             var rdf2h = this.view.rdf2h;
             var graphNode = this.view.graphNode;
             var graph = this.view.graph;
-            var mode = this.view.mode;
+            var context = this.view.context;
             var currentMatcherIndex = this.view.currentMatcherIndex;
             function resolvePath(path) {
                 if (path === ".") {
@@ -71,33 +71,33 @@ function RDF2h(matcherGraph) {
             if (name.startsWith(":render ")) {
                 var splits = name.split(" ");
                 var nodePath = splits[1];
-                var subMode = splits[2];
-                if (subMode) {
-                    subMode = RDF2h.resolveCurie(subMode);
+                var subContext = splits[2];
+                if (subContext) {
+                    subContext = RDF2h.resolveCurie(subContext);
                 }
-                if (!subMode) {
-                    subMode = mode;
+                if (!subContext) {
+                    subContext = context;
                 }
                 var resolvedNodes = resolvePath(nodePath);
                 if (resolvedNodes.length > 1) {
                     console.log("Argument of render evaluates to more than one node!")
                 }
                 if (resolvedNodes.length > 0) {
-                    return rdf2h.render(graph, resolvedNodes[0], subMode)
+                    return rdf2h.render(graph, resolvedNodes[0], subContext)
                 } else {
                     return "";
                 }
             }
             if (name.startsWith(":continue")) {
                 var splits = name.split(" ");
-                var subMode = splits[1];
-                if (!subMode) {
-                    subMode = mode;
+                var subContext = splits[1];
+                if (!subContext) {
+                    subContext = context;
                 }
                 if (graphNode.nodes().length > 1) {
                     console.log(":continue invoked in context with more than one node, this shouldn't be possible!")
                 }
-                return rdf2h.render(graph, graphNode.nodes()[0], subMode, currentMatcherIndex + 1);
+                return rdf2h.render(graph, graphNode.nodes()[0], subContext, currentMatcherIndex + 1);
 
             }
             if (name.startsWith("+")) {
@@ -106,10 +106,10 @@ function RDF2h(matcherGraph) {
             }
             var nodes = resolvePath(name);
             if (nodes.length === 1) {
-                return new RDF2h.Renderee(rdf2h, graph, nodes[0], mode);
+                return new RDF2h.Renderee(rdf2h, graph, nodes[0], context);
             } else {
                 return nodes.map(function (node) {
-                    return new RDF2h.Renderee(rdf2h, graph, node, mode);
+                    return new RDF2h.Renderee(rdf2h, graph, node, context);
                 });
             }
             /*var node = this.view;
@@ -125,7 +125,7 @@ function RDF2h(matcherGraph) {
 })();
 
 
-RDF2h.Renderee = function (rdf2h, graph, node, mode) {
+RDF2h.Renderee = function (rdf2h, graph, node, context) {
     if (!node) {
         throw "no node specficied!";
     }
@@ -135,7 +135,7 @@ RDF2h.Renderee = function (rdf2h, graph, node, mode) {
     this.rdf2h = rdf2h;
     this.graph = graph;
     this.node = node;
-    this.mode = mode;
+    this.context = context;
     var cf = rdf.cf.Graph(graph);
     this.graphNode = cf.node(node);
 };
@@ -167,20 +167,17 @@ RDF2h.prototype.getRenderer = function (renderee) {
             console.error("Triple pattern must have r2h:this as subject or object");
         }
     }
-    function matchesMode(cfMatcher) {
-        var modes = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#mode").nodes();
-        if (modes.length === 0) {
-            //console.log("matcher "+cfMatcher+" specifies no mode, thus accepting it for "+renderee.mode);
+    function matchesContext(cfTemplate) {
+        var contexts = cfTemplate.out("http://rdf2h.github.io/2015/rdf2h#context").nodes();
+        if (contexts.length === 0) {
+            //console.log("matcher "+cfMatcher+" specifies no context, thus accepting it for "+renderee.context);
             return true;
         }
-        return modes.some(function(mode) {
-            return renderee.mode == mode;
+        return contexts.some(function(context) {
+            return renderee.context == context;
         });
     }
     function matches(cfMatcher) {
-        if (!matchesMode(cfMatcher)) {
-            return false;
-        }
         var triplePatterns = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#triplePattern").nodes();
         for (var i = 0; i < triplePatterns.length; i++) {
             var cfTp = cf.node(triplePatterns[i]);
@@ -216,12 +213,14 @@ RDF2h.prototype.getRenderer = function (renderee) {
             for (var j = 0; j < templateNodes.length; j++) {
                 var templateNode = templateNodes[j];
                 var cfTemplate = cf.node(templateNode);
-                //TODO check the context of template
+                if (!matchesContext(cfTemplate)) {
+                    continue;
+                }
                 var jsNode = cfTemplate.
                         out("http://rdf2h.github.io/2015/rdf2h#javaScript").
                         nodes()[0];
                 if (jsNode) {
-                    return eval("var f = "+jsNode.nominalValue+";");
+                    return eval("var f = "+jsNode.nominalValue+"; f;");
                 }
                 var mustacheNode = cfTemplate.
                         out("http://rdf2h.github.io/2015/rdf2h#mustache").
@@ -241,9 +240,12 @@ RDF2h.prototype.getRenderer = function (renderee) {
 
 }
 
-RDF2h.prototype.render = function (graph, node, mode, startMatcherIndex) {
+RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
+    if (!context) {
+        context = RDF2h.resolveCurie("r2h:Default");
+    }
     //wrap all in one object that gets special care by lookup
-    var renderee = new RDF2h.Renderee(this, graph, node, mode);
+    var renderee = new RDF2h.Renderee(this, graph, node, context);
     if (!startMatcherIndex) {
         this.startMatcherIndex = 0;
     } else {
