@@ -68,6 +68,15 @@ function RDF2h(matcherGraph) {
                     }
                 }
             }
+            if (name.startsWith("@prefix ")) {
+                var splits = name.split(" ");
+                var prefixPart = splits[1];
+                var iriPart = splits[2];
+                var prefix = prefixPart.substring(0, prefixPart.length -1);
+                var iri = iriPart.substring(1, iriPart.length -1);
+                RDF2h.prefixMap[prefix] = iri;
+                return "";
+            }
             if (name.startsWith(":render ")) {
                 var splits = name.split(" ");
                 var nodePath = splits[1];
