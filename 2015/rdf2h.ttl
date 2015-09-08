@@ -1,0 +1,11 @@
+@base <http://rdf2h.github.io/2015/rdf2h> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<Matcher> a rdfs:Class;
+   skos:prefLabel "Matcher"@en;
+   skos:definition "A matcher matches some resources and is associated to one or several resources suitable for rendering the matched resources."@en;
+   rdfs:comment "TODO: add its properties to this ontology"@de.
