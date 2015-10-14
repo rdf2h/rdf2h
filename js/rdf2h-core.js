@@ -100,6 +100,9 @@ function RDF2h(matcherGraph) {
             if (name.startsWith(":continue")) {
                 var splits = name.split(" ");
                 var subContext = splits[1];
+                if (subContext) {
+                    subContext = RDF2h.resolveCurie(subContext);
+                }
                 if (!subContext) {
                     subContext = context;
                 }
