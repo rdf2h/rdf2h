@@ -275,6 +275,8 @@ RDF2h.resolveCurie = function (curie) {
     var suffix = splits[1];
     if (RDF2h.prefixMap[prefix]) {
         return RDF2h.prefixMap[prefix] + suffix;
+    } else {
+        return curie;
     }
 
 };
