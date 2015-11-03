@@ -3,10 +3,12 @@
 
 var rdf = require("rdf-ext")();
 var Mustache = require("mustache");
+var Logger = require("./logger.js");
 
 rdf.setPrefix("r2h", "http://rdf2h.github.io/2015/rdf2h#");
 
 function RDF2h(matcherGraph) {
+    RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
     this.matcherGraph = matcherGraph;
     //use cf.in on r2h:Matcher create array of matchers
     var cf = rdf.cf.Graph(matcherGraph);
@@ -45,8 +47,10 @@ function RDF2h(matcherGraph) {
         }
         this.matchers.splice(getInsertPosition(), 0, matcherToPlace);
     }
-    console.log(this.matchers);
+    RDF2h.logger.debug("Constructed RDF2h with the following matchers: ", this.matchers);
 }
+
+RDF2h.logger = new Logger();
 
 (function () {
     var origLokup = Mustache.Context.prototype.lookup;
@@ -89,7 +93,7 @@ function RDF2h(matcherGraph) {
                 }
                 var resolvedNodes = resolvePath(nodePath);
                 if (resolvedNodes.length > 1) {
-                    console.log("Argument of render evaluates to more than one node!")
+                    RDF2h.logger.warn("Argument of render evaluates to more than one node!")
                 }
                 if (resolvedNodes.length > 0) {
                     return rdf2h.render(graph, resolvedNodes[0], subContext)
@@ -107,7 +111,7 @@ function RDF2h(matcherGraph) {
                     subContext = context;
                 }
                 if (graphNode.nodes().length > 1) {
-                    console.log(":continue invoked in context with more than one node, this shouldn't be possible!")
+                    RDF2h.logger.warn(":continue invoked in context with more than one node, this shouldn't be possible!")
                 }
                 return rdf2h.render(graph, graphNode.nodes()[0], subContext, currentMatcherIndex + 1);
 
@@ -182,11 +186,14 @@ RDF2h.prototype.getRenderer = function (renderee) {
     function matchesContext(cfTemplate) {
         var contexts = cfTemplate.out("http://rdf2h.github.io/2015/rdf2h#context").nodes();
         if (contexts.length === 0) {
-            //console.log("matcher "+cfMatcher+" specifies no context, thus accepting it for "+renderee.context);
+            RDF2h.logger.trace("template "+cfTemplate+" specifies no context, thus accepting it for "+renderee.context);
             return true;
         }
         return contexts.some(function(context) {
-            return renderee.context == context;
+            if (renderee.context == context) {
+                RDF2h.logger.trace("template "+cfTemplate+" matches the context "+renderee.context);
+                return true;
+            }
         });
     }
     function matches(cfMatcher) {
@@ -194,6 +201,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         for (var i = 0; i < triplePatterns.length; i++) {
             var cfTp = cf.node(triplePatterns[i]);
             if (!matchPattern(cfTp)) {
+                RDF2h.logger.debug("Matcher "+cfMatcher+" doesn't has tripple patterns matching "+renderee.graphNode);
                 return false;
             }
         }
@@ -242,6 +250,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
                 }
                 return templateRenderer(mustacheNode.toLocaleString());
             }
+            RDF2h.logger.debug("Matcher "+cfMatcher+" has not template with matching context");
         }
     }
     if (this.startMatcherIndex === 0) {
@@ -272,7 +281,7 @@ RDF2h.prefixMap = rdf.prefixes.addAll({
 });
 
 RDF2h.resolveCurie = function (curie) {
-    console.log("resolving " + curie);
+    RDF2h.logger.debug("resolving " + curie);
     var splits = curie.split(":");
     var prefix = splits[0];
     var suffix = splits[1];
