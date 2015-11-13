@@ -2,3 +2,6 @@ sudo: false
 language: node_js
 node_js:
   - "4.1"
+branches:
+  only: 
+    - gh-pages
