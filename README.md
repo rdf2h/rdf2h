@@ -1,4 +1,4 @@
-RDF2h
+RDF2h [![Build Status](https://travis-ci.org/rdf2h/rdf2h.svg)](https://travis-ci.org/rdf2h/rdf2h)
 -------
 
 RDF2h is a tool for rendering RDF resources using mustache templates.
