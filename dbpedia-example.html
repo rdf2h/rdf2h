@@ -8,6 +8,7 @@
         <script src="dist/rdf-ext.js"></script>
         <script src="dist/rdf2h.js"></script>
         <script src="dist/n3-parser.js"></script>
+        <script src="dist/rdf-store-ldp.js"></script>
         <script id="matchers" type="text/turtle">
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
@@ -34,13 +35,13 @@ $(function () {
     var matchersTtl = $("#matchers").text();
     N3Parser.parse(matchersTtl).then(function (matchers) {
         console.log(matchers.toString());
-        var store = new rdf.LdpStore();
+        var store = new LdpStore();
         $("#go").on("click", function () {
             store.match(
+                    null,
+                    null,
+                    null,
                     $("#graph").val(),
-                    null,
-                    null,
-                    null,
                     function (data) {
                         console.log(data.toString());
                         var rendered = new RDF2h(matchers).render(data, rdf.createNamedNode($("#resource").val()));
