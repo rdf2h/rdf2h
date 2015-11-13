@@ -4,13 +4,18 @@
     "author": "Reto Gmür",
     "description": "Library to render RDF resources.",
     "dependencies": {
-        "rdf-ext": "*",
-        "mustache": "*"
-    },
-    "devDependencies": {
+        "rdf-ext": "0.3.0-rc1",
+        "clownface": "0.3.0-rc1",
+        "mustache": "*",
+        "rdf-parser-n3": "0.3.0-rc1",
+        "rdf-parser-n3-browser": "0.3.0-rc1",
         "browserify": "latest"
     },
     "scripts": {
-        "install": "mkdir -p dist && browserify -d js/rdf2h-core.js js/logger.js > dist/rdf2h.js"
+        "install": "mkdir -p dist && browserify -d js/rdf2h-core.js js/logger.js > dist/rdf2h.js && cp node_modules/rdf-parser-n3-browser/dist/n3-parser.js dist/n3-parser.js",
+        "test": "node_modules/.bin/mocha"
+    },
+    "devDependencies": {
+        "mocha": "^2.3.3"
     }
 }

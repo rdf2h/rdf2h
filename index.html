@@ -15,13 +15,14 @@
 
         <script src="js/libs/jquery/jquery.js"></script>
         <script src="dist/rdf2h.js"></script>
+        <script src="node_modules/rdf-parser-n3/dist/n3-parser.js"></script>
         <script>
             $(function () {
                 $(".apply").on("click", function () {
-                    rdf.parseTurtle($("#data").val(), function (data) {
+                    N3Parser.parse($("#data").val()).then(function (data) {
                         console.log(data.toString());
                         var resource = rdf.createNamedNode($('#resource').val());
-                        rdf.parseTurtle($("#matchers").val(), function (matchers) {
+                        N3Parser.parse($("#matchers").val()).then(function (matchers) {
                             var rdf2h = new RDF2h(matchers);
                             var rendered = rdf2h.render(data, resource);
                             $("#output-window").text(rendered);

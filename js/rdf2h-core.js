@@ -1,7 +1,8 @@
 /* global rdf, Mustache */
 
 
-var rdf = require("rdf-ext")();
+var rdf = require("rdf-ext");
+var clownface = require("clownface");
 var Mustache = require("mustache");
 var Logger = require("./logger.js");
 
@@ -11,7 +12,7 @@ function RDF2h(matcherGraph) {
     RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
     this.matcherGraph = matcherGraph;
     //use cf.in on r2h:Matcher create array of matchers
-    var cf = rdf.cf.Graph(matcherGraph);
+    var cf = clownface.Graph(matcherGraph);
     var matcherType = cf.node("http://rdf2h.github.io/2015/rdf2h#Matcher");
     var unorderedMatchers = matcherType.in("http://www.w3.org/1999/02/22-rdf-syntax-ns#type").nodes();
     this.matchers = [];
@@ -152,16 +153,19 @@ RDF2h.Renderee = function (rdf2h, graph, node, context) {
     this.graph = graph;
     this.node = node;
     this.context = context;
-    var cf = rdf.cf.Graph(graph);
+    var cf = clownface.Graph(graph);
     this.graphNode = cf.node(node);
 };
 
 RDF2h.Renderee.prototype.toString = function () {
+    if (this.node.nominalValue) {
+        return this.node.nominalValue;
+    }
     return this.node.toString();
 }
 
 RDF2h.prototype.getRenderer = function (renderee) {
-    var cf = rdf.cf.Graph(this.matcherGraph);
+    var cf = clownface.Graph(this.matcherGraph);
 
     function matchPattern(cfTriplePattern) {
         function isThis(node) {
@@ -248,7 +252,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
                 if (mustacheNode.interfaceName === "NamedNode") {
                     return templateRenderer(resolveTemplateNode(mustacheNode.nominalValue));
                 }
-                return templateRenderer(mustacheNode.toLocaleString());
+                return templateRenderer(mustacheNode.nominalValue);
             }
             RDF2h.logger.debug("Matcher "+cfMatcher+" has not template with matching context");
         }
@@ -276,9 +280,11 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
     return renderer(renderee);
 }
 
-RDF2h.prefixMap = rdf.prefixes.addAll({
+RDF2h.prefixMap = rdf.prefixes;
+RDF2h.prefixMap["s"] = "http://schema.org/";
+/*rdf.prefixes.addAll({
     "s": "http://schema.org/"
-});
+});*/
 
 RDF2h.resolveCurie = function (curie) {
     RDF2h.logger.debug("resolving " + curie);
