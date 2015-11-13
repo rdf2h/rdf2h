@@ -5,7 +5,9 @@
         <title>Remote resource renderer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="js/libs/jquery/jquery.js"></script>
+        <script src="dist/rdf-ext.js"></script>
         <script src="dist/rdf2h.js"></script>
+        <script src="dist/n3-parser.js"></script>
         <script id="matchers" type="text/turtle">
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
             @prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
@@ -30,7 +32,7 @@
         <script type="text/javascript">
 $(function () {
     var matchersTtl = $("#matchers").text();
-    rdf.parseTurtle(matchersTtl, function (matchers) {
+    N3Parser.parse(matchersTtl).then(function (matchers) {
         console.log(matchers.toString());
         var store = new rdf.LdpStore();
         $("#go").on("click", function () {
