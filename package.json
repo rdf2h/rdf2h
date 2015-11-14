@@ -7,7 +7,8 @@
         "rdf-ext": "0.3.0-rc1",
         "clownface": "0.3.0-rc1",
         "mustache": "*",
-        "rdf-parser-n3": "0.3.0-rc1"
+        "rdf-parser-n3": "0.3.0-rc1",
+        "rdf-store-ldp-browser": "0.3.0-rc1b"
     },
     "scripts": {
         "prepublish": "mkdir -p dist && browserify --external rdf-ext -d js/rdf2h-core.js js/logger.js > dist/rdf2h.js && cp node_modules/rdf-parser-n3-browser/dist/n3-parser.js dist/n3-parser.js&& cp node_modules/rdf-store-ldp-browser/dist/rdf-store-ldp.js dist/rdf-store-ldp.js",
@@ -16,7 +17,6 @@
     "devDependencies": {
         "browserify": "latest",
         "mocha": "^2.3.3",
-        "rdf-store-ldp-browser": "0.3.0-rc1b",
         "rdf-parser-n3-browser": "0.3.0-rc1c"
     }
 }
