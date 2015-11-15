@@ -3,11 +3,9 @@ var LdpStore = require('rdf-store-ldp');
 if (typeof window !== 'undefined') {
     window.LdpStore = LdpStore;
 }
-},{"rdf-store-ldp":31}],2:[function(require,module,exports){
+},{"rdf-store-ldp":29}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
-arguments[4][2][0].apply(exports,arguments)
-},{"dup":2}],4:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -1476,7 +1474,7 @@ function utf8ToBytes (string, units) {
       }
 
       // valid surrogate pair
-      codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
+      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
     } else if (leadSurrogate) {
       // valid bmp char, but last char was a lead
       if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
@@ -1555,7 +1553,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":5,"ieee754":6,"is-array":7}],5:[function(require,module,exports){
+},{"base64-js":4,"ieee754":5,"is-array":6}],4:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1681,7 +1679,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -1767,7 +1765,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 /**
  * isArray
@@ -1802,7 +1800,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2102,7 +2100,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2127,7 +2125,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * Determine if an object is Buffer
  *
@@ -2146,240 +2144,12 @@ module.exports = function (obj) {
     ))
 }
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],12:[function(require,module,exports){
-(function (process){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
-  }
-
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
-
-  return parts;
-}
-
-// Split a filename into [root, dir, basename, ext], unix version
-// 'root' is just a slash, or nothing.
-var splitPathRe =
-    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
-var splitPath = function(filename) {
-  return splitPathRe.exec(filename).slice(1);
-};
-
-// path.resolve([from ...], to)
-// posix version
-exports.resolve = function() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : process.cwd();
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-};
-
-// path.normalize(path)
-// posix version
-exports.normalize = function(path) {
-  var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
-  }), !isAbsolute).join('/');
-
-  if (!path && !isAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isAbsolute ? '/' : '') + path;
-};
-
-// posix version
-exports.isAbsolute = function(path) {
-  return path.charAt(0) === '/';
-};
-
-// posix version
-exports.join = function() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-};
-
-
-// path.relative(from, to)
-// posix version
-exports.relative = function(from, to) {
-  from = exports.resolve(from).substr(1);
-  to = exports.resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-};
-
-exports.sep = '/';
-exports.delimiter = ':';
-
-exports.dirname = function(path) {
-  var result = splitPath(path),
-      root = result[0],
-      dir = result[1];
-
-  if (!root && !dir) {
-    // No dirname whatsoever
-    return '.';
-  }
-
-  if (dir) {
-    // It has a dirname, strip trailing slash
-    dir = dir.substr(0, dir.length - 1);
-  }
-
-  return root + dir;
-};
-
-
-exports.basename = function(path, ext) {
-  var f = splitPath(path)[2];
-  // TODO: make this comparison case-insensitive on windows?
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-};
-
-
-exports.extname = function(path) {
-  return splitPath(path)[3];
-};
-
-function filter (xs, f) {
-    if (xs.filter) return xs.filter(f);
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) res.push(xs[i]);
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b'
-    ? function (str, start, len) { return str.substr(start, len) }
-    : function (str, start, len) {
-        if (start < 0) start = str.length + start;
-        return str.substr(start, len);
-    }
-;
-
-}).call(this,require('_process'))
-},{"_process":13}],13:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -2472,10 +2242,10 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],14:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":15}],15:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":13}],13:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -2559,7 +2329,7 @@ function forEach (xs, f) {
   }
 }
 
-},{"./_stream_readable":17,"./_stream_writable":19,"core-util-is":20,"inherits":9,"process-nextick-args":21}],16:[function(require,module,exports){
+},{"./_stream_readable":15,"./_stream_writable":17,"core-util-is":18,"inherits":8,"process-nextick-args":19}],14:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -2588,7 +2358,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":18,"core-util-is":20,"inherits":9}],17:[function(require,module,exports){
+},{"./_stream_transform":16,"core-util-is":18,"inherits":8}],15:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -3565,7 +3335,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":15,"_process":13,"buffer":4,"core-util-is":20,"events":8,"inherits":9,"isarray":11,"process-nextick-args":21,"string_decoder/":28,"util":3}],18:[function(require,module,exports){
+},{"./_stream_duplex":13,"_process":11,"buffer":3,"core-util-is":18,"events":7,"inherits":8,"isarray":10,"process-nextick-args":19,"string_decoder/":26,"util":2}],16:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -3764,7 +3534,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":15,"core-util-is":20,"inherits":9}],19:[function(require,module,exports){
+},{"./_stream_duplex":13,"core-util-is":18,"inherits":8}],17:[function(require,module,exports){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
 // the drain event emission and buffering.
@@ -4293,7 +4063,7 @@ function endWritable(stream, state, cb) {
   state.ended = true;
 }
 
-},{"./_stream_duplex":15,"buffer":4,"core-util-is":20,"events":8,"inherits":9,"process-nextick-args":21,"util-deprecate":22}],20:[function(require,module,exports){
+},{"./_stream_duplex":13,"buffer":3,"core-util-is":18,"events":7,"inherits":8,"process-nextick-args":19,"util-deprecate":20}],18:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4403,7 +4173,7 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 }).call(this,{"isBuffer":require("../../../../insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../insert-module-globals/node_modules/is-buffer/index.js":10}],21:[function(require,module,exports){
+},{"../../../../insert-module-globals/node_modules/is-buffer/index.js":9}],19:[function(require,module,exports){
 (function (process){
 'use strict';
 module.exports = nextTick;
@@ -4420,7 +4190,7 @@ function nextTick(fn) {
 }
 
 }).call(this,require('_process'))
-},{"_process":13}],22:[function(require,module,exports){
+},{"_process":11}],20:[function(require,module,exports){
 (function (global){
 
 /**
@@ -4491,10 +4261,10 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":16}],24:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":14}],22:[function(require,module,exports){
 var Stream = (function (){
   try {
     return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
@@ -4508,13 +4278,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":15,"./lib/_stream_passthrough.js":16,"./lib/_stream_readable.js":17,"./lib/_stream_transform.js":18,"./lib/_stream_writable.js":19}],25:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":13,"./lib/_stream_passthrough.js":14,"./lib/_stream_readable.js":15,"./lib/_stream_transform.js":16,"./lib/_stream_writable.js":17}],23:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":18}],26:[function(require,module,exports){
+},{"./lib/_stream_transform.js":16}],24:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":19}],27:[function(require,module,exports){
+},{"./lib/_stream_writable.js":17}],25:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4643,7 +4413,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":8,"inherits":9,"readable-stream/duplex.js":14,"readable-stream/passthrough.js":23,"readable-stream/readable.js":24,"readable-stream/transform.js":25,"readable-stream/writable.js":26}],28:[function(require,module,exports){
+},{"events":7,"inherits":8,"readable-stream/duplex.js":12,"readable-stream/passthrough.js":21,"readable-stream/readable.js":22,"readable-stream/transform.js":23,"readable-stream/writable.js":24}],26:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4866,14 +4636,14 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":4}],29:[function(require,module,exports){
+},{"buffer":3}],27:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],30:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -5463,7 +5233,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":29,"_process":13,"inherits":9}],31:[function(require,module,exports){
+},{"./support/isBuffer":27,"_process":11,"inherits":8}],29:[function(require,module,exports){
 var mimeTypeUtil = require('rdf-mime-type-util')
 var rdf = require('rdf-ext')
 var util = require('util')
@@ -5633,7 +5403,7 @@ LdpStore.prototype.merge = function (iri, graph, callback, options) {
 
 module.exports = LdpStore
 
-},{"rdf-ext":"rdf-ext","rdf-mime-type-util":32,"rdf-store-abstract":138,"util":30}],32:[function(require,module,exports){
+},{"rdf-ext":"rdf-ext","rdf-mime-type-util":30,"rdf-store-abstract":135,"util":28}],30:[function(require,module,exports){
 var JsonLdParser = require('rdf-parser-jsonld')
 var MicrodataParser = require('rdf-parser-microdata')
 var N3Parser = require('rdf-parser-n3')
@@ -5773,7 +5543,7 @@ module.exports = {
   SerializerUtil: SerializerUtil
 }
 
-},{"rdf-parser-jsonld":33,"rdf-parser-microdata":53,"rdf-parser-n3":76,"rdf-parser-rdfxml":100,"rdf-serializer-jsonld":122,"rdf-serializer-n3":124,"rdf-serializer-ntriples":134,"rdf-serializer-sparql-update":136}],33:[function(require,module,exports){
+},{"rdf-parser-jsonld":31,"rdf-parser-microdata":50,"rdf-parser-n3":73,"rdf-parser-rdfxml":97,"rdf-serializer-jsonld":119,"rdf-serializer-n3":121,"rdf-serializer-ntriples":131,"rdf-serializer-sparql-update":133}],31:[function(require,module,exports){
 var jsonld = require('jsonld')
 var rdf = require('rdf-ext')
 var util = require('util')
@@ -5997,9 +5767,9 @@ for (var property in instance) {
 
 module.exports = JsonLdParser
 
-},{"jsonld":35,"rdf-ext":"rdf-ext","rdf-parser-abstract":38,"util":30}],34:[function(require,module,exports){
+},{"jsonld":33,"rdf-ext":"rdf-ext","rdf-parser-abstract":35,"util":28}],32:[function(require,module,exports){
 // Ignore module for browserify (see package.json)
-},{}],35:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 (function (process,global,__dirname){
 /**
  * A JavaScript implementation of the JSON-LD API.
@@ -6007,7 +5777,7 @@ module.exports = JsonLdParser
  * @author Dave Longley
  *
  * @license BSD 3-Clause License
- * Copyright (c) 2011-2014 Digital Bazaar, Inc.
+ * Copyright (c) 2011-2015 Digital Bazaar, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -6747,13 +6517,19 @@ jsonld.objectify = function(input, ctx, options, callback) {
 };
 
 /**
- * Performs RDF dataset normalization on the given JSON-LD input. The output
- * is an RDF dataset unless the 'format' option is used.
+ * Performs RDF dataset normalization on the given input. The input is JSON-LD
+ * unless the 'inputFormat' options is used. The output is an RDF dataset
+ * unless the 'format' option is used.
  *
- * @param input the JSON-LD input to normalize.
+ * @param input the input to normalize as JSON-LD or as a format specified by
+ *          the 'inputFormat' option.
  * @param [options] the options to use:
+ *          [algorithm] the normalization algorithm to use, `URDNA2015` or
+ *            `URGNA2012` (default: `URGNA2012`).
  *          [base] the base IRI to use.
  *          [expandContext] a context to expand with.
+ *          [inputFormat] the format if input is not JSON-LD:
+ *            'application/nquads' for N-Quads.
  *          [format] the format if output is a string:
  *            'application/nquads' for N-Quads.
  *          [documentLoader(url, callback(err, remoteDoc))] the document loader.
@@ -6774,6 +6550,9 @@ jsonld.normalize = function(input, options, callback) {
   options = options || {};
 
   // set default options
+  if(!('algorithm' in options)) {
+    options.algorithm = 'URGNA2012';
+  }
   if(!('base' in options)) {
     options.base = (typeof input === 'string') ? input : '';
   }
@@ -6781,20 +6560,30 @@ jsonld.normalize = function(input, options, callback) {
     options.documentLoader = jsonld.loadDocument;
   }
 
-  // convert to RDF dataset then do normalization
-  var opts = _clone(options);
-  delete opts.format;
-  opts.produceGeneralizedRdf = false;
-  jsonld.toRDF(input, opts, function(err, dataset) {
-    if(err) {
+  if('inputFormat' in options) {
+    if(options.inputFormat !== 'application/nquads') {
       return callback(new JsonLdError(
-        'Could not convert input to RDF dataset before normalization.',
-        'jsonld.NormalizeError', {cause: err}));
+        'Unknown normalization input format.',
+        'jsonld.NormalizeError'));
     }
-
+    var parsedInput = _parseNQuads(input);
     // do normalization
-    new Processor().normalize(dataset, options, callback);
-  });
+    new Processor().normalize(parsedInput, options, callback);
+  } else {
+    // convert to RDF dataset then do normalization
+    var opts = _clone(options);
+    delete opts.format;
+    opts.produceGeneralizedRdf = false;
+    jsonld.toRDF(input, opts, function(err, dataset) {
+      if(err) {
+        return callback(new JsonLdError(
+          'Could not convert input to RDF dataset before normalization.',
+          'jsonld.NormalizeError', {cause: err}));
+      }
+      // do normalization
+      new Processor().normalize(dataset, options, callback);
+    });
+  }
 };
 
 /**
@@ -6967,7 +6756,8 @@ jsonld.toRDF = function(input, options, callback) {
  * @param [options] the options to use:
  *          [base] the base IRI to use.
  *          [expandContext] a context to expand with.
- *          [namer] a jsonld.UniqueNamer to use to label blank nodes.
+ *          [issuer] a jsonld.IdentifierIssuer to use to label blank nodes.
+ *          [namer] (deprecated)
  *          [documentLoader(url, callback(err, remoteDoc))] the document loader.
  * @param callback(err, nodeMap) called once the operation completes.
  */
@@ -7022,7 +6812,8 @@ jsonld.createNodeMap = function(input, options, callback) {
  * @param [options] the options to use:
  *          [base] the base IRI to use.
  *          [expandContext] a context to expand with.
- *          [namer] a jsonld.UniqueNamer to use to label blank nodes.
+ *          [issuer] a jsonld.IdentifierIssuer to use to label blank nodes.
+ *          [namer] (deprecated).
  *          [mergeNodes] true to merge properties for nodes with the same ID,
  *            false to ignore new properties for nodes with the same ID once
  *            the ID has been defined; note that this may not prevent merging
@@ -7088,7 +6879,7 @@ jsonld.merge = function(docs, ctx, options, callback) {
       mergeNodes = options.mergeNodes;
     }
 
-    var namer = options.namer || new UniqueNamer('_:b');
+    var issuer = options.namer || options.issuer || new IdentifierIssuer('_:b');
     var graphs = {'@default': {}};
 
     var defaultGraph;
@@ -7097,13 +6888,13 @@ jsonld.merge = function(docs, ctx, options, callback) {
         // uniquely relabel blank nodes
         var doc = expanded[i];
         doc = jsonld.relabelBlankNodes(doc, {
-          namer: new UniqueNamer('_:b' + i + '-')
+          issuer: new IdentifierIssuer('_:b' + i + '-')
         });
 
         // add nodes to the shared node map graphs if merging nodes, to a
         // separate graph set if not
         var _graphs = (mergeNodes || i === 0) ? graphs : {'@default': {}};
-        _createNodeMap(doc, _graphs, '@default', namer);
+        _createNodeMap(doc, _graphs, '@default', issuer);
 
         if(_graphs !== graphs) {
           // merge document graphs but don't merge existing nodes
@@ -7163,12 +6954,13 @@ jsonld.merge = function(docs, ctx, options, callback) {
  *
  * @param input the JSON-LD input.
  * @param [options] the options to use:
- *          [namer] a jsonld.UniqueNamer to use.
+ *          [issuer] a jsonld.IdentifierIssuer to use to label blank nodes.
+ *          [namer] (deprecated).
  */
 jsonld.relabelBlankNodes = function(input, options) {
   options = options || {};
-  var namer = options.namer || new UniqueNamer('_:b');
-  return _labelBlankNodes(namer, input);
+  var issuer = options.namer || options.issuer || new IdentifierIssuer('_:b');
+  return _labelBlankNodes(issuer, input);
 };
 
 /**
@@ -9014,7 +8806,8 @@ Processor.prototype.expand = function(
  *
  * @param input the expanded JSON-LD to create a node map of.
  * @param [options] the options to use:
- *          [namer] the UniqueNamer to use.
+ *          [issuer] a jsonld.IdentifierIssuer to use to label blank nodes.
+ *          [namer] (deprecated).
  *
  * @return the node map.
  */
@@ -9022,9 +8815,9 @@ Processor.prototype.createNodeMap = function(input, options) {
   options = options || {};
 
   // produce a map of all subjects and name each bnode
-  var namer = options.namer || new UniqueNamer('_:b');
+  var issuer = options.namer || options.issuer || new IdentifierIssuer('_:b');
   var graphs = {'@default': {}};
-  _createNodeMap(input, graphs, '@default', namer);
+  _createNodeMap(input, graphs, '@default', issuer);
 
   // add all non-default graphs to default graph
   return _mergeNodeMaps(graphs);
@@ -9073,8 +8866,8 @@ Processor.prototype.frame = function(input, frame, options) {
 
   // produce a map of all graphs and name each bnode
   // FIXME: currently uses subjects from @merged graph only
-  var namer = new UniqueNamer('_:b');
-  _createNodeMap(input, state.graphs, '@merged', namer);
+  var issuer = new IdentifierIssuer('_:b');
+  _createNodeMap(input, state.graphs, '@merged', issuer);
   state.subjects = state.graphs['@merged'];
 
   // frame the subjects
@@ -9091,201 +8884,14 @@ Processor.prototype.frame = function(input, frame, options) {
  * @param callback(err, normalized) called once the operation completes.
  */
 Processor.prototype.normalize = function(dataset, options, callback) {
-  // create quads and map bnodes to their associated quads
-  var quads = [];
-  var bnodes = {};
-  for(var graphName in dataset) {
-    var triples = dataset[graphName];
-    if(graphName === '@default') {
-      graphName = null;
-    }
-    for(var ti = 0; ti < triples.length; ++ti) {
-      var quad = triples[ti];
-      if(graphName !== null) {
-        if(graphName.indexOf('_:') === 0) {
-          quad.name = {type: 'blank node', value: graphName};
-        } else {
-          quad.name = {type: 'IRI', value: graphName};
-        }
-      }
-      quads.push(quad);
-
-      var attrs = ['subject', 'object', 'name'];
-      for(var ai = 0; ai < attrs.length; ++ai) {
-        var attr = attrs[ai];
-        if(quad[attr] && quad[attr].type === 'blank node') {
-          var id = quad[attr].value;
-          if(id in bnodes) {
-            bnodes[id].quads.push(quad);
-          } else {
-            bnodes[id] = {quads: [quad]};
-          }
-        }
-      }
-    }
+  if(options.algorithm === 'URDNA2015') {
+    return new URDNA2015(options).main(dataset, callback);
   }
-
-  // mapping complete, start canonical naming
-  var namer = new UniqueNamer('_:c14n');
-  return hashBlankNodes(Object.keys(bnodes));
-
-  // generates unique and duplicate hashes for bnodes
-  function hashBlankNodes(unnamed) {
-    var nextUnnamed = [];
-    var duplicates = {};
-    var unique = {};
-
-    // TODO: instead of N calls to setImmediate, run
-    // atomic normalization parts for a specified
-    // slice of time (perhaps configurable) as this
-    // will better utilize CPU and improve performance
-    // as JS processing speed improves
-
-    // hash quads for each unnamed bnode
-    jsonld.setImmediate(function() {hashUnnamed(0);});
-    function hashUnnamed(i) {
-      if(i === unnamed.length) {
-        // done, name blank nodes
-        return nameBlankNodes(unique, duplicates, nextUnnamed);
-      }
-
-      // hash unnamed bnode
-      var bnode = unnamed[i];
-      var hash = _hashQuads(bnode, bnodes);
-
-      // store hash as unique or a duplicate
-      if(hash in duplicates) {
-        duplicates[hash].push(bnode);
-        nextUnnamed.push(bnode);
-      } else if(hash in unique) {
-        duplicates[hash] = [unique[hash], bnode];
-        nextUnnamed.push(unique[hash]);
-        nextUnnamed.push(bnode);
-        delete unique[hash];
-      } else {
-        unique[hash] = bnode;
-      }
-
-      // hash next unnamed bnode
-      jsonld.setImmediate(function() {hashUnnamed(i + 1);});
-    }
+  if(options.algorithm === 'URGNA2012') {
+    return new URGNA2012(options).main(dataset, callback);
   }
-
-  // names unique hash bnodes
-  function nameBlankNodes(unique, duplicates, unnamed) {
-    // name unique bnodes in sorted hash order
-    var named = false;
-    var hashes = Object.keys(unique).sort();
-    for(var i = 0; i < hashes.length; ++i) {
-      var bnode = unique[hashes[i]];
-      namer.getName(bnode);
-      named = true;
-    }
-
-    if(named) {
-      // continue to hash bnodes if a bnode was assigned a name
-      hashBlankNodes(unnamed);
-    } else {
-      // name the duplicate hash bnodes
-      nameDuplicates(duplicates);
-    }
-  }
-
-  // names duplicate hash bnodes
-  function nameDuplicates(duplicates) {
-    // enumerate duplicate hash groups in sorted order
-    var hashes = Object.keys(duplicates).sort();
-
-    // process each group
-    processGroup(0);
-    function processGroup(i) {
-      if(i === hashes.length) {
-        // done, create JSON-LD array
-        return createArray();
-      }
-
-      // name each group member
-      var group = duplicates[hashes[i]];
-      var results = [];
-      nameGroupMember(group, 0);
-      function nameGroupMember(group, n) {
-        if(n === group.length) {
-          // name bnodes in hash order
-          results.sort(function(a, b) {
-            a = a.hash;
-            b = b.hash;
-            return (a < b) ? -1 : ((a > b) ? 1 : 0);
-          });
-          for(var r = 0; r < results.length; ++r) {
-            // name all bnodes in path namer in key-entry order
-            // Note: key-order is preserved in javascript
-            for(var key in results[r].pathNamer.existing) {
-              namer.getName(key);
-            }
-          }
-          return processGroup(i + 1);
-        }
-
-        // skip already-named bnodes
-        var bnode = group[n];
-        if(namer.isNamed(bnode)) {
-          return nameGroupMember(group, n + 1);
-        }
-
-        // hash bnode paths
-        var pathNamer = new UniqueNamer('_:b');
-        pathNamer.getName(bnode);
-        _hashPaths(bnode, bnodes, namer, pathNamer,
-          function(err, result) {
-            if(err) {
-              return callback(err);
-            }
-            results.push(result);
-            nameGroupMember(group, n + 1);
-          });
-      }
-    }
-  }
-
-  // creates the sorted array of RDF quads
-  function createArray() {
-    var normalized = [];
-
-    /* Note: At this point all bnodes in the set of RDF quads have been
-     assigned canonical names, which have been stored in the 'namer' object.
-     Here each quad is updated by assigning each of its bnodes its new name
-     via the 'namer' object. */
-
-    // update bnode names in each quad and serialize
-    for(var i = 0; i < quads.length; ++i) {
-      var quad = quads[i];
-      var attrs = ['subject', 'object', 'name'];
-      for(var ai = 0; ai < attrs.length; ++ai) {
-        var attr = attrs[ai];
-        if(quad[attr] && quad[attr].type === 'blank node' &&
-          quad[attr].value.indexOf('_:c14n') !== 0) {
-          quad[attr].value = namer.getName(quad[attr].value);
-        }
-      }
-      normalized.push(_toNQuad(quad, quad.name ? quad.name.value : null));
-    }
-
-    // sort normalized output
-    normalized.sort();
-
-    // handle output format
-    if(options.format) {
-      if(options.format === 'application/nquads') {
-        return callback(null, normalized.join(''));
-      }
-      return callback(new JsonLdError(
-        'Unknown output format.',
-        'jsonld.UnknownFormat', {format: options.format}));
-    }
-
-    // output RDF dataset
-    callback(null, _parseNQuads(normalized.join('')));
-  }
+  callback(new Error(
+    'Invalid RDF Dataset Normalization algorithm: ' + options.algorithm));
 };
 
 /**
@@ -9474,9 +9080,9 @@ Processor.prototype.fromRDF = function(dataset, options, callback) {
  */
 Processor.prototype.toRDF = function(input, options) {
   // create node map for default graph (and any named graphs)
-  var namer = new UniqueNamer('_:b');
+  var issuer = new IdentifierIssuer('_:b');
   var nodeMap = {'@default': {}};
-  _createNodeMap(input, nodeMap, '@default', namer);
+  _createNodeMap(input, nodeMap, '@default', issuer);
 
   var dataset = {};
   var graphNames = Object.keys(nodeMap).sort();
@@ -9484,7 +9090,7 @@ Processor.prototype.toRDF = function(input, options) {
     var graphName = graphNames[i];
     // skip relative IRIs
     if(graphName === '@default' || _isAbsoluteIri(graphName)) {
-      dataset[graphName] = _graphToRDF(nodeMap[graphName], namer, options);
+      dataset[graphName] = _graphToRDF(nodeMap[graphName], issuer, options);
     }
   }
   return dataset;
@@ -9648,6 +9254,10 @@ function _expandLanguageMap(languageMap) {
     }
     for(var vi = 0; vi < val.length; ++vi) {
       var item = val[vi];
+      if(item === null) {
+          // null values are allowed (8.5) but ignored (3.1)
+          continue;
+      }
       if(!_isString(item)) {
         throw new JsonLdError(
           'Invalid JSON-LD syntax; language map values must be strings.',
@@ -9664,24 +9274,24 @@ function _expandLanguageMap(languageMap) {
 }
 
 /**
- * Labels the blank nodes in the given value using the given UniqueNamer.
+ * Labels the blank nodes in the given value using the given IdentifierIssuer.
  *
- * @param namer the UniqueNamer to use.
+ * @param issuer the IdentifierIssuer to use.
  * @param element the element with blank nodes to rename.
  *
  * @return the element.
  */
-function _labelBlankNodes(namer, element) {
+function _labelBlankNodes(issuer, element) {
   if(_isArray(element)) {
     for(var i = 0; i < element.length; ++i) {
-      element[i] = _labelBlankNodes(namer, element[i]);
+      element[i] = _labelBlankNodes(issuer, element[i]);
     }
   } else if(_isList(element)) {
-    element['@list'] = _labelBlankNodes(namer, element['@list']);
+    element['@list'] = _labelBlankNodes(issuer, element['@list']);
   } else if(_isObject(element)) {
-    // rename blank node
+    // relabel blank node
     if(_isBlankNode(element)) {
-      element['@id'] = namer.getName(element['@id']);
+      element['@id'] = issuer.getId(element['@id']);
     }
 
     // recursively apply to all keys
@@ -9689,7 +9299,7 @@ function _labelBlankNodes(namer, element) {
     for(var ki = 0; ki < keys.length; ++ki) {
       var key = keys[ki];
       if(key !== '@id') {
-        element[key] = _labelBlankNodes(namer, element[key]);
+        element[key] = _labelBlankNodes(issuer, element[key]);
       }
     }
   }
@@ -9764,12 +9374,12 @@ function _expandValue(activeCtx, activeProperty, value) {
  * Creates an array of RDF triples for the given graph.
  *
  * @param graph the graph to create RDF triples for.
- * @param namer a UniqueNamer for assigning blank node names.
+ * @param issuer a IdentifierIssuer for assigning blank node names.
  * @param options the RDF serialization options.
  *
  * @return the array of RDF triples for the given graph.
  */
-function _graphToRDF(graph, namer, options) {
+function _graphToRDF(graph, issuer, options) {
   var rval = [];
 
   var ids = Object.keys(graph).sort();
@@ -9816,7 +9426,7 @@ function _graphToRDF(graph, namer, options) {
 
         // convert @list to triples
         if(_isList(item)) {
-          _listToRDF(item['@list'], namer, subject, predicate, rval);
+          _listToRDF(item['@list'], issuer, subject, predicate, rval);
         } else {
           // convert value or node object to triple
           var object = _objectToRDF(item);
@@ -9837,12 +9447,12 @@ function _graphToRDF(graph, namer, options) {
  * (an RDF collection).
  *
  * @param list the @list value.
- * @param namer a UniqueNamer for assigning blank node names.
+ * @param issuer a IdentifierIssuer for assigning blank node names.
  * @param subject the subject for the head of the list.
  * @param predicate the predicate for the head of the list.
  * @param triples the array of triples to append to.
  */
-function _listToRDF(list, namer, subject, predicate, triples) {
+function _listToRDF(list, issuer, subject, predicate, triples) {
   var first = {type: 'IRI', value: RDF_FIRST};
   var rest = {type: 'IRI', value: RDF_REST};
   var nil = {type: 'IRI', value: RDF_NIL};
@@ -9850,7 +9460,7 @@ function _listToRDF(list, namer, subject, predicate, triples) {
   for(var i = 0; i < list.length; ++i) {
     var item = list[i];
 
-    var blankNode = {type: 'blank node', value: namer.getName()};
+    var blankNode = {type: 'blank node', value: issuer.getId()};
     triples.push({subject: subject, predicate: predicate, object: blankNode});
 
     subject = blankNode;
@@ -10003,215 +9613,800 @@ function _compareRDFTriples(t1, t2) {
   return true;
 }
 
-/**
- * Hashes all of the quads about a blank node.
- *
- * @param id the ID of the bnode to hash quads for.
- * @param bnodes the mapping of bnodes to quads.
- *
- * @return the new hash.
- */
-function _hashQuads(id, bnodes) {
-  // return cached hash
-  if('hash' in bnodes[id]) {
-    return bnodes[id].hash;
+/////////////////////////////// DEFINE URDNA2015 //////////////////////////////
+
+var URDNA2015 = (function() {
+
+var POSITIONS = {'subject': 's', 'object': 'o', 'name': 'g'};
+
+var Normalize = function(options) {
+  options = options || {};
+  this.name = 'URDNA2015';
+  this.options = options;
+  this.blankNodeInfo = {};
+  this.hashToBlankNodes = {};
+  this.canonicalIssuer = new IdentifierIssuer('_:c14n');
+  this.quads = [];
+  this.schedule = {};
+  if('maxCallStackDepth' in options) {
+    this.schedule.MAX_DEPTH = options.maxCallStackDepth;
+  } else {
+    this.schedule.MAX_DEPTH = 500;
+  }
+  if('maxTotalCallStackDepth' in options) {
+    this.schedule.MAX_TOTAL_DEPTH = options.maxCallStackDepth;
+  } else {
+    this.schedule.MAX_TOTAL_DEPTH = 0xFFFFFFFF;
+  }
+  this.schedule.depth = 0;
+  this.schedule.totalDepth = 0;
+  if('timeSlice' in options) {
+    this.schedule.timeSlice = options.timeSlice;
+  } else {
+    // milliseconds
+    this.schedule.timeSlice = 10;
+  }
+};
+
+// do some work in a time slice, but in serial
+Normalize.prototype.doWork = function(fn, callback) {
+  var schedule = this.schedule;
+
+  if(schedule.totalDepth >= schedule.MAX_TOTAL_DEPTH) {
+    return callback(new Error(
+      'Maximum total call stack depth exceeded; normalization aborting.'));
   }
 
-  // serialize all of bnode's quads
-  var quads = bnodes[id].quads;
-  var nquads = [];
-  for(var i = 0; i < quads.length; ++i) {
-    nquads.push(_toNQuad(
-      quads[i], quads[i].name ? quads[i].name.value : null, id));
-  }
-  // sort serialized quads
-  nquads.sort();
-  // return hashed quads
-  var hash = bnodes[id].hash = sha1.hash(nquads);
-  return hash;
-}
-
-/**
- * Produces a hash for the paths of adjacent bnodes for a bnode,
- * incorporating all information about its subgraph of bnodes. This
- * method will recursively pick adjacent bnode permutations that produce the
- * lexicographically-least 'path' serializations.
- *
- * @param id the ID of the bnode to hash paths for.
- * @param bnodes the map of bnode quads.
- * @param namer the canonical bnode namer.
- * @param pathNamer the namer used to assign names to adjacent bnodes.
- * @param callback(err, result) called once the operation completes.
- */
-function _hashPaths(id, bnodes, namer, pathNamer, callback) {
-  // create SHA-1 digest
-  var md = sha1.create();
-
-  // group adjacent bnodes by hash, keep properties and references separate
-  var groups = {};
-  var groupHashes;
-  var quads = bnodes[id].quads;
-  jsonld.setImmediate(function() {groupNodes(0);});
-  function groupNodes(i) {
-    if(i === quads.length) {
-      // done, hash groups
-      groupHashes = Object.keys(groups).sort();
-      return hashGroup(0);
+  (function work() {
+    if(schedule.depth === schedule.MAX_DEPTH) {
+      // stack too deep, run on next tick
+      schedule.depth = 0;
+      schedule.running = false;
+      return jsonld.nextTick(work);
     }
 
-    // get adjacent bnode
-    var quad = quads[i];
-    var bnode = _getAdjacentBlankNodeName(quad.subject, id);
-    var direction = null;
-    if(bnode !== null) {
-      // normal property
-      direction = 'p';
-    } else {
-      bnode = _getAdjacentBlankNodeName(quad.object, id);
-      if(bnode !== null) {
-        // reverse property
-        direction = 'r';
-      }
+    // if not yet running, force run
+    var now = new Date().getTime();
+    if(!schedule.running) {
+      schedule.start = new Date().getTime();
+      schedule.deadline = schedule.start + schedule.timeSlice;
     }
 
-    if(bnode !== null) {
-      // get bnode name (try canonical, path, then hash)
-      var name;
-      if(namer.isNamed(bnode)) {
-        name = namer.getName(bnode);
-      } else if(pathNamer.isNamed(bnode)) {
-        name = pathNamer.getName(bnode);
-      } else {
-        name = _hashQuads(bnode, bnodes);
-      }
-
-      // hash direction, property, and bnode name/hash
-      var md = sha1.create();
-      md.update(direction);
-      md.update(quad.predicate.value);
-      md.update(name);
-      var groupHash = md.digest();
-
-      // add bnode to hash group
-      if(groupHash in groups) {
-        groups[groupHash].push(bnode);
-      } else {
-        groups[groupHash] = [bnode];
-      }
+    // TODO: should also include an estimate of expectedWorkTime
+    if(now < schedule.deadline) {
+      schedule.running = true;
+      schedule.depth++;
+      schedule.totalDepth++;
+      return fn(function(err, result) {
+        schedule.depth--;
+        schedule.totalDepth--;
+        callback(err, result);
+      });
     }
 
-    jsonld.setImmediate(function() {groupNodes(i + 1);});
+    // not enough time left in this slice, run after letting browser
+    // do some other things
+    schedule.depth = 0;
+    schedule.running = false;
+    jsonld.setImmediate(work);
+  })();
+};
+
+// asynchronously loop
+Normalize.prototype.forEach = function(iterable, fn, callback) {
+  var self = this;
+  var iterator;
+  var idx = 0;
+  var length;
+  if(_isArray(iterable)) {
+    length = iterable.length;
+    iterator = function() {
+      if(idx === length) {
+        return false;
+      }
+      iterator.value = iterable[idx++];
+      iterator.key = idx;
+      return true;
+    };
+  } else {
+    var keys = Object.keys(iterable);
+    length = keys.length;
+    iterator = function() {
+      if(idx === length) {
+        return false;
+      }
+      iterator.key = keys[idx++];
+      iterator.value = iterable[iterator.key];
+      return true;
+    };
   }
 
-  // hashes a group of adjacent bnodes
-  function hashGroup(i) {
-    if(i === groupHashes.length) {
-      // done, return SHA-1 digest and path namer
-      return callback(null, {hash: md.digest(), pathNamer: pathNamer});
+  (function iterate(err, result) {
+    if(err) {
+      return callback(err);
     }
+    if(iterator()) {
+      return self.doWork(function() {
+        fn(iterator.value, iterator.key, iterate);
+      });
+    }
+    callback();
+  })();
+};
 
-    // digest group hash
-    var groupHash = groupHashes[i];
-    md.update(groupHash);
+// asynchronous waterfall
+Normalize.prototype.waterfall = function(fns, callback) {
+  var self = this;
+  self.forEach(fns, function(fn, idx, callback) {
+    self.doWork(fn, callback);
+  }, callback);
+};
 
-    // choose a path and namer from the permutations
-    var chosenPath = null;
-    var chosenNamer = null;
-    var permutator = new Permutator(groups[groupHash]);
-    jsonld.setImmediate(function() {permutate();});
-    function permutate() {
-      var permutation = permutator.next();
-      var pathNamerCopy = pathNamer.clone();
+// asynchronous while
+Normalize.prototype.whilst = function(condition, fn, callback) {
+  var self = this;
+  (function loop(err) {
+    if(err) {
+      return callback(err);
+    }
+    if(!condition()) {
+      return callback();
+    }
+    self.doWork(fn, loop);
+  })();
+};
 
-      // build adjacent path
-      var path = '';
-      var recurse = [];
-      for(var n in permutation) {
-        var bnode = permutation[n];
+// 4.4) Normalization Algorithm
+Normalize.prototype.main = function(dataset, callback) {
+  var self = this;
+  self.schedule.start = new Date().getTime();
+  var result;
 
-        // use canonical name if available
-        if(namer.isNamed(bnode)) {
-          path += namer.getName(bnode);
-        } else {
-          // recurse if bnode isn't named in the path yet
-          if(!pathNamerCopy.isNamed(bnode)) {
-            recurse.push(bnode);
+  // handle invalid output format
+  if(self.options.format) {
+    if(self.options.format !== 'application/nquads') {
+      return callback(new JsonLdError(
+        'Unknown output format.',
+        'jsonld.UnknownFormat', {format: self.options.format}));
+    }
+  }
+
+  // 1) Create the normalization state.
+
+  // Note: Optimize by generating non-normalized blank node map concurrently.
+  var nonNormalized = {};
+
+  self.waterfall([
+    function(callback) {
+      // 2) For every quad in input dataset:
+      self.forEach(dataset, function(triples, graphName, callback) {
+        if(graphName === '@default') {
+          graphName = null;
+        }
+        self.forEach(triples, function(quad, idx, callback) {
+          if(graphName !== null) {
+            if(graphName.indexOf('_:') === 0) {
+              quad.name = {type: 'blank node', value: graphName};
+            } else {
+              quad.name = {type: 'IRI', value: graphName};
+            }
           }
-          path += pathNamerCopy.getName(bnode);
-        }
+          self.quads.push(quad);
 
-        // skip permutation if path is already >= chosen path
-        if(chosenPath !== null && path.length >= chosenPath.length &&
-          path > chosenPath) {
-          return nextPermutation(true);
-        }
-      }
-
-      // does the next recursion
-      nextRecursion(0);
-      function nextRecursion(n) {
-        if(n === recurse.length) {
-          // done, do next permutation
-          return nextPermutation(false);
-        }
-
-        // do recursion
-        var bnode = recurse[n];
-        _hashPaths(bnode, bnodes, namer, pathNamerCopy,
-          function(err, result) {
-            if(err) {
-              return callback(err);
+          // 2.1) For each blank node that occurs in the quad, add a reference
+          // to the quad using the blank node identifier in the blank node to
+          // quads map, creating a new entry if necessary.
+          self.forEachComponent(quad, function(component) {
+            if(component.type !== 'blank node') {
+              return;
             }
-            path += pathNamerCopy.getName(bnode) + '<' + result.hash + '>';
-            pathNamerCopy = result.pathNamer;
-
-            // skip permutation if path is already >= chosen path
-            if(chosenPath !== null && path.length >= chosenPath.length &&
-              path > chosenPath) {
-              return nextPermutation(true);
+            var id = component.value;
+            if(id in self.blankNodeInfo) {
+              self.blankNodeInfo[id].quads.push(quad);
+            } else {
+              nonNormalized[id] = true;
+              self.blankNodeInfo[id] = {quads: [quad]};
             }
-
-            // do next recursion
-            nextRecursion(n + 1);
           });
-      }
+          callback();
+        }, callback);
+      }, callback);
+    },
+    function(callback) {
+      // 3) Create a list of non-normalized blank node identifiers
+      // non-normalized identifiers and populate it using the keys from the
+      // blank node to quads map.
+      // Note: We use a map here and it was generated during step 2.
 
-      // stores the results of this permutation and runs the next
-      function nextPermutation(skipped) {
-        if(!skipped && (chosenPath === null || path < chosenPath)) {
-          chosenPath = path;
-          chosenNamer = pathNamerCopy;
+      // 4) Initialize simple, a boolean flag, to true.
+      var simple = true;
+
+      // 5) While simple is true, issue canonical identifiers for blank nodes:
+      self.whilst(function() { return simple; }, function(callback) {
+        // 5.1) Set simple to false.
+        simple = false;
+
+        // 5.2) Clear hash to blank nodes map.
+        self.hashToBlankNodes = {};
+
+        self.waterfall([
+          function(callback) {
+            // 5.3) For each blank node identifier identifier in non-normalized
+            // identifiers:
+            self.forEach(nonNormalized, function(value, id, callback) {
+              // 5.3.1) Create a hash, hash, according to the Hash First Degree
+              // Quads algorithm.
+              self.hashFirstDegreeQuads(id, function(err, hash) {
+                if(err) {
+                  return callback(err);
+                }
+                // 5.3.2) Add hash and identifier to hash to blank nodes map,
+                // creating a new entry if necessary.
+                if(hash in self.hashToBlankNodes) {
+                  self.hashToBlankNodes[hash].push(id);
+                } else {
+                  self.hashToBlankNodes[hash] = [id];
+                }
+                callback();
+              });
+            }, callback);
+          },
+          function(callback) {
+            // 5.4) For each hash to identifier list mapping in hash to blank
+            // nodes map, lexicographically-sorted by hash:
+            var hashes = Object.keys(self.hashToBlankNodes).sort();
+            self.forEach(hashes, function(hash, i, callback) {
+              // 5.4.1) If the length of identifier list is greater than 1,
+              // continue to the next mapping.
+              var idList = self.hashToBlankNodes[hash];
+              if(idList.length > 1) {
+                return callback();
+              }
+
+              // 5.4.2) Use the Issue Identifier algorithm, passing canonical
+              // issuer and the single blank node identifier in identifier
+              // list, identifier, to issue a canonical replacement identifier
+              // for identifier.
+              // TODO: consider changing `getId` to `issue`
+              var id = idList[0];
+              self.canonicalIssuer.getId(id);
+
+              // 5.4.3) Remove identifier from non-normalized identifiers.
+              delete nonNormalized[id];
+
+              // 5.4.4) Remove hash from the hash to blank nodes map.
+              delete self.hashToBlankNodes[hash];
+
+              // 5.4.5) Set simple to true.
+              simple = true;
+              callback();
+            }, callback);
+          }
+        ], callback);
+      }, callback);
+    },
+    function(callback) {
+      // 6) For each hash to identifier list mapping in hash to blank nodes map,
+      // lexicographically-sorted by hash:
+      var hashes = Object.keys(self.hashToBlankNodes).sort();
+      self.forEach(hashes, function(hash, idx, callback) {
+        // 6.1) Create hash path list where each item will be a result of
+        // running the Hash N-Degree Quads algorithm.
+        var hashPathList = [];
+
+        // 6.2) For each blank node identifier identifier in identifier list:
+        var idList = self.hashToBlankNodes[hash];
+        self.waterfall([
+          function(callback) {
+            self.forEach(idList, function(id, idx, callback) {
+              // 6.2.1) If a canonical identifier has already been issued for
+              // identifier, continue to the next identifier.
+              if(self.canonicalIssuer.hasId(id)) {
+                return callback();
+              }
+
+              // 6.2.2) Create temporary issuer, an identifier issuer
+              // initialized with the prefix _:b.
+              var issuer = new IdentifierIssuer('_:b');
+
+              // 6.2.3) Use the Issue Identifier algorithm, passing temporary
+              // issuer and identifier, to issue a new temporary blank node
+              // identifier for identifier.
+              issuer.getId(id);
+
+              // 6.2.4) Run the Hash N-Degree Quads algorithm, passing
+              // temporary issuer, and append the result to the hash path list.
+              self.hashNDegreeQuads(id, issuer, function(err, result) {
+                if(err) {
+                  return callback(err);
+                }
+                hashPathList.push(result);
+                callback();
+              });
+            }, callback);
+          },
+          function(callback) {
+            // 6.3) For each result in the hash path list,
+            // lexicographically-sorted by the hash in result:
+            hashPathList.sort(function(a, b) {
+              return (a.hash < b.hash) ? -1 : ((a.hash > b.hash) ? 1 : 0);
+            });
+            self.forEach(hashPathList, function(result, idx, callback) {
+              // 6.3.1) For each blank node identifier, existing identifier,
+              // that was issued a temporary identifier by identifier issuer
+              // in result, issue a canonical identifier, in the same order,
+              // using the Issue Identifier algorithm, passing canonical
+              // issuer and existing identifier.
+              for(var existing in result.issuer.existing) {
+                self.canonicalIssuer.getId(existing);
+              }
+              callback();
+            }, callback);
+          }
+        ], callback);
+      }, callback);
+    }, function(callback) {
+      /* Note: At this point all blank nodes in the set of RDF quads have been
+      assigned canonical identifiers, which have been stored in the canonical
+      issuer. Here each quad is updated by assigning each of its blank nodes
+      its new identifier. */
+
+      // 7) For each quad, quad, in input dataset:
+      var normalized = [];
+      self.waterfall([
+        function(callback) {
+          self.forEach(self.quads, function(quad, idx, callback) {
+            // 7.1) Create a copy, quad copy, of quad and replace any existing
+            // blank node identifiers using the canonical identifiers
+            // previously issued by canonical issuer.
+            // Note: We optimize away the copy here.
+            self.forEachComponent(quad, function(component) {
+              if(component.type === 'blank node' &&
+                component.value.indexOf(self.canonicalIssuer.prefix) !== 0) {
+                component.value = self.canonicalIssuer.getId(component.value);
+              }
+            });
+            // 7.2) Add quad copy to the normalized dataset.
+            normalized.push(_toNQuad(quad));
+            callback();
+          }, callback);
+        },
+        function(callback) {
+          // sort normalized output
+          normalized.sort();
+
+          // 8) Return the normalized dataset.
+          if(self.options.format === 'application/nquads') {
+            result = normalized.join('');
+            return callback();
+          }
+
+          result = _parseNQuads(normalized.join(''));
+          callback();
         }
-
-        // do next permutation
-        if(permutator.hasNext()) {
-          jsonld.setImmediate(function() {permutate();});
-        } else {
-          // digest chosen path and update namer
-          md.update(chosenPath);
-          pathNamer = chosenNamer;
-
-          // hash the next group
-          hashGroup(i + 1);
-        }
-      }
+      ], callback);
     }
-  }
-}
+  ], function(err) {
+    callback(err, result);
+  });
+};
 
-/**
- * A helper function that gets the blank node name from an RDF quad node
- * (subject or object). If the node is a blank node and its value
- * does not match the given blank node ID, it will be returned.
- *
- * @param node the RDF quad node.
- * @param id the ID of the blank node to look next to.
- *
- * @return the adjacent blank node name or null if none was found.
- */
-function _getAdjacentBlankNodeName(node, id) {
-  return (node.type === 'blank node' && node.value !== id ? node.value : null);
-}
+// 4.6) Hash First Degree Quads
+Normalize.prototype.hashFirstDegreeQuads = function(id, callback) {
+  var self = this;
+
+  // return cached hash
+  var info = self.blankNodeInfo[id];
+  if('hash' in info) {
+    return callback(null, info.hash);
+  }
+
+  // 1) Initialize nquads to an empty list. It will be used to store quads in
+  // N-Quads format.
+  var nquads = [];
+
+  // 2) Get the list of quads quads associated with the reference blank node
+  // identifier in the blank node to quads map.
+  var quads = info.quads;
+
+  // 3) For each quad quad in quads:
+  self.forEach(quads, function(quad, idx, callback) {
+    // 3.1) Serialize the quad in N-Quads format with the following special
+    // rule:
+
+    // 3.1.1) If any component in quad is an blank node, then serialize it
+    // using a special identifier as follows:
+    var copy = {predicate: quad.predicate};
+    self.forEachComponent(quad, function(component, key) {
+      // 3.1.2) If the blank node's existing blank node identifier matches the
+      // reference blank node identifier then use the blank node identifier _:a,
+      // otherwise, use the blank node identifier _:z.
+      copy[key] = self.modifyFirstDegreeComponent(id, component, key);
+    });
+    nquads.push(_toNQuad(copy));
+    callback();
+  }, function(err) {
+    if(err) {
+      return callback(err);
+    }
+    // 4) Sort nquads in lexicographical order.
+    nquads.sort();
+
+    // 5) Return the hash that results from passing the sorted, joined nquads
+    // through the hash algorithm.
+    info.hash = NormalizeHash.hashNQuads(self.name, nquads);
+    callback(null, info.hash);
+  });
+};
+
+// helper for modifying component during Hash First Degree Quads
+Normalize.prototype.modifyFirstDegreeComponent = function(id, component) {
+  if(component.type !== 'blank node') {
+    return component;
+  }
+  component = _clone(component);
+  component.value = (component.value === id ? '_:a' : '_:z');
+  return component;
+};
+
+// 4.7) Hash Related Blank Node
+Normalize.prototype.hashRelatedBlankNode = function(
+  related, quad, issuer, position, callback) {
+  var self = this;
+
+  // 1) Set the identifier to use for related, preferring first the canonical
+  // identifier for related if issued, second the identifier issued by issuer
+  // if issued, and last, if necessary, the result of the Hash First Degree
+  // Quads algorithm, passing related.
+  var id;
+  self.waterfall([
+    function(callback) {
+      if(self.canonicalIssuer.hasId(related)) {
+        id = self.canonicalIssuer.getId(related);
+        return callback();
+      }
+      if(issuer.hasId(related)) {
+        id = issuer.getId(related);
+        return callback();
+      }
+      self.hashFirstDegreeQuads(related, function(err, hash) {
+        if(err) {
+          return callback(err);
+        }
+        id = hash;
+        callback();
+      });
+    }
+  ], function(err) {
+    if(err) {
+      return callback(err);
+    }
+
+    // 2) Initialize a string input to the value of position.
+    // Note: We use a hash object instead.
+    var md = new NormalizeHash(self.name);
+    md.update(position);
+
+    // 3) If position is not g, append <, the value of the predicate in quad,
+    // and > to input.
+    if(position !== 'g') {
+      md.update(self.getRelatedPredicate(quad));
+    }
+
+    // 4) Append identifier to input.
+    md.update(id);
+
+    // 5) Return the hash that results from passing input through the hash
+    // algorithm.
+    return callback(null, md.digest());
+  });
+};
+
+// helper for getting a related predicate
+Normalize.prototype.getRelatedPredicate = function(quad) {
+  return '<' + quad.predicate.value + '>';
+};
+
+// 4.8) Hash N-Degree Quads
+Normalize.prototype.hashNDegreeQuads = function(id, issuer, callback) {
+  var self = this;
+
+  // 1) Create a hash to related blank nodes map for storing hashes that
+  // identify related blank nodes.
+  // Note: 2) and 3) handled within `createHashToRelated`
+  var hashToRelated;
+  var md = new NormalizeHash(self.name);
+  self.waterfall([
+    function(callback) {
+      self.createHashToRelated(id, issuer, function(err, result) {
+        if(err) {
+          return callback(err);
+        }
+        hashToRelated = result;
+        callback();
+      });
+    },
+    function(callback) {
+      // 4) Create an empty string, data to hash.
+      // Note: We created a hash object `md` above instead.
+
+      // 5) For each related hash to blank node list mapping in hash to related
+      // blank nodes map, sorted lexicographically by related hash:
+      var hashes = Object.keys(hashToRelated).sort();
+      self.forEach(hashes, function(hash, idx, callback) {
+        // 5.1) Append the related hash to the data to hash.
+        md.update(hash);
+
+        // 5.2) Create a string chosen path.
+        var chosenPath = '';
+
+        // 5.3) Create an unset chosen issuer variable.
+        var chosenIssuer;
+
+        // 5.4) For each permutation of blank node list:
+        var permutator = new Permutator(hashToRelated[hash]);
+        self.whilst(
+          function() { return permutator.hasNext(); },
+          function(nextPermutation) {
+          var permutation = permutator.next();
+
+          // 5.4.1) Create a copy of issuer, issuer copy.
+          var issuerCopy = issuer.clone();
+
+          // 5.4.2) Create a string path.
+          var path = '';
+
+          // 5.4.3) Create a recursion list, to store blank node identifiers
+          // that must be recursively processed by this algorithm.
+          var recursionList = [];
+
+          self.waterfall([
+            function(callback) {
+              // 5.4.4) For each related in permutation:
+              self.forEach(permutation, function(related, idx, callback) {
+                // 5.4.4.1) If a canonical identifier has been issued for related,
+                // append it to path.
+                if(self.canonicalIssuer.hasId(related)) {
+                  path += self.canonicalIssuer.getId(related);
+                } else {
+                  // 5.4.4.2) Otherwise:
+                  // 5.4.4.2.1) If issuer copy has not issued an identifier for
+                  // related, append related to recursion list.
+                  if(!issuerCopy.hasId(related)) {
+                    recursionList.push(related);
+                  }
+                  // 5.4.4.2.2) Use the Issue Identifier algorithm, passing
+                  // issuer copy and related and append the result to path.
+                  path += issuerCopy.getId(related);
+                }
+
+                // 5.4.4.3) If chosen path is not empty and the length of path
+                // is greater than or equal to the length of chosen path and
+                // path is lexicographically greater than chosen path, then
+                // skip to the next permutation.
+                if(chosenPath.length !== 0 &&
+                  path.length >= chosenPath.length && path > chosenPath) {
+                  // FIXME: may cause inaccurate total depth calculation
+                  return nextPermutation();
+                }
+                callback();
+              }, callback);
+            },
+            function(callback) {
+              // 5.4.5) For each related in recursion list:
+              self.forEach(recursionList, function(related, idx, callback) {
+                // 5.4.5.1) Set result to the result of recursively executing
+                // the Hash N-Degree Quads algorithm, passing related for
+                // identifier and issuer copy for path identifier issuer.
+                self.hashNDegreeQuads(
+                  related, issuerCopy, function(err, result) {
+                  if(err) {
+                    return callback(err);
+                  }
+
+                  // 5.4.5.2) Use the Issue Identifier algorithm, passing issuer
+                  // copy and related and append the result to path.
+                  path += issuerCopy.getId(related);
+
+                  // 5.4.5.3) Append <, the hash in result, and > to path.
+                  path += '<' + result.hash + '>';
+
+                  // 5.4.5.4) Set issuer copy to the identifier issuer in result.
+                  issuerCopy = result.issuer;
+
+                  // 5.4.5.5) If chosen path is not empty and the length of path
+                  // is greater than or equal to the length of chosen path and
+                  // path is lexicographically greater than chosen path, then
+                  // skip to the next permutation.
+                  if(chosenPath.length !== 0 &&
+                    path.length >= chosenPath.length && path > chosenPath) {
+                    // FIXME: may cause inaccurate total depth calculation
+                    return nextPermutation();
+                  }
+                  callback();
+                });
+              }, callback);
+            },
+            function(callback) {
+              // 5.4.6) If chosen path is empty or path is lexicographically
+              // less than chosen path, set chosen path to path and chosen
+              // issuer to issuer copy.
+              if(chosenPath.length === 0 || path < chosenPath) {
+                chosenPath = path;
+                chosenIssuer = issuerCopy;
+              }
+              callback();
+            }
+          ], nextPermutation);
+        }, function(err) {
+          if(err) {
+            return callback(err);
+          }
+
+          // 5.5) Append chosen path to data to hash.
+          md.update(chosenPath);
+
+          // 5.6) Replace issuer, by reference, with chosen issuer.
+          issuer = chosenIssuer;
+          callback();
+        });
+      }, callback);
+    }
+  ], function(err) {
+    // 6) Return issuer and the hash that results from passing data to hash
+    // through the hash algorithm.
+    callback(err, {hash: md.digest(), issuer: issuer});
+  });
+};
+
+// helper for creating hash to related blank nodes map
+Normalize.prototype.createHashToRelated = function(id, issuer, callback) {
+  var self = this;
+
+  // 1) Create a hash to related blank nodes map for storing hashes that
+  // identify related blank nodes.
+  var hashToRelated = {};
+
+  // 2) Get a reference, quads, to the list of quads in the blank node to
+  // quads map for the key identifier.
+  var quads = self.blankNodeInfo[id].quads;
+
+  // 3) For each quad in quads:
+  self.forEach(quads, function(quad, idx, callback) {
+    // 3.1) For each component in quad, if component is the subject, object,
+    // and graph name and it is a blank node that is not identified by
+    // identifier:
+    self.forEach(quad, function(component, key, callback) {
+      if(key === 'predicate' ||
+        !(component.type === 'blank node' && component.value !== id)) {
+        return callback();
+      }
+      // 3.1.1) Set hash to the result of the Hash Related Blank Node
+      // algorithm, passing the blank node identifier for component as
+      // related, quad, path identifier issuer as issuer, and position as
+      // either s, o, or g based on whether component is a subject, object,
+      // graph name, respectively.
+      var related = component.value;
+      var position = POSITIONS[key];
+      self.hashRelatedBlankNode(
+        related, quad, issuer, position, function(err, hash) {
+        if(err) {
+          return callback(err);
+        }
+        // 3.1.2) Add a mapping of hash to the blank node identifier for
+        // component to hash to related blank nodes map, adding an entry as
+        // necessary.
+        if(hash in hashToRelated) {
+          hashToRelated[hash].push(related);
+        } else {
+          hashToRelated[hash] = [related];
+        }
+        callback();
+      });
+    }, callback);
+  }, function(err) {
+    callback(err, hashToRelated);
+  });
+};
+
+// helper that iterates over quad components (skips predicate)
+Normalize.prototype.forEachComponent = function(quad, op) {
+  for(var key in quad) {
+    // skip `predicate`
+    if(key === 'predicate') {
+      continue;
+    }
+    op(quad[key], key, quad);
+  }
+};
+
+return Normalize;
+
+})(); // end of define URDNA2015
+
+/////////////////////////////// DEFINE URGNA2012 //////////////////////////////
+
+var URGNA2012 = (function() {
+
+var Normalize = function(options) {
+  URDNA2015.call(this, options);
+  this.name = 'URGNA2012';
+};
+Normalize.prototype = new URDNA2015();
+
+// helper for modifying component during Hash First Degree Quads
+Normalize.prototype.modifyFirstDegreeComponent = function(id, component, key) {
+  if(component.type !== 'blank node') {
+    return component;
+  }
+  component = _clone(component);
+  if(key === 'name') {
+    component.value = '_:g';
+  } else {
+    component.value = (component.value === id ? '_:a' : '_:z');
+  }
+  return component;
+};
+
+// helper for getting a related predicate
+Normalize.prototype.getRelatedPredicate = function(quad) {
+  return quad.predicate.value;
+};
+
+// helper for creating hash to related blank nodes map
+Normalize.prototype.createHashToRelated = function(id, issuer, callback) {
+  var self = this;
+
+  // 1) Create a hash to related blank nodes map for storing hashes that
+  // identify related blank nodes.
+  var hashToRelated = {};
+
+  // 2) Get a reference, quads, to the list of quads in the blank node to
+  // quads map for the key identifier.
+  var quads = self.blankNodeInfo[id].quads;
+
+  // 3) For each quad in quads:
+  self.forEach(quads, function(quad, idx, callback) {
+    // 3.1) If the quad's subject is a blank node that does not match
+    // identifier, set hash to the result of the Hash Related Blank Node
+    // algorithm, passing the blank node identifier for subject as related,
+    // quad, path identifier issuer as issuer, and p as position.
+    var position;
+    var related;
+    if(quad.subject.type === 'blank node' && quad.subject.value !== id) {
+      related = quad.subject.value;
+      position = 'p';
+    } else if(quad.object.type === 'blank node' && quad.object.value !== id) {
+      // 3.2) Otherwise, if quad's object is a blank node that does not match
+      // identifier, to the result of the Hash Related Blank Node algorithm,
+      // passing the blank node identifier for object as related, quad, path
+      // identifier issuer as issuer, and r as position.
+      related = quad.object.value;
+      position = 'r';
+    } else {
+      // 3.3) Otherwise, continue to the next quad.
+      return callback();
+    }
+    // 3.4) Add a mapping of hash to the blank node identifier for the
+    // component that matched (subject or object) to hash to related blank
+    // nodes map, adding an entry as necessary.
+    self.hashRelatedBlankNode(
+      related, quad, issuer, position, function(err, hash) {
+      if(hash in hashToRelated) {
+        hashToRelated[hash].push(related);
+      } else {
+        hashToRelated[hash] = [related];
+      }
+      callback();
+    });
+  }, function(err) {
+    callback(err, hashToRelated);
+  });
+};
+
+return Normalize;
+
+})(); // end of define URGNA2012
 
 /**
  * Recursively flattens the subjects in the given JSON-LD expanded input
@@ -10220,15 +10415,15 @@ function _getAdjacentBlankNodeName(node, id) {
  * @param input the JSON-LD expanded input.
  * @param graphs a map of graph name to subject map.
  * @param graph the name of the current graph.
- * @param namer the blank node namer.
+ * @param issuer the blank node identifier issuer.
  * @param name the name assigned to the current input if it is a bnode.
  * @param list the list to append to, null for none.
  */
-function _createNodeMap(input, graphs, graph, namer, name, list) {
+function _createNodeMap(input, graphs, graph, issuer, name, list) {
   // recurse through array
   if(_isArray(input)) {
     for(var i = 0; i < input.length; ++i) {
-      _createNodeMap(input[i], graphs, graph, namer, undefined, list);
+      _createNodeMap(input[i], graphs, graph, issuer, undefined, list);
     }
     return;
   }
@@ -10247,7 +10442,7 @@ function _createNodeMap(input, graphs, graph, namer, name, list) {
       var type = input['@type'];
       // rename @type blank node
       if(type.indexOf('_:') === 0) {
-        input['@type'] = type = namer.getName(type);
+        input['@type'] = type = issuer.getId(type);
       }
     }
     if(list) {
@@ -10264,14 +10459,14 @@ function _createNodeMap(input, graphs, graph, namer, name, list) {
     for(var i = 0; i < types.length; ++i) {
       var type = types[i];
       if(type.indexOf('_:') === 0) {
-        namer.getName(type);
+        issuer.getId(type);
       }
     }
   }
 
   // get name for subject
   if(_isUndefined(name)) {
-    name = _isBlankNode(input) ? namer.getName(input['@id']) : input['@id'];
+    name = _isBlankNode(input) ? issuer.getId(input['@id']) : input['@id'];
   }
 
   // add subject reference to list
@@ -10302,9 +10497,9 @@ function _createNodeMap(input, graphs, graph, namer, name, list) {
           var item = items[ii];
           var itemName = item['@id'];
           if(_isBlankNode(item)) {
-            itemName = namer.getName(itemName);
+            itemName = issuer.getId(itemName);
           }
-          _createNodeMap(item, graphs, graph, namer, itemName);
+          _createNodeMap(item, graphs, graph, issuer, itemName);
           jsonld.addValue(
             subjects[itemName], reverseProperty, referencedNode,
             {propertyIsArray: true, allowDuplicate: false});
@@ -10320,7 +10515,7 @@ function _createNodeMap(input, graphs, graph, namer, name, list) {
         graphs[name] = {};
       }
       var g = (graph === '@merged') ? graph : name;
-      _createNodeMap(input[property], graphs, g, namer);
+      _createNodeMap(input[property], graphs, g, issuer);
       continue;
     }
 
@@ -10343,7 +10538,7 @@ function _createNodeMap(input, graphs, graph, namer, name, list) {
 
     // if property is a bnode, assign it a new id
     if(property.indexOf('_:') === 0) {
-      property = namer.getName(property);
+      property = issuer.getId(property);
     }
 
     // ensure property is added for empty arrays
@@ -10356,30 +10551,30 @@ function _createNodeMap(input, graphs, graph, namer, name, list) {
 
       if(property === '@type') {
         // rename @type blank nodes
-        o = (o.indexOf('_:') === 0) ? namer.getName(o) : o;
+        o = (o.indexOf('_:') === 0) ? issuer.getId(o) : o;
       }
 
       // handle embedded subject or subject reference
       if(_isSubject(o) || _isSubjectReference(o)) {
-        // rename blank node @id
-        var id = _isBlankNode(o) ? namer.getName(o['@id']) : o['@id'];
+        // relabel blank node @id
+        var id = _isBlankNode(o) ? issuer.getId(o['@id']) : o['@id'];
 
         // add reference and recurse
         jsonld.addValue(
           subject, property, {'@id': id},
           {propertyIsArray: true, allowDuplicate: false});
-        _createNodeMap(o, graphs, graph, namer, id);
+        _createNodeMap(o, graphs, graph, issuer, id);
       } else if(_isList(o)) {
         // handle @list
         var _list = [];
-        _createNodeMap(o['@list'], graphs, graph, namer, name, _list);
+        _createNodeMap(o['@list'], graphs, graph, issuer, name, _list);
         o = {'@list': _list};
         jsonld.addValue(
           subject, property, o,
           {propertyIsArray: true, allowDuplicate: false});
       } else {
         // handle @value
-        _createNodeMap(o, graphs, graph, namer, name);
+        _createNodeMap(o, graphs, graph, issuer, name);
         jsonld.addValue(
           subject, property, o, {propertyIsArray: true, allowDuplicate: false});
       }
@@ -12531,37 +12726,36 @@ function _toNQuads(dataset) {
       quads.push(_toNQuad(triple, graphName));
     }
   }
-  quads.sort();
-  return quads.join('');
+  return quads.sort().join('');
 }
 
 /**
  * Converts an RDF triple and graph name to an N-Quad string (a single quad).
  *
- * @param triple the RDF triple to convert.
+ * @param triple the RDF triple or quad to convert (a triple or quad may be
+ *          passed, if a triple is passed then `graphName` should be given
+ *          to specify the name of the graph the triple is in, `null` for
+ *          the default graph).
  * @param graphName the name of the graph containing the triple, null for
  *          the default graph.
- * @param bnode the bnode the quad is mapped to (optional, for use
- *          during normalization only).
  *
  * @return the N-Quad string.
  */
-function _toNQuad(triple, graphName, bnode) {
+function _toNQuad(triple, graphName) {
   var s = triple.subject;
   var p = triple.predicate;
   var o = triple.object;
-  var g = graphName;
+  var g = graphName || null;
+  if('name' in triple && triple.name) {
+    g = triple.name.value;
+  }
 
   var quad = '';
 
   // subject is an IRI
   if(s.type === 'IRI') {
     quad += '<' + s.value + '>';
-  } else if(bnode) {
-    // bnode normalization mode
-    quad += (s.value === bnode) ? '_:a' : '_:z';
   } else {
-    // bnode normal mode
     quad += s.value;
   }
   quad += ' ';
@@ -12569,12 +12763,7 @@ function _toNQuad(triple, graphName, bnode) {
   // predicate is an IRI
   if(p.type === 'IRI') {
     quad += '<' + p.value + '>';
-  } else if(bnode) {
-    // FIXME: TBD what to do with bnode predicates during normalization
-    // bnode normalization mode
-    quad += '_:p';
   } else {
-    // bnode normal mode
     quad += p.value;
   }
   quad += ' ';
@@ -12583,13 +12772,7 @@ function _toNQuad(triple, graphName, bnode) {
   if(o.type === 'IRI') {
     quad += '<' + o.value + '>';
   } else if(o.type === 'blank node') {
-    // normalization mode
-    if(bnode) {
-      quad += (o.value === bnode) ? '_:a' : '_:z';
-    } else {
-      // normal mode
-      quad += o.value;
-    }
+    quad += o.value;
   } else {
     var escaped = o.value
       .replace(/\\/g, '\\\\')
@@ -12608,11 +12791,9 @@ function _toNQuad(triple, graphName, bnode) {
   }
 
   // graph
-  if(g !== null) {
+  if(g !== null && g !== undefined) {
     if(g.indexOf('_:') !== 0) {
       quad += ' <' + g + '>';
-    } else if(bnode) {
-      quad += ' _:g';
     } else {
       quad += ' ' + g;
     }
@@ -12726,66 +12907,74 @@ function _parseRdfaApiData(data) {
 jsonld.registerRDFParser('rdfa-api', _parseRdfaApiData);
 
 /**
- * Creates a new UniqueNamer. A UniqueNamer issues unique names, keeping
- * track of any previously issued names.
+ * Creates a new IdentifierIssuer. A IdentifierIssuer issues unique
+ * identifiers, keeping track of any previously issued identifiers.
  *
  * @param prefix the prefix to use ('<prefix><counter>').
  */
-function UniqueNamer(prefix) {
+function IdentifierIssuer(prefix) {
   this.prefix = prefix;
   this.counter = 0;
   this.existing = {};
 }
-jsonld.UniqueNamer = UniqueNamer;
+jsonld.IdentifierIssuer = IdentifierIssuer;
+// backwards-compability
+jsonld.UniqueNamer = IdentifierIssuer;
 
 /**
- * Copies this UniqueNamer.
+ * Copies this IdentifierIssuer.
  *
- * @return a copy of this UniqueNamer.
+ * @return a copy of this IdentifierIssuer.
  */
-UniqueNamer.prototype.clone = function() {
-  var copy = new UniqueNamer(this.prefix);
+IdentifierIssuer.prototype.clone = function() {
+  var copy = new IdentifierIssuer(this.prefix);
   copy.counter = this.counter;
   copy.existing = _clone(this.existing);
   return copy;
 };
 
 /**
- * Gets the new name for the given old name, where if no old name is given
- * a new name will be generated.
+ * Gets the new identifier for the given old identifier, where if no old
+ * identifier is given a new identifier will be generated.
  *
- * @param [oldName] the old name to get the new name for.
+ * @param [old] the old identifier to get the new identifier for.
  *
- * @return the new name.
+ * @return the new identifier.
  */
-UniqueNamer.prototype.getName = function(oldName) {
-  // return existing old name
-  if(oldName && oldName in this.existing) {
-    return this.existing[oldName];
+IdentifierIssuer.prototype.getId = function(old) {
+  // return existing old identifier
+  if(old && old in this.existing) {
+    return this.existing[old];
   }
 
-  // get next name
-  var name = this.prefix + this.counter;
+  // get next identifier
+  var identifier = this.prefix + this.counter;
   this.counter += 1;
 
   // save mapping
-  if(oldName) {
-    this.existing[oldName] = name;
+  if(old) {
+    this.existing[old] = identifier;
   }
 
-  return name;
+  return identifier;
 };
+// alias
+IdentifierIssuer.prototype.getName = IdentifierIssuer.prototype.getName;
 
 /**
- * Returns true if the given oldName has already been assigned a new name.
+ * Returns true if the given old identifer has already been assigned a new
+ * identifier.
  *
- * @param oldName the oldName to check.
+ * @param old the old identifier to check.
  *
- * @return true if the oldName has been assigned a new name, false if not.
+ * @return true if the old identifier has been assigned a new identifier, false
+ *   if not.
  */
-UniqueNamer.prototype.isNamed = function(oldName) {
-  return (oldName in this.existing);
+IdentifierIssuer.prototype.hasId = function(old) {
+  return (old in this.existing);
 };
+// alias
+IdentifierIssuer.prototype.isNamed = IdentifierIssuer.prototype.hasId;
 
 /**
  * A Permutator iterates over all possible permutations of the given array
@@ -12863,52 +13052,250 @@ Permutator.prototype.next = function() {
   return rval;
 };
 
-// SHA-1 API
-var sha1 = jsonld.sha1 = {};
-
-if(_nodejs) {
-  var crypto = require('crypto');
-  sha1.create = function() {
-    var md = crypto.createHash('sha1');
-    return {
-      update: function(data) {
-        md.update(data, 'utf8');
-      },
-      digest: function() {
-        return md.digest('hex');
-      }
-    };
-  };
-} else {
-  sha1.create = function() {
-    return new sha1.MessageDigest();
-  };
-}
+//////////////////////// DEFINE NORMALIZATION HASH API ////////////////////////
 
 /**
- * Hashes the given array of quads and returns its hexadecimal SHA-1 message
- * digest.
+ * Creates a new NormalizeHash for use by the given normalization algorithm.
  *
- * @param nquads the list of serialized quads to hash.
- *
- * @return the hexadecimal SHA-1 message digest.
+ * @param algorithm the RDF Dataset Normalization algorithm to use:
+ *          'URDNA2015' or 'URGNA2012'.
  */
-sha1.hash = function(nquads) {
-  var md = sha1.create();
+var NormalizeHash = function(algorithm) {
+  if(!(this instanceof NormalizeHash)) {
+    return new NormalizeHash(algorithm);
+  }
+  if(['URDNA2015', 'URGNA2012'].indexOf(algorithm) === -1) {
+    throw new Error(
+      'Invalid RDF Dataset Normalization algorithm: ' + algorithm);
+  }
+  NormalizeHash._init.call(this, algorithm);
+};
+NormalizeHash.hashNQuads = function(algorithm, nquads) {
+  var md = new NormalizeHash(algorithm);
   for(var i = 0; i < nquads.length; ++i) {
     md.update(nquads[i]);
   }
   return md.digest();
 };
 
-// only define sha1 MessageDigest for non-nodejs
-if(!_nodejs) {
+// switch definition of NormalizeHash based on environment
+(function(_nodejs) {
+
+if(_nodejs) {
+  // define NormalizeHash using native crypto lib
+  var crypto = require('crypto');
+  NormalizeHash._init = function(algorithm) {
+    if(algorithm === 'URDNA2015') {
+      algorithm = 'sha256';
+    } else {
+      // assume URGNA2012
+      algorithm = 'sha1';
+    }
+    this.md = crypto.createHash(algorithm);
+  };
+  NormalizeHash.prototype.update = function(msg) {
+    return this.md.update(msg, 'utf8');
+  };
+  NormalizeHash.prototype.digest = function() {
+    return this.md.digest('hex');
+  };
+  return;
+}
+
+// define NormalizeHash using JavaScript
+NormalizeHash._init = function(algorithm) {
+  if(algorithm === 'URDNA2015') {
+    algorithm = new sha256.Algorithm();
+  } else {
+    // assume URGNA2012
+    algorithm = new sha1.Algorithm();
+  }
+  this.md = new MessageDigest(algorithm);
+};
+NormalizeHash.prototype.update = function(msg) {
+  return this.md.update(msg);
+};
+NormalizeHash.prototype.digest = function() {
+  return this.md.digest().toHex();
+};
+
+/////////////////////////// DEFINE MESSAGE DIGEST API /////////////////////////
+
+/**
+ * Creates a new MessageDigest.
+ *
+ * @param algorithm the algorithm to use.
+ */
+var MessageDigest = function(algorithm) {
+  if(!(this instanceof MessageDigest)) {
+    return new MessageDigest(algorithm);
+  }
+
+  this._algorithm = algorithm;
+
+  // create shared padding as needed
+  if(!MessageDigest._padding ||
+    MessageDigest._padding.length < this._algorithm.blockSize) {
+    MessageDigest._padding = String.fromCharCode(128);
+    var c = String.fromCharCode(0x00);
+    var n = 64;
+    while(n > 0) {
+      if(n & 1) {
+        MessageDigest._padding += c;
+      }
+      n >>>= 1;
+      if(n > 0) {
+        c += c;
+      }
+    }
+  }
+
+  // start digest automatically for first time
+  this.start();
+};
+
+/**
+ * Starts the digest.
+ *
+ * @return this digest object.
+ */
+MessageDigest.prototype.start = function() {
+  // up to 56-bit message length for convenience
+  this.messageLength = 0;
+
+  // full message length
+  this.fullMessageLength = [];
+  var int32s = this._algorithm.messageLengthSize / 4;
+  for(var i = 0; i < int32s; ++i) {
+    this.fullMessageLength.push(0);
+  }
+
+  // input buffer
+  this._input = new MessageDigest.ByteBuffer();
+
+  // get starting state
+  this.state = this._algorithm.start();
+
+  return this;
+};
+
+/**
+ * Updates the digest with the given message input. The input must be
+ * a string of characters.
+ *
+ * @param msg the message input to update with (ByteBuffer or string).
+ *
+ * @return this digest object.
+ */
+MessageDigest.prototype.update = function(msg) {
+  // encode message as a UTF-8 encoded binary string
+  msg = new MessageDigest.ByteBuffer(unescape(encodeURIComponent(msg)));
+
+  // update message length
+  this.messageLength += msg.length();
+  var len = msg.length();
+  len = [(len / 0x100000000) >>> 0, len >>> 0];
+  for(var i = this.fullMessageLength.length - 1; i >= 0; --i) {
+    this.fullMessageLength[i] += len[1];
+    len[1] = len[0] + ((this.fullMessageLength[i] / 0x100000000) >>> 0);
+    this.fullMessageLength[i] = this.fullMessageLength[i] >>> 0;
+    len[0] = ((len[1] / 0x100000000) >>> 0);
+  }
+
+  // add bytes to input buffer
+  this._input.putBytes(msg.bytes());
+
+  // digest blocks
+  while(this._input.length() >= this._algorithm.blockSize) {
+    this.state = this._algorithm.digest(this.state, this._input);
+  }
+
+  // compact input buffer every 2K or if empty
+  if(this._input.read > 2048 || this._input.length() === 0) {
+    this._input.compact();
+  }
+
+  return this;
+};
+
+/**
+ * Produces the digest.
+ *
+ * @return a byte buffer containing the digest value.
+ */
+MessageDigest.prototype.digest = function() {
+  /* Note: Here we copy the remaining bytes in the input buffer and add the
+  appropriate padding. Then we do the final update on a copy of the state so
+  that if the user wants to get intermediate digests they can do so. */
+
+  /* Determine the number of bytes that must be added to the message to
+  ensure its length is appropriately congruent. In other words, the data to
+  be digested must be a multiple of `blockSize`. This data includes the
+  message, some padding, and the length of the message. Since the length of
+  the message will be encoded as `messageLengthSize` bytes, that means that
+  the last segment of the data must have `blockSize` - `messageLengthSize`
+  bytes of message and padding. Therefore, the length of the message plus the
+  padding must be congruent to X mod `blockSize` because
+  `blockSize` - `messageLengthSize` = X.
+
+  For example, SHA-1 is congruent to 448 mod 512 and SHA-512 is congruent to
+  896 mod 1024. SHA-1 uses a `blockSize` of 64 bytes (512 bits) and a
+  `messageLengthSize` of 8 bytes (64 bits). SHA-512 uses a `blockSize` of
+  128 bytes (1024 bits) and a `messageLengthSize` of 16 bytes (128 bits).
+
+  In order to fill up the message length it must be filled with padding that
+  begins with 1 bit followed by all 0 bits. Padding must *always* be present,
+  so if the message length is already congruent, then `blockSize` padding bits
+  must be added. */
+
+  // create final block
+  var finalBlock = new MessageDigest.ByteBuffer();
+  finalBlock.putBytes(this._input.bytes());
+
+  // compute remaining size to be digested (include message length size)
+  var remaining = (
+    this.fullMessageLength[this.fullMessageLength.length - 1] +
+    this._algorithm.messageLengthSize);
+
+  // add padding for overflow blockSize - overflow
+  // _padding starts with 1 byte with first bit is set (byte value 128), then
+  // there may be up to (blockSize - 1) other pad bytes
+  var overflow = remaining & (this._algorithm.blockSize - 1);
+  finalBlock.putBytes(MessageDigest._padding.substr(
+    0, this._algorithm.blockSize - overflow));
+
+  // serialize message length in bits in big-endian order; since length
+  // is stored in bytes we multiply by 8 (left shift by 3 and merge in
+  // remainder from )
+  var messageLength = new MessageDigest.ByteBuffer();
+  for(var i = 0; i < this.fullMessageLength.length; ++i) {
+    messageLength.putInt32((this.fullMessageLength[i] << 3) |
+      (this.fullMessageLength[i + 1] >>> 28));
+  }
+
+  // write the length of the message (algorithm-specific)
+  this._algorithm.writeMessageLength(finalBlock, messageLength);
+
+  // digest final block
+  var state = this._algorithm.digest(this.state.copy(), finalBlock);
+
+  // write state to buffer
+  var rval = new MessageDigest.ByteBuffer();
+  state.write(rval);
+  return rval;
+};
 
 /**
  * Creates a simple byte buffer for message digest operations.
+ *
+ * @param data the data to put in the buffer.
  */
-sha1.Buffer = function() {
-  this.data = '';
+MessageDigest.ByteBuffer = function(data) {
+  if(typeof data === 'string') {
+    this.data = data;
+  } else {
+    this.data = '';
+  }
   this.read = 0;
 };
 
@@ -12917,7 +13304,7 @@ sha1.Buffer = function() {
  *
  * @param i the 32-bit integer.
  */
-sha1.Buffer.prototype.putInt32 = function(i) {
+MessageDigest.ByteBuffer.prototype.putInt32 = function(i) {
   this.data += (
     String.fromCharCode(i >> 24 & 0xFF) +
     String.fromCharCode(i >> 16 & 0xFF) +
@@ -12931,7 +13318,7 @@ sha1.Buffer.prototype.putInt32 = function(i) {
  *
  * @return the word.
  */
-sha1.Buffer.prototype.getInt32 = function() {
+MessageDigest.ByteBuffer.prototype.getInt32 = function() {
   var rval = (
     this.data.charCodeAt(this.read) << 24 ^
     this.data.charCodeAt(this.read + 1) << 16 ^
@@ -12942,11 +13329,20 @@ sha1.Buffer.prototype.getInt32 = function() {
 };
 
 /**
+ * Puts the given bytes into this buffer.
+ *
+ * @param bytes the bytes as a binary-encoded string.
+ */
+MessageDigest.ByteBuffer.prototype.putBytes = function(bytes) {
+  this.data += bytes;
+};
+
+/**
  * Gets the bytes in this buffer.
  *
  * @return a string full of UTF-8 encoded characters.
  */
-sha1.Buffer.prototype.bytes = function() {
+MessageDigest.ByteBuffer.prototype.bytes = function() {
   return this.data.slice(this.read);
 };
 
@@ -12955,14 +13351,14 @@ sha1.Buffer.prototype.bytes = function() {
  *
  * @return the number of bytes in this buffer.
  */
-sha1.Buffer.prototype.length = function() {
+MessageDigest.ByteBuffer.prototype.length = function() {
   return this.data.length - this.read;
 };
 
 /**
  * Compacts this buffer.
  */
-sha1.Buffer.prototype.compact = function() {
+MessageDigest.ByteBuffer.prototype.compact = function() {
   this.data = this.data.slice(this.read);
   this.read = 0;
 };
@@ -12972,7 +13368,7 @@ sha1.Buffer.prototype.compact = function() {
  *
  * @return a hexadecimal string.
  */
-sha1.Buffer.prototype.toHex = function() {
+MessageDigest.ByteBuffer.prototype.toHex = function() {
   var rval = '';
   for(var i = this.read; i < this.data.length; ++i) {
     var b = this.data.charCodeAt(i);
@@ -12984,148 +13380,39 @@ sha1.Buffer.prototype.toHex = function() {
   return rval;
 };
 
-/**
- * Creates a SHA-1 message digest object.
- *
- * @return a message digest object.
- */
-sha1.MessageDigest = function() {
-  // do initialization as necessary
-  if(!_sha1.initialized) {
-    _sha1.init();
-  }
+///////////////////////////// DEFINE SHA-1 ALGORITHM //////////////////////////
 
-  this.blockLength = 64;
+var sha1 = {
+  // used for word storage
+  _w: null
+};
+
+sha1.Algorithm = function() {
+  this.name = 'sha1',
+  this.blockSize = 64;
   this.digestLength = 20;
-  // length of message so far (does not including padding)
-  this.messageLength = 0;
-
-  // input buffer
-  this.input = new sha1.Buffer();
-
-  // for storing words in the SHA-1 algorithm
-  this.words = new Array(80);
-
-  // SHA-1 state contains five 32-bit integers
-  this.state = {
-    h0: 0x67452301,
-    h1: 0xEFCDAB89,
-    h2: 0x98BADCFE,
-    h3: 0x10325476,
-    h4: 0xC3D2E1F0
-  };
+  this.messageLengthSize = 8;
 };
 
-/**
- * Updates the digest with the given string input.
- *
- * @param msg the message input to update with.
- */
-sha1.MessageDigest.prototype.update = function(msg) {
-  // UTF-8 encode message
-  msg = unescape(encodeURIComponent(msg));
-
-  // update message length and input buffer
-  this.messageLength += msg.length;
-  this.input.data += msg;
-
-  // process input
-  _sha1.update(this.state, this.words, this.input);
-
-  // compact input buffer every 2K or if empty
-  if(this.input.read > 2048 || this.input.length() === 0) {
-    this.input.compact();
+sha1.Algorithm.prototype.start = function() {
+  if(!sha1._w) {
+    sha1._w = new Array(80);
   }
+  return sha1._createState();
 };
 
-/**
- * Produces the digest.
- *
- * @return the digest as a hexadecimal string.
- */
-sha1.MessageDigest.prototype.digest = function() {
-  /* Determine the number of bytes that must be added to the message
-  to ensure its length is congruent to 448 mod 512. In other words,
-  a 64-bit integer that gives the length of the message will be
-  appended to the message and whatever the length of the message is
-  plus 64 bits must be a multiple of 512. So the length of the
-  message must be congruent to 448 mod 512 because 512 - 64 = 448.
-
-  In order to fill up the message length it must be filled with
-  padding that begins with 1 bit followed by all 0 bits. Padding
-  must *always* be present, so if the message length is already
-  congruent to 448 mod 512, then 512 padding bits must be added. */
-
-  // 512 bits == 64 bytes, 448 bits == 56 bytes, 64 bits = 8 bytes
-  // _padding starts with 1 byte with first bit is set in it which
-  // is byte value 128, then there may be up to 63 other pad bytes
-  var len = this.messageLength;
-  var padBytes = new sha1.Buffer();
-  padBytes.data += this.input.bytes();
-  padBytes.data += _sha1.padding.substr(0, 64 - ((len + 8) % 64));
-
-  /* Now append length of the message. The length is appended in bits
-  as a 64-bit number in big-endian order. Since we store the length
-  in bytes, we must multiply it by 8 (or left shift by 3). So here
-  store the high 3 bits in the low end of the first 32-bits of the
-  64-bit number and the lower 5 bits in the high end of the second
-  32-bits. */
-  padBytes.putInt32((len >>> 29) & 0xFF);
-  padBytes.putInt32((len << 3) & 0xFFFFFFFF);
-  _sha1.update(this.state, this.words, padBytes);
-  var rval = new sha1.Buffer();
-  rval.putInt32(this.state.h0);
-  rval.putInt32(this.state.h1);
-  rval.putInt32(this.state.h2);
-  rval.putInt32(this.state.h3);
-  rval.putInt32(this.state.h4);
-  return rval.toHex();
+sha1.Algorithm.prototype.writeMessageLength = function(
+  finalBlock, messageLength) {
+  // message length is in bits and in big-endian order; simply append
+  finalBlock.putBytes(messageLength.bytes());
 };
 
-// private SHA-1 data
-var _sha1 = {
-  padding: null,
-  initialized: false
-};
-
-/**
- * Initializes the constant tables.
- */
-_sha1.init = function() {
-  // create padding
-  _sha1.padding = String.fromCharCode(128);
-  var c = String.fromCharCode(0x00);
-  var n = 64;
-  while(n > 0) {
-    if(n & 1) {
-      _sha1.padding += c;
-    }
-    n >>>= 1;
-    if(n > 0) {
-      c += c;
-    }
-  }
-
-  // now initialized
-  _sha1.initialized = true;
-};
-
-/**
- * Updates a SHA-1 state with the given byte buffer.
- *
- * @param s the SHA-1 state to update.
- * @param w the array to use to store words.
- * @param input the input byte buffer.
- */
-_sha1.update = function(s, w, input) {
+sha1.Algorithm.prototype.digest = function(s, input) {
   // consume 512 bit (64 byte) chunks
   var t, a, b, c, d, e, f, i;
   var len = input.length();
+  var _w = sha1._w;
   while(len >= 64) {
-    // the w array will be populated with sixteen 32-bit big-endian words
-    // and then extended into 80 32-bit words according to SHA-1 algorithm
-    // and for 32-79 using Max Locktyukhin's optimization
-
     // initialize hash value for this chunk
     a = s.h0;
     b = s.h1;
@@ -13133,10 +13420,14 @@ _sha1.update = function(s, w, input) {
     d = s.h3;
     e = s.h4;
 
+    // the _w array will be populated with sixteen 32-bit big-endian words
+    // and then extended into 80 32-bit words according to SHA-1 algorithm
+    // and for 32-79 using Max Locktyukhin's optimization
+
     // round 1
     for(i = 0; i < 16; ++i) {
       t = input.getInt32();
-      w[i] = t;
+      _w[i] = t;
       f = d ^ (b & (c ^ d));
       t = ((a << 5) | (a >>> 27)) + f + e + 0x5A827999 + t;
       e = d;
@@ -13146,9 +13437,9 @@ _sha1.update = function(s, w, input) {
       a = t;
     }
     for(; i < 20; ++i) {
-      t = (w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16]);
+      t = (_w[i - 3] ^ _w[i - 8] ^ _w[i - 14] ^ _w[i - 16]);
       t = (t << 1) | (t >>> 31);
-      w[i] = t;
+      _w[i] = t;
       f = d ^ (b & (c ^ d));
       t = ((a << 5) | (a >>> 27)) + f + e + 0x5A827999 + t;
       e = d;
@@ -13159,9 +13450,9 @@ _sha1.update = function(s, w, input) {
     }
     // round 2
     for(; i < 32; ++i) {
-      t = (w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16]);
+      t = (_w[i - 3] ^ _w[i - 8] ^ _w[i - 14] ^ _w[i - 16]);
       t = (t << 1) | (t >>> 31);
-      w[i] = t;
+      _w[i] = t;
       f = b ^ c ^ d;
       t = ((a << 5) | (a >>> 27)) + f + e + 0x6ED9EBA1 + t;
       e = d;
@@ -13171,9 +13462,9 @@ _sha1.update = function(s, w, input) {
       a = t;
     }
     for(; i < 40; ++i) {
-      t = (w[i - 6] ^ w[i - 16] ^ w[i - 28] ^ w[i - 32]);
+      t = (_w[i - 6] ^ _w[i - 16] ^ _w[i - 28] ^ _w[i - 32]);
       t = (t << 2) | (t >>> 30);
-      w[i] = t;
+      _w[i] = t;
       f = b ^ c ^ d;
       t = ((a << 5) | (a >>> 27)) + f + e + 0x6ED9EBA1 + t;
       e = d;
@@ -13184,9 +13475,9 @@ _sha1.update = function(s, w, input) {
     }
     // round 3
     for(; i < 60; ++i) {
-      t = (w[i - 6] ^ w[i - 16] ^ w[i - 28] ^ w[i - 32]);
+      t = (_w[i - 6] ^ _w[i - 16] ^ _w[i - 28] ^ _w[i - 32]);
       t = (t << 2) | (t >>> 30);
-      w[i] = t;
+      _w[i] = t;
       f = (b & c) | (d & (b ^ c));
       t = ((a << 5) | (a >>> 27)) + f + e + 0x8F1BBCDC + t;
       e = d;
@@ -13197,9 +13488,9 @@ _sha1.update = function(s, w, input) {
     }
     // round 4
     for(; i < 80; ++i) {
-      t = (w[i - 6] ^ w[i - 16] ^ w[i - 28] ^ w[i - 32]);
+      t = (_w[i - 6] ^ _w[i - 16] ^ _w[i - 28] ^ _w[i - 32]);
       t = (t << 2) | (t >>> 30);
-      w[i] = t;
+      _w[i] = t;
       f = b ^ c ^ d;
       t = ((a << 5) | (a >>> 27)) + f + e + 0xCA62C1D6 + t;
       e = d;
@@ -13210,17 +13501,218 @@ _sha1.update = function(s, w, input) {
     }
 
     // update hash state
-    s.h0 += a;
-    s.h1 += b;
-    s.h2 += c;
-    s.h3 += d;
-    s.h4 += e;
+    s.h0 = (s.h0 + a) | 0;
+    s.h1 = (s.h1 + b) | 0;
+    s.h2 = (s.h2 + c) | 0;
+    s.h3 = (s.h3 + d) | 0;
+    s.h4 = (s.h4 + e) | 0;
 
     len -= 64;
   }
+
+  return s;
 };
 
-} // end non-nodejs
+sha1._createState = function() {
+  var state = {
+    h0: 0x67452301,
+    h1: 0xEFCDAB89,
+    h2: 0x98BADCFE,
+    h3: 0x10325476,
+    h4: 0xC3D2E1F0
+  };
+  state.copy = function() {
+    var rval = sha1._createState();
+    rval.h0 = state.h0;
+    rval.h1 = state.h1;
+    rval.h2 = state.h2;
+    rval.h3 = state.h3;
+    rval.h4 = state.h4;
+    return rval;
+  };
+  state.write = function(buffer) {
+    buffer.putInt32(state.h0);
+    buffer.putInt32(state.h1);
+    buffer.putInt32(state.h2);
+    buffer.putInt32(state.h3);
+    buffer.putInt32(state.h4);
+  };
+  return state;
+};
+
+//////////////////////////// DEFINE SHA-256 ALGORITHM /////////////////////////
+
+var sha256 = {
+  // shared state
+  _k: null,
+  _w: null
+};
+
+sha256.Algorithm = function() {
+  this.name = 'sha256',
+  this.blockSize = 64;
+  this.digestLength = 32;
+  this.messageLengthSize = 8;
+};
+
+sha256.Algorithm.prototype.start = function() {
+  if(!sha256._k) {
+    sha256._init();
+  }
+  return sha256._createState();
+};
+
+sha256.Algorithm.prototype.writeMessageLength = function(
+  finalBlock, messageLength) {
+  // message length is in bits and in big-endian order; simply append
+  finalBlock.putBytes(messageLength.bytes());
+};
+
+sha256.Algorithm.prototype.digest = function(s, input) {
+  // consume 512 bit (64 byte) chunks
+  var t1, t2, s0, s1, ch, maj, i, a, b, c, d, e, f, g, h;
+  var len = input.length();
+  var _k = sha256._k;
+  var _w = sha256._w;
+  while(len >= 64) {
+    // the w array will be populated with sixteen 32-bit big-endian words
+    // and then extended into 64 32-bit words according to SHA-256
+    for(i = 0; i < 16; ++i) {
+      _w[i] = input.getInt32();
+    }
+    for(; i < 64; ++i) {
+      // XOR word 2 words ago rot right 17, rot right 19, shft right 10
+      t1 = _w[i - 2];
+      t1 =
+        ((t1 >>> 17) | (t1 << 15)) ^
+        ((t1 >>> 19) | (t1 << 13)) ^
+        (t1 >>> 10);
+      // XOR word 15 words ago rot right 7, rot right 18, shft right 3
+      t2 = _w[i - 15];
+      t2 =
+        ((t2 >>> 7) | (t2 << 25)) ^
+        ((t2 >>> 18) | (t2 << 14)) ^
+        (t2 >>> 3);
+      // sum(t1, word 7 ago, t2, word 16 ago) modulo 2^32
+      _w[i] = (t1 + _w[i - 7] + t2 + _w[i - 16]) | 0;
+    }
+
+    // initialize hash value for this chunk
+    a = s.h0;
+    b = s.h1;
+    c = s.h2;
+    d = s.h3;
+    e = s.h4;
+    f = s.h5;
+    g = s.h6;
+    h = s.h7;
+
+    // round function
+    for(i = 0; i < 64; ++i) {
+      // Sum1(e)
+      s1 =
+        ((e >>> 6) | (e << 26)) ^
+        ((e >>> 11) | (e << 21)) ^
+        ((e >>> 25) | (e << 7));
+      // Ch(e, f, g) (optimized the same way as SHA-1)
+      ch = g ^ (e & (f ^ g));
+      // Sum0(a)
+      s0 =
+        ((a >>> 2) | (a << 30)) ^
+        ((a >>> 13) | (a << 19)) ^
+        ((a >>> 22) | (a << 10));
+      // Maj(a, b, c) (optimized the same way as SHA-1)
+      maj = (a & b) | (c & (a ^ b));
+
+      // main algorithm
+      t1 = h + s1 + ch + _k[i] + _w[i];
+      t2 = s0 + maj;
+      h = g;
+      g = f;
+      f = e;
+      e = (d + t1) | 0;
+      d = c;
+      c = b;
+      b = a;
+      a = (t1 + t2) | 0;
+    }
+
+    // update hash state
+    s.h0 = (s.h0 + a) | 0;
+    s.h1 = (s.h1 + b) | 0;
+    s.h2 = (s.h2 + c) | 0;
+    s.h3 = (s.h3 + d) | 0;
+    s.h4 = (s.h4 + e) | 0;
+    s.h5 = (s.h5 + f) | 0;
+    s.h6 = (s.h6 + g) | 0;
+    s.h7 = (s.h7 + h) | 0;
+    len -= 64;
+  }
+
+  return s;
+};
+
+sha256._createState = function() {
+  var state = {
+    h0: 0x6A09E667,
+    h1: 0xBB67AE85,
+    h2: 0x3C6EF372,
+    h3: 0xA54FF53A,
+    h4: 0x510E527F,
+    h5: 0x9B05688C,
+    h6: 0x1F83D9AB,
+    h7: 0x5BE0CD19
+  };
+  state.copy = function() {
+    var rval = sha256._createState();
+    rval.h0 = state.h0;
+    rval.h1 = state.h1;
+    rval.h2 = state.h2;
+    rval.h3 = state.h3;
+    rval.h4 = state.h4;
+    rval.h5 = state.h5;
+    rval.h6 = state.h6;
+    rval.h7 = state.h7;
+    return rval;
+  };
+  state.write = function(buffer) {
+    buffer.putInt32(state.h0);
+    buffer.putInt32(state.h1);
+    buffer.putInt32(state.h2);
+    buffer.putInt32(state.h3);
+    buffer.putInt32(state.h4);
+    buffer.putInt32(state.h5);
+    buffer.putInt32(state.h6);
+    buffer.putInt32(state.h7);
+  };
+  return state;
+};
+
+sha256._init = function() {
+  // create K table for SHA-256
+  sha256._k = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
+    0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+    0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
+    0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
+    0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+    0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3,
+    0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
+    0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+
+  // used for word storage
+  sha256._w = new Array(64);
+};
+
+})(_nodejs); // end definition of NormalizeHash
 
 if(!XMLSerializer) {
 
@@ -13308,9 +13800,10 @@ if(_nodejs) {
 if(_nodejs) {
   jsonld.use = function(extension) {
     switch(extension) {
+      // TODO: Deprecated as of 0.4.0. Remove at some point.
       case 'request':
         // use node JSON-LD request extension
-        jsonld.request = require('./request');
+        jsonld.request = require('jsonld-request');
         break;
       default:
         throw new JsonLdError(
@@ -13370,7 +13863,7 @@ return factory;
 })();
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},"/node_modules/rdf-store-ldp/node_modules/rdf-mime-type-util/node_modules/rdf-parser-jsonld/node_modules/jsonld/js")
-},{"./request":34,"_process":13,"crypto":34,"es6-promise":36,"http":34,"pkginfo":37,"request":34,"util":34,"xmldom":34}],36:[function(require,module,exports){
+},{"_process":11,"crypto":32,"es6-promise":34,"http":32,"jsonld-request":32,"pkginfo":32,"request":32,"util":32,"xmldom":32}],34:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -14333,146 +14826,7 @@ return factory;
     }
 }).call(this);
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":13}],37:[function(require,module,exports){
-(function (__dirname){
-/*
- * pkginfo.js: Top-level include for the pkginfo module
- *
- * (C) 2011, Charlie Robbins
- *
- */
- 
-var fs = require('fs'),
-    path = require('path');
-
-//
-// ### function pkginfo ([options, 'property', 'property' ..])
-// #### @pmodule {Module} Parent module to read from.
-// #### @options {Object|Array|string} **Optional** Options used when exposing properties.
-// #### @arguments {string...} **Optional** Specified properties to expose.
-// Exposes properties from the package.json file for the parent module on 
-// it's exports. Valid usage:
-//
-// `require('pkginfo')()`
-//
-// `require('pkginfo')('version', 'author');`
-//
-// `require('pkginfo')(['version', 'author']);`
-//
-// `require('pkginfo')({ include: ['version', 'author'] });`
-//
-var pkginfo = module.exports = function (pmodule, options) {
-  var args = [].slice.call(arguments, 2).filter(function (arg) {
-    return typeof arg === 'string';
-  });
-  
-  //
-  // **Parse variable arguments**
-  //
-  if (Array.isArray(options)) {
-    //
-    // If the options passed in is an Array assume that
-    // it is the Array of properties to expose from the
-    // on the package.json file on the parent module.
-    //
-    options = { include: options };
-  }
-  else if (typeof options === 'string') {
-    //
-    // Otherwise if the first argument is a string, then
-    // assume that it is the first property to expose from
-    // the package.json file on the parent module.
-    //
-    options = { include: [options] };
-  }
-  
-  //
-  // **Setup default options**
-  //
-  options = options || {};
-  
-  // ensure that includes have been defined
-  options.include = options.include || [];
-  
-  if (args.length > 0) {
-    //
-    // If additional string arguments have been passed in
-    // then add them to the properties to expose on the 
-    // parent module. 
-    //
-    options.include = options.include.concat(args);
-  }
-  
-  var pkg = pkginfo.read(pmodule, options.dir).package;
-  Object.keys(pkg).forEach(function (key) {
-    if (options.include.length > 0 && !~options.include.indexOf(key)) {
-      return;
-    }
-    
-    if (!pmodule.exports[key]) {
-      pmodule.exports[key] = pkg[key];
-    }
-  });
-  
-  return pkginfo;
-};
-
-//
-// ### function find (dir)
-// #### @pmodule {Module} Parent module to read from.
-// #### @dir {string} **Optional** Directory to start search from.
-// Searches up the directory tree from `dir` until it finds a directory
-// which contains a `package.json` file. 
-//
-pkginfo.find = function (pmodule, dir) {
-  if (! dir) {
-    dir = path.dirname(pmodule.filename);
-  }
-  
-  var files = fs.readdirSync(dir);
-  
-  if (~files.indexOf('package.json')) {
-    return path.join(dir, 'package.json');
-  }
-  
-  if (dir === '/') {
-    throw new Error('Could not find package.json up from: ' + dir);
-  }
-  else if (!dir || dir === '.') {
-    throw new Error('Cannot find package.json from unspecified directory');
-  }
-  
-  return pkginfo.find(pmodule, path.dirname(dir));
-};
-
-//
-// ### function read (pmodule, dir)
-// #### @pmodule {Module} Parent module to read from.
-// #### @dir {string} **Optional** Directory to start search from.
-// Searches up the directory tree from `dir` until it finds a directory
-// which contains a `package.json` file and returns the package information.
-//
-pkginfo.read = function (pmodule, dir) { 
-  dir = pkginfo.find(pmodule, dir);
-  
-  var data = fs.readFileSync(dir).toString();
-      
-  return {
-    dir: dir, 
-    package: JSON.parse(data)
-  };
-};
-
-//
-// Call `pkginfo` on this module and expose version.
-//
-pkginfo(module, {
-  dir: __dirname,
-  include: ['version'],
-  target: pkginfo
-});
-}).call(this,"/node_modules/rdf-store-ldp/node_modules/rdf-mime-type-util/node_modules/rdf-parser-jsonld/node_modules/jsonld/node_modules/pkginfo/lib")
-},{"fs":2,"path":12}],38:[function(require,module,exports){
+},{"_process":11}],35:[function(require,module,exports){
 var concatStream = require('concat-stream')
 var util = require('util')
 var Readable = require('stream').Readable
@@ -14561,7 +14915,7 @@ util.inherits(AbstractParser.TripleReadStream, Readable)
 
 module.exports = AbstractParser
 
-},{"concat-stream":39,"stream":27,"util":30}],39:[function(require,module,exports){
+},{"concat-stream":36,"stream":25,"util":28}],36:[function(require,module,exports){
 (function (Buffer){
 var Writable = require('readable-stream').Writable
 var inherits = require('inherits')
@@ -14701,19 +15055,19 @@ function u8Concat (parts) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":4,"inherits":40,"readable-stream":51,"typedarray":52}],40:[function(require,module,exports){
-arguments[4][9][0].apply(exports,arguments)
-},{"dup":9}],41:[function(require,module,exports){
+},{"buffer":3,"inherits":37,"readable-stream":48,"typedarray":49}],37:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],38:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_stream_readable":40,"./_stream_writable":42,"core-util-is":43,"dup":13,"inherits":37,"process-nextick-args":45}],39:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"./_stream_transform":41,"core-util-is":43,"dup":14,"inherits":37}],40:[function(require,module,exports){
 arguments[4][15][0].apply(exports,arguments)
-},{"./_stream_readable":43,"./_stream_writable":45,"core-util-is":46,"dup":15,"inherits":40,"process-nextick-args":48}],42:[function(require,module,exports){
+},{"./_stream_duplex":38,"_process":11,"buffer":3,"core-util-is":43,"dup":15,"events":7,"inherits":37,"isarray":44,"process-nextick-args":45,"string_decoder/":46,"util":2}],41:[function(require,module,exports){
 arguments[4][16][0].apply(exports,arguments)
-},{"./_stream_transform":44,"core-util-is":46,"dup":16,"inherits":40}],43:[function(require,module,exports){
+},{"./_stream_duplex":38,"core-util-is":43,"dup":16,"inherits":37}],42:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./_stream_duplex":41,"_process":13,"buffer":4,"core-util-is":46,"dup":17,"events":8,"inherits":40,"isarray":47,"process-nextick-args":48,"string_decoder/":49,"util":3}],44:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"./_stream_duplex":41,"core-util-is":46,"dup":18,"inherits":40}],45:[function(require,module,exports){
-arguments[4][19][0].apply(exports,arguments)
-},{"./_stream_duplex":41,"buffer":4,"core-util-is":46,"dup":19,"events":8,"inherits":40,"process-nextick-args":48,"util-deprecate":50}],46:[function(require,module,exports){
+},{"./_stream_duplex":38,"buffer":3,"core-util-is":43,"dup":17,"events":7,"inherits":37,"process-nextick-args":45,"util-deprecate":47}],43:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -14823,17 +15177,17 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 }).call(this,{"isBuffer":require("../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":10}],47:[function(require,module,exports){
-arguments[4][11][0].apply(exports,arguments)
-},{"dup":11}],48:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"_process":13,"dup":21}],49:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"buffer":4,"dup":28}],50:[function(require,module,exports){
+},{"../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":9}],44:[function(require,module,exports){
+arguments[4][10][0].apply(exports,arguments)
+},{"dup":10}],45:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"_process":11,"dup":19}],46:[function(require,module,exports){
+arguments[4][26][0].apply(exports,arguments)
+},{"buffer":3,"dup":26}],47:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"dup":20}],48:[function(require,module,exports){
 arguments[4][22][0].apply(exports,arguments)
-},{"dup":22}],51:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":41,"./lib/_stream_passthrough.js":42,"./lib/_stream_readable.js":43,"./lib/_stream_transform.js":44,"./lib/_stream_writable.js":45,"dup":24}],52:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":38,"./lib/_stream_passthrough.js":39,"./lib/_stream_readable.js":40,"./lib/_stream_transform.js":41,"./lib/_stream_writable.js":42,"dup":22}],49:[function(require,module,exports){
 var undefined = (void 0); // Paranoia
 
 // Beyond this value, index getters/setters (i.e. array[0], array[1]) are so slow to
@@ -15465,7 +15819,7 @@ function packF32(v) { return packIEEE754(v, 8, 23); }
 
 }());
 
-},{}],53:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 var rdf = require('rdf-ext')
 var util = require('util')
 var DomParser = require('rdf-parser-dom')
@@ -15835,7 +16189,7 @@ for (var property in instance) {
 
 module.exports = MicrodataParser
 
-},{"./uri-resolver":75,"rdf-ext":"rdf-ext","rdf-parser-dom":55,"util":30}],54:[function(require,module,exports){
+},{"./uri-resolver":72,"rdf-ext":"rdf-ext","rdf-parser-dom":52,"util":28}],51:[function(require,module,exports){
 /* global DOMParser */
 var util = require('util')
 var AbstractParser = require('rdf-parser-abstract')
@@ -15860,7 +16214,7 @@ DomParser.prototype.parseXmlDom = function (toparse, base) {
 
 module.exports = DomParser
 
-},{"rdf-parser-abstract":57,"util":30}],55:[function(require,module,exports){
+},{"rdf-parser-abstract":54,"util":28}],52:[function(require,module,exports){
 (function (process){
 if (process.browser) {
   module.exports = require('./browser')
@@ -15869,7 +16223,7 @@ if (process.browser) {
 }
 
 }).call(this,require('_process'))
-},{"./browser":54,"./node":56,"_process":13}],56:[function(require,module,exports){
+},{"./browser":51,"./node":53,"_process":11}],53:[function(require,module,exports){
 var util = require('util')
 var xmldom = require('xmldom')
 var AbstractParser = require('rdf-parser-abstract')
@@ -15906,23 +16260,23 @@ DomParser.prototype.parseXmlDom = function (toparse, base) {
 
 module.exports = DomParser
 
-},{"rdf-parser-abstract":57,"util":30,"xmldom":72}],57:[function(require,module,exports){
-arguments[4][38][0].apply(exports,arguments)
-},{"concat-stream":58,"dup":38,"stream":27,"util":30}],58:[function(require,module,exports){
-arguments[4][39][0].apply(exports,arguments)
-},{"buffer":4,"dup":39,"inherits":59,"readable-stream":70,"typedarray":71}],59:[function(require,module,exports){
-arguments[4][9][0].apply(exports,arguments)
-},{"dup":9}],60:[function(require,module,exports){
+},{"rdf-parser-abstract":54,"util":28,"xmldom":69}],54:[function(require,module,exports){
+arguments[4][35][0].apply(exports,arguments)
+},{"concat-stream":55,"dup":35,"stream":25,"util":28}],55:[function(require,module,exports){
+arguments[4][36][0].apply(exports,arguments)
+},{"buffer":3,"dup":36,"inherits":56,"readable-stream":67,"typedarray":68}],56:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],57:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_stream_readable":59,"./_stream_writable":61,"core-util-is":62,"dup":13,"inherits":56,"process-nextick-args":64}],58:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"./_stream_transform":60,"core-util-is":62,"dup":14,"inherits":56}],59:[function(require,module,exports){
 arguments[4][15][0].apply(exports,arguments)
-},{"./_stream_readable":62,"./_stream_writable":64,"core-util-is":65,"dup":15,"inherits":59,"process-nextick-args":67}],61:[function(require,module,exports){
+},{"./_stream_duplex":57,"_process":11,"buffer":3,"core-util-is":62,"dup":15,"events":7,"inherits":56,"isarray":63,"process-nextick-args":64,"string_decoder/":65,"util":2}],60:[function(require,module,exports){
 arguments[4][16][0].apply(exports,arguments)
-},{"./_stream_transform":63,"core-util-is":65,"dup":16,"inherits":59}],62:[function(require,module,exports){
+},{"./_stream_duplex":57,"core-util-is":62,"dup":16,"inherits":56}],61:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./_stream_duplex":60,"_process":13,"buffer":4,"core-util-is":65,"dup":17,"events":8,"inherits":59,"isarray":66,"process-nextick-args":67,"string_decoder/":68,"util":3}],63:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"./_stream_duplex":60,"core-util-is":65,"dup":18,"inherits":59}],64:[function(require,module,exports){
-arguments[4][19][0].apply(exports,arguments)
-},{"./_stream_duplex":60,"buffer":4,"core-util-is":65,"dup":19,"events":8,"inherits":59,"process-nextick-args":67,"util-deprecate":69}],65:[function(require,module,exports){
+},{"./_stream_duplex":57,"buffer":3,"core-util-is":62,"dup":17,"events":7,"inherits":56,"process-nextick-args":64,"util-deprecate":66}],62:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -16032,19 +16386,19 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 }).call(this,{"isBuffer":require("../../../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":10}],66:[function(require,module,exports){
-arguments[4][11][0].apply(exports,arguments)
-},{"dup":11}],67:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"_process":13,"dup":21}],68:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"buffer":4,"dup":28}],69:[function(require,module,exports){
+},{"../../../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":9}],63:[function(require,module,exports){
+arguments[4][10][0].apply(exports,arguments)
+},{"dup":10}],64:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"_process":11,"dup":19}],65:[function(require,module,exports){
+arguments[4][26][0].apply(exports,arguments)
+},{"buffer":3,"dup":26}],66:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"dup":20}],67:[function(require,module,exports){
 arguments[4][22][0].apply(exports,arguments)
-},{"dup":22}],70:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":60,"./lib/_stream_passthrough.js":61,"./lib/_stream_readable.js":62,"./lib/_stream_transform.js":63,"./lib/_stream_writable.js":64,"dup":24}],71:[function(require,module,exports){
-arguments[4][52][0].apply(exports,arguments)
-},{"dup":52}],72:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":57,"./lib/_stream_passthrough.js":58,"./lib/_stream_readable.js":59,"./lib/_stream_transform.js":60,"./lib/_stream_writable.js":61,"dup":22}],68:[function(require,module,exports){
+arguments[4][49][0].apply(exports,arguments)
+},{"dup":49}],69:[function(require,module,exports){
 function DOMParser(options){
 	this.options = options ||{locator:{}};
 	
@@ -16301,7 +16655,7 @@ if(typeof require == 'function'){
 	exports.DOMParser = DOMParser;
 }
 
-},{"./dom":73,"./sax":74}],73:[function(require,module,exports){
+},{"./dom":70,"./sax":71}],70:[function(require,module,exports){
 /*
  * DOM Level 2
  * Object DOMException
@@ -17441,7 +17795,7 @@ if(typeof require == 'function'){
 	exports.XMLSerializer = XMLSerializer;
 }
 
-},{}],74:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
 //[4a]   	NameChar	   ::=   	NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
 //[5]   	Name	   ::=   	NameStartChar (NameChar)*
@@ -18027,7 +18381,7 @@ if(typeof require == 'function'){
 }
 
 
-},{}],75:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 /* global rdf:true */
 'use strict';
 
@@ -18233,7 +18587,7 @@ URIResolver.prototype.parseGeneric = function(parsed) {
 
 module.exports = URIResolver;
 
-},{}],76:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 var rdf = require('rdf-ext')
 var util = require('util')
 var AbstractParser = require('rdf-parser-abstract')
@@ -18336,7 +18690,7 @@ for (var property in instance) {
 
 module.exports = N3Parser
 
-},{"n3":77,"rdf-ext":"rdf-ext","rdf-parser-abstract":85,"util":30}],77:[function(require,module,exports){
+},{"n3":74,"rdf-ext":"rdf-ext","rdf-parser-abstract":82,"util":28}],74:[function(require,module,exports){
 // Replace local require by a lazy loader
 var globalRequire = require;
 require = function () {};
@@ -18364,7 +18718,7 @@ Object.keys(exports).forEach(function (submodule) {
   });
 });
 
-},{"./lib/N3Lexer":78,"./lib/N3Parser":79,"./lib/N3Store":80,"./lib/N3StreamParser":81,"./lib/N3StreamWriter":82,"./lib/N3Util":83,"./lib/N3Writer":84}],78:[function(require,module,exports){
+},{"./lib/N3Lexer":75,"./lib/N3Parser":76,"./lib/N3Store":77,"./lib/N3StreamParser":78,"./lib/N3StreamWriter":79,"./lib/N3Util":80,"./lib/N3Writer":81}],75:[function(require,module,exports){
 // **N3Lexer** tokenizes N3 documents.
 var fromCharCode = String.fromCharCode;
 var immediately = typeof setImmediate === 'function' ? setImmediate :
@@ -18725,7 +19079,7 @@ N3Lexer.prototype = {
 // Export the `N3Lexer` class as a whole.
 module.exports = N3Lexer;
 
-},{}],79:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 // **N3Parser** parses N3 documents.
 var N3Lexer = require('./N3Lexer');
 
@@ -19427,7 +19781,7 @@ function noop() {}
 // Export the `N3Parser` class as a whole.
 module.exports = N3Parser;
 
-},{"./N3Lexer":78}],80:[function(require,module,exports){
+},{"./N3Lexer":75}],77:[function(require,module,exports){
 // **N3Store** objects store N3 triples by graph in memory.
 
 var expandPrefixedName = require('./N3Util').expandPrefixedName;
@@ -19786,7 +20140,7 @@ N3Store.prototype = {
 // Export the `N3Store` class as a whole.
 module.exports = N3Store;
 
-},{"./N3Util":83}],81:[function(require,module,exports){
+},{"./N3Util":80}],78:[function(require,module,exports){
 // **N3StreamParser** parses an N3 stream into a triple stream
 var Transform = require('stream').Transform,
     util = require('util'),
@@ -19822,7 +20176,7 @@ util.inherits(N3StreamParser, Transform);
 // Export the `N3StreamParser` class as a whole.
 module.exports = N3StreamParser;
 
-},{"./N3Parser.js":79,"stream":27,"util":30}],82:[function(require,module,exports){
+},{"./N3Parser.js":76,"stream":25,"util":28}],79:[function(require,module,exports){
 // **N3StreamWriter** serializes a triple stream into an N3 stream
 var Transform = require('stream').Transform,
     util = require('util'),
@@ -19854,7 +20208,7 @@ util.inherits(N3StreamWriter, Transform);
 // Export the `N3StreamWriter` class as a whole.
 module.exports = N3StreamWriter;
 
-},{"./N3Writer.js":84,"stream":27,"util":30}],83:[function(require,module,exports){
+},{"./N3Writer.js":81,"stream":25,"util":28}],80:[function(require,module,exports){
 // **N3Util** provides N3 utility functions
 
 var Xsd = 'http://www.w3.org/2001/XMLSchema#';
@@ -19972,7 +20326,7 @@ function applyToThis(f) {
 // Expose N3Util, attaching all functions to it
 module.exports = addN3Util(addN3Util);
 
-},{}],84:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 // **N3Writer** writes N3 documents.
 
 // Matches a literal as represented in memory by the N3 library
@@ -20302,37 +20656,37 @@ function characterReplacer(character) {
 // Export the `N3Writer` class as a whole.
 module.exports = N3Writer;
 
-},{}],85:[function(require,module,exports){
-arguments[4][38][0].apply(exports,arguments)
-},{"concat-stream":86,"dup":38,"stream":27,"util":30}],86:[function(require,module,exports){
-arguments[4][39][0].apply(exports,arguments)
-},{"buffer":4,"dup":39,"inherits":87,"readable-stream":98,"typedarray":99}],87:[function(require,module,exports){
-arguments[4][9][0].apply(exports,arguments)
-},{"dup":9}],88:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
+arguments[4][35][0].apply(exports,arguments)
+},{"concat-stream":83,"dup":35,"stream":25,"util":28}],83:[function(require,module,exports){
+arguments[4][36][0].apply(exports,arguments)
+},{"buffer":3,"dup":36,"inherits":84,"readable-stream":95,"typedarray":96}],84:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],85:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_stream_readable":87,"./_stream_writable":89,"core-util-is":90,"dup":13,"inherits":84,"process-nextick-args":92}],86:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"./_stream_transform":88,"core-util-is":90,"dup":14,"inherits":84}],87:[function(require,module,exports){
 arguments[4][15][0].apply(exports,arguments)
-},{"./_stream_readable":90,"./_stream_writable":92,"core-util-is":93,"dup":15,"inherits":87,"process-nextick-args":95}],89:[function(require,module,exports){
+},{"./_stream_duplex":85,"_process":11,"buffer":3,"core-util-is":90,"dup":15,"events":7,"inherits":84,"isarray":91,"process-nextick-args":92,"string_decoder/":93,"util":2}],88:[function(require,module,exports){
 arguments[4][16][0].apply(exports,arguments)
-},{"./_stream_transform":91,"core-util-is":93,"dup":16,"inherits":87}],90:[function(require,module,exports){
+},{"./_stream_duplex":85,"core-util-is":90,"dup":16,"inherits":84}],89:[function(require,module,exports){
 arguments[4][17][0].apply(exports,arguments)
-},{"./_stream_duplex":88,"_process":13,"buffer":4,"core-util-is":93,"dup":17,"events":8,"inherits":87,"isarray":94,"process-nextick-args":95,"string_decoder/":96,"util":3}],91:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"./_stream_duplex":88,"core-util-is":93,"dup":18,"inherits":87}],92:[function(require,module,exports){
+},{"./_stream_duplex":85,"buffer":3,"core-util-is":90,"dup":17,"events":7,"inherits":84,"process-nextick-args":92,"util-deprecate":94}],90:[function(require,module,exports){
+arguments[4][43][0].apply(exports,arguments)
+},{"../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":9,"dup":43}],91:[function(require,module,exports){
+arguments[4][10][0].apply(exports,arguments)
+},{"dup":10}],92:[function(require,module,exports){
 arguments[4][19][0].apply(exports,arguments)
-},{"./_stream_duplex":88,"buffer":4,"core-util-is":93,"dup":19,"events":8,"inherits":87,"process-nextick-args":95,"util-deprecate":97}],93:[function(require,module,exports){
-arguments[4][46][0].apply(exports,arguments)
-},{"../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":10,"dup":46}],94:[function(require,module,exports){
-arguments[4][11][0].apply(exports,arguments)
-},{"dup":11}],95:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"_process":13,"dup":21}],96:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"buffer":4,"dup":28}],97:[function(require,module,exports){
+},{"_process":11,"dup":19}],93:[function(require,module,exports){
+arguments[4][26][0].apply(exports,arguments)
+},{"buffer":3,"dup":26}],94:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"dup":20}],95:[function(require,module,exports){
 arguments[4][22][0].apply(exports,arguments)
-},{"dup":22}],98:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":88,"./lib/_stream_passthrough.js":89,"./lib/_stream_readable.js":90,"./lib/_stream_transform.js":91,"./lib/_stream_writable.js":92,"dup":24}],99:[function(require,module,exports){
-arguments[4][52][0].apply(exports,arguments)
-},{"dup":52}],100:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":85,"./lib/_stream_passthrough.js":86,"./lib/_stream_readable.js":87,"./lib/_stream_transform.js":88,"./lib/_stream_writable.js":89,"dup":22}],96:[function(require,module,exports){
+arguments[4][49][0].apply(exports,arguments)
+},{"dup":49}],97:[function(require,module,exports){
 /**
  * @fileoverview
  *  RDF/XML PARSER
@@ -20976,49 +21330,49 @@ for (var property in instance) {
 
 module.exports = RdfXmlParser
 
-},{"rdf-ext":"rdf-ext","rdf-parser-dom":102,"util":30}],101:[function(require,module,exports){
-arguments[4][54][0].apply(exports,arguments)
-},{"dup":54,"rdf-parser-abstract":104,"util":30}],102:[function(require,module,exports){
-arguments[4][55][0].apply(exports,arguments)
-},{"./browser":101,"./node":103,"_process":13,"dup":55}],103:[function(require,module,exports){
-arguments[4][56][0].apply(exports,arguments)
-},{"dup":56,"rdf-parser-abstract":104,"util":30,"xmldom":119}],104:[function(require,module,exports){
-arguments[4][38][0].apply(exports,arguments)
-},{"concat-stream":105,"dup":38,"stream":27,"util":30}],105:[function(require,module,exports){
-arguments[4][39][0].apply(exports,arguments)
-},{"buffer":4,"dup":39,"inherits":106,"readable-stream":117,"typedarray":118}],106:[function(require,module,exports){
-arguments[4][9][0].apply(exports,arguments)
-},{"dup":9}],107:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"./_stream_readable":109,"./_stream_writable":111,"core-util-is":112,"dup":15,"inherits":106,"process-nextick-args":114}],108:[function(require,module,exports){
-arguments[4][16][0].apply(exports,arguments)
-},{"./_stream_transform":110,"core-util-is":112,"dup":16,"inherits":106}],109:[function(require,module,exports){
-arguments[4][17][0].apply(exports,arguments)
-},{"./_stream_duplex":107,"_process":13,"buffer":4,"core-util-is":112,"dup":17,"events":8,"inherits":106,"isarray":113,"process-nextick-args":114,"string_decoder/":115,"util":3}],110:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"./_stream_duplex":107,"core-util-is":112,"dup":18,"inherits":106}],111:[function(require,module,exports){
-arguments[4][19][0].apply(exports,arguments)
-},{"./_stream_duplex":107,"buffer":4,"core-util-is":112,"dup":19,"events":8,"inherits":106,"process-nextick-args":114,"util-deprecate":116}],112:[function(require,module,exports){
-arguments[4][65][0].apply(exports,arguments)
-},{"../../../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":10,"dup":65}],113:[function(require,module,exports){
-arguments[4][11][0].apply(exports,arguments)
-},{"dup":11}],114:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"_process":13,"dup":21}],115:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"buffer":4,"dup":28}],116:[function(require,module,exports){
-arguments[4][22][0].apply(exports,arguments)
-},{"dup":22}],117:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":107,"./lib/_stream_passthrough.js":108,"./lib/_stream_readable.js":109,"./lib/_stream_transform.js":110,"./lib/_stream_writable.js":111,"dup":24}],118:[function(require,module,exports){
+},{"rdf-ext":"rdf-ext","rdf-parser-dom":99,"util":28}],98:[function(require,module,exports){
+arguments[4][51][0].apply(exports,arguments)
+},{"dup":51,"rdf-parser-abstract":101,"util":28}],99:[function(require,module,exports){
 arguments[4][52][0].apply(exports,arguments)
-},{"dup":52}],119:[function(require,module,exports){
-arguments[4][72][0].apply(exports,arguments)
-},{"./dom":120,"./sax":121,"dup":72}],120:[function(require,module,exports){
-arguments[4][73][0].apply(exports,arguments)
-},{"dup":73}],121:[function(require,module,exports){
-arguments[4][74][0].apply(exports,arguments)
-},{"dup":74}],122:[function(require,module,exports){
+},{"./browser":98,"./node":100,"_process":11,"dup":52}],100:[function(require,module,exports){
+arguments[4][53][0].apply(exports,arguments)
+},{"dup":53,"rdf-parser-abstract":101,"util":28,"xmldom":116}],101:[function(require,module,exports){
+arguments[4][35][0].apply(exports,arguments)
+},{"concat-stream":102,"dup":35,"stream":25,"util":28}],102:[function(require,module,exports){
+arguments[4][36][0].apply(exports,arguments)
+},{"buffer":3,"dup":36,"inherits":103,"readable-stream":114,"typedarray":115}],103:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],104:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_stream_readable":106,"./_stream_writable":108,"core-util-is":109,"dup":13,"inherits":103,"process-nextick-args":111}],105:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"./_stream_transform":107,"core-util-is":109,"dup":14,"inherits":103}],106:[function(require,module,exports){
+arguments[4][15][0].apply(exports,arguments)
+},{"./_stream_duplex":104,"_process":11,"buffer":3,"core-util-is":109,"dup":15,"events":7,"inherits":103,"isarray":110,"process-nextick-args":111,"string_decoder/":112,"util":2}],107:[function(require,module,exports){
+arguments[4][16][0].apply(exports,arguments)
+},{"./_stream_duplex":104,"core-util-is":109,"dup":16,"inherits":103}],108:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"./_stream_duplex":104,"buffer":3,"core-util-is":109,"dup":17,"events":7,"inherits":103,"process-nextick-args":111,"util-deprecate":113}],109:[function(require,module,exports){
+arguments[4][62][0].apply(exports,arguments)
+},{"../../../../../../../../../../../../../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":9,"dup":62}],110:[function(require,module,exports){
+arguments[4][10][0].apply(exports,arguments)
+},{"dup":10}],111:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"_process":11,"dup":19}],112:[function(require,module,exports){
+arguments[4][26][0].apply(exports,arguments)
+},{"buffer":3,"dup":26}],113:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"dup":20}],114:[function(require,module,exports){
+arguments[4][22][0].apply(exports,arguments)
+},{"./lib/_stream_duplex.js":104,"./lib/_stream_passthrough.js":105,"./lib/_stream_readable.js":106,"./lib/_stream_transform.js":107,"./lib/_stream_writable.js":108,"dup":22}],115:[function(require,module,exports){
+arguments[4][49][0].apply(exports,arguments)
+},{"dup":49}],116:[function(require,module,exports){
+arguments[4][69][0].apply(exports,arguments)
+},{"./dom":117,"./sax":118,"dup":69}],117:[function(require,module,exports){
+arguments[4][70][0].apply(exports,arguments)
+},{"dup":70}],118:[function(require,module,exports){
+arguments[4][71][0].apply(exports,arguments)
+},{"dup":71}],119:[function(require,module,exports){
 var rdf = require('rdf-ext')
 var util = require('util')
 var AbstractSerializer = require('rdf-serializer-abstract')
@@ -21116,7 +21470,7 @@ for (var property in instance) {
 
 module.exports = JsonLdSerializer
 
-},{"rdf-ext":"rdf-ext","rdf-serializer-abstract":123,"util":30}],123:[function(require,module,exports){
+},{"rdf-ext":"rdf-ext","rdf-serializer-abstract":120,"util":28}],120:[function(require,module,exports){
 var util = require('util')
 var Readable = require('stream').Readable
 
@@ -21176,7 +21530,7 @@ util.inherits(AbstractSerializer.DataReadStream, Readable)
 
 module.exports = AbstractSerializer
 
-},{"stream":27,"util":30}],124:[function(require,module,exports){
+},{"stream":25,"util":28}],121:[function(require,module,exports){
 var rdf = require('rdf-ext')
 var util = require('util')
 var AbstractSerializer = require('rdf-serializer-abstract')
@@ -21256,25 +21610,25 @@ for (var property in instance) {
 
 module.exports = N3Serializer
 
-},{"n3":125,"rdf-ext":"rdf-ext","rdf-serializer-abstract":133,"util":30}],125:[function(require,module,exports){
+},{"n3":122,"rdf-ext":"rdf-ext","rdf-serializer-abstract":130,"util":28}],122:[function(require,module,exports){
+arguments[4][74][0].apply(exports,arguments)
+},{"./lib/N3Lexer":123,"./lib/N3Parser":124,"./lib/N3Store":125,"./lib/N3StreamParser":126,"./lib/N3StreamWriter":127,"./lib/N3Util":128,"./lib/N3Writer":129,"dup":74}],123:[function(require,module,exports){
+arguments[4][75][0].apply(exports,arguments)
+},{"dup":75}],124:[function(require,module,exports){
+arguments[4][76][0].apply(exports,arguments)
+},{"./N3Lexer":123,"dup":76}],125:[function(require,module,exports){
 arguments[4][77][0].apply(exports,arguments)
-},{"./lib/N3Lexer":126,"./lib/N3Parser":127,"./lib/N3Store":128,"./lib/N3StreamParser":129,"./lib/N3StreamWriter":130,"./lib/N3Util":131,"./lib/N3Writer":132,"dup":77}],126:[function(require,module,exports){
+},{"./N3Util":128,"dup":77}],126:[function(require,module,exports){
 arguments[4][78][0].apply(exports,arguments)
-},{"dup":78}],127:[function(require,module,exports){
+},{"./N3Parser.js":124,"dup":78,"stream":25,"util":28}],127:[function(require,module,exports){
 arguments[4][79][0].apply(exports,arguments)
-},{"./N3Lexer":126,"dup":79}],128:[function(require,module,exports){
+},{"./N3Writer.js":129,"dup":79,"stream":25,"util":28}],128:[function(require,module,exports){
 arguments[4][80][0].apply(exports,arguments)
-},{"./N3Util":131,"dup":80}],129:[function(require,module,exports){
+},{"dup":80}],129:[function(require,module,exports){
 arguments[4][81][0].apply(exports,arguments)
-},{"./N3Parser.js":127,"dup":81,"stream":27,"util":30}],130:[function(require,module,exports){
-arguments[4][82][0].apply(exports,arguments)
-},{"./N3Writer.js":132,"dup":82,"stream":27,"util":30}],131:[function(require,module,exports){
-arguments[4][83][0].apply(exports,arguments)
-},{"dup":83}],132:[function(require,module,exports){
-arguments[4][84][0].apply(exports,arguments)
-},{"dup":84}],133:[function(require,module,exports){
-arguments[4][123][0].apply(exports,arguments)
-},{"dup":123,"stream":27,"util":30}],134:[function(require,module,exports){
+},{"dup":81}],130:[function(require,module,exports){
+arguments[4][120][0].apply(exports,arguments)
+},{"dup":120,"stream":25,"util":28}],131:[function(require,module,exports){
 var rdf = require('rdf-ext')
 var util = require('util')
 var AbstractSerializer = require('rdf-serializer-abstract')
@@ -21309,9 +21663,9 @@ for (var property in instance) {
 
 module.exports = NTriplesSerializer
 
-},{"rdf-ext":"rdf-ext","rdf-serializer-abstract":135,"util":30}],135:[function(require,module,exports){
-arguments[4][123][0].apply(exports,arguments)
-},{"dup":123,"stream":27,"util":30}],136:[function(require,module,exports){
+},{"rdf-ext":"rdf-ext","rdf-serializer-abstract":132,"util":28}],132:[function(require,module,exports){
+arguments[4][120][0].apply(exports,arguments)
+},{"dup":120,"stream":25,"util":28}],133:[function(require,module,exports){
 var rdf = require('rdf-ext')
 var util = require('util')
 var AbstractSerializer = require('rdf-serializer-abstract')
@@ -21348,9 +21702,9 @@ for (var property in instance) {
 
 module.exports = SparqlUpdateSerializer
 
-},{"rdf-ext":"rdf-ext","rdf-serializer-abstract":137,"util":30}],137:[function(require,module,exports){
-arguments[4][123][0].apply(exports,arguments)
-},{"dup":123,"stream":27,"util":30}],138:[function(require,module,exports){
+},{"rdf-ext":"rdf-ext","rdf-serializer-abstract":134,"util":28}],134:[function(require,module,exports){
+arguments[4][120][0].apply(exports,arguments)
+},{"dup":120,"stream":25,"util":28}],135:[function(require,module,exports){
 function AbstractStore () {
 }
 
