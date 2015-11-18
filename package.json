@@ -1,6 +1,6 @@
 {
   "name": "rdf2h",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Reto Gmür",
   "description": "Library to render RDF resources.",
   "dependencies": {
