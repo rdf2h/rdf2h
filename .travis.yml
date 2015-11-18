@@ -5,6 +5,7 @@ node_js:
 branches:
   only: 
     - gh-pages
+    - /.*/ 
 deploy:
   provider: npm
   email: "reto.gmuer@zazuko.com"
