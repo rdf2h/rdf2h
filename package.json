@@ -18,5 +18,7 @@
         "mocha": "^2.3.3",
         "rdf-parser-n3-browser": "0.3.0-rc1c",
         "rdf-store-ldp-browser": "0.3.0-rc2"
-    }
+    },
+    "license": "Apache-2.0",
+    "repository": "https://github.com/rdf2h/rdf2h.git"
 }
