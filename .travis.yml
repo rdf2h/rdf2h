@@ -5,3 +5,10 @@ node_js:
 branches:
   only: 
     - gh-pages
+deploy:
+  provider: npm
+  email: "reto.gmuer@zazuko.com"
+  api_key:
+    secure: "GoDAUpGJJCSaRcjO5w/adk6qXE4tnq0Gh9d8T8oX93evLv6u1gZuIXZWVhbOQcH9nHCbngI2DRgmdv61cg10pYTuRbwQDS9p/4CVSJTub++V64UfDGtQGwrnGUeMlxDOPyZxjOyVhQGrQKbq6FF4z4J9CKuPm2BGvexppMu4ygG/O93DvzBVtvZaROXtHjcfiM7y2IIliVno6xv4fzY75U7fDuIRL7UYOZyF7KbRvjujvW9PM1/kyIEzXIBgLbJ8nCARpLUJdb9KNbDAhbNo8bLFv9n1VTdP0NA1wzW8lIro3Izj7BzC76c+unOQhLbLCF0LLyTe4CnvThSeAsoAmAtxyWvALTmQAnIsqDDBag/ckyDfoaITQZE1NGF4ZS6asliWxyUn+H/NuH5YGpWpggTM997TqlDwxT5k/89aalPvy1PO+DDCcJ8G4Z57ixdPFkgOzu6pzV6yyqgkeF+NWhuHYKhXJQOMs2jJIo1TqiultEh9aEXCi/7g8PMbgIb1XmgL2EwiNbQerczYY+zSGsrvLsu3ABGIYvFB6DSsVNPRLx/o4f/tyVxgY4wVqZiRHeYQZviij6/Bi8lsDAHUzVElCh7csbZbXzjwzNzKhed+V8MkwKA1qoh3ZFaRJ/AB2vtZL06tHJkmMngdPPdrPSANQ+b+RkRBX3DqxN9nCiA="
+  on:
+    tags: true
