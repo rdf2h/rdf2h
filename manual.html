@@ -32,24 +32,39 @@
             <a href="index.html">go here</a>.
         </p>
         <h2>Including RDF2h in your page</h2>
-        <p>RDF2h provides a js file aggregating its dependencies ( 
-            <a href="https://github.com/zazukoians/rdf-ext">rdf-ext</a>
-            and <a href="https://github.com/janl/mustache.js">mustache.js</a>),
-            so you have to include the following in the head of your HTML page 
+        <p>To use RDF2h you need to add <code>rdf-ext.js</code> and <code>rdf2h.js</code>
+            to your page. So add the following in the head of your HTML page 
             (adapt the paths to much the location of the file):</p>
 
         <div class="code">
-        &lt;script src="dist/rdf2h.js">&lt;/script>
+            &lt;script src="dist/rdf-ext.js">&lt;/script><br/>
+            &lt;script src="dist/rdf2h.js">&lt;/script>
         </div>
-        <p>For testing purposes only you may use 
-            https://rawgit.com/rdf2h/rdf2h/gh-pages/dist/rdf2h.js as value of 
-            the src attribute.</p>
+        <p>The released files are also available via CDN, for example:</p>
+        <div class="code">
+            &lt;script src="//cdn.rawgit.com/rdf2h/rdf2h/v0.1.1/dist/rdf-ext.js">&lt;/script><br/>
+            &lt;script src="//cdn.rawgit.com/rdf2h/rdf2h/v0.1.1/dist/rdf2h.js">&lt;/script>
+        </div>
+        <p>Check <a href="https://github.com/rdf2h/rdf2h/releases">the release page</a>
+            for the latest release and replace the version number in the CDN URLs 
+            accordingly.</p>
+        <p>The <code>rdf-ext.js</code> file referenced above provides the core
+            rdf-ext functionality needed by RDF2h. However in most applications
+            and in the following examples we also need to parse RDF data. For 
+            that we need to add a parser. To add the <a href="http://www.w3.org/TR/turtle/">Turtle</a> parser:</p>
+        <div class="code">
+            &lt;script src="dist/n3-parser.js">&lt;/script>
+        </div>
         <p>RDF2h does not depend on <a href="http://jquery.com/">jQuery</a>, 
             however some of the examples in this manual use jQuery, so you may 
             want to include it too.
         </p>
         <div class="code">
-        &lt;script src="js/libs/jquery/jquery.j">&lt;/script><br/>
+            &lt;script src="js/libs/jquery/jquery.js">&lt;/script><br/>
+        </div>
+        <p>Or from CDN:</p>
+        <div class="code">
+            &lt;script src="//code.jquery.com/jquery-2.1.4.min.js">&lt;/script><br/>
         </div>
         <h2>Invoking RDF2h</h2>
         <p>RDF2h is instantiated with a graph describing the matchers, the 
@@ -81,12 +96,13 @@ var matchersTurtle = '@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-n
         r2h:mustache "The title: {{dc:title}}"\n\
       ]\n\
     ].'
-rdf.parseTurtle(matchersTurtle, function (matchers) {
-    rdf.parseTurtle(dataTurtle, function (data) {
+N3Parser.parse(matchersTurtle).then(function (matchers) {
+    N3Parser.parse(dataTurtle).then(function (data) {
         var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
         alert(renderingResult);
     });
 });</pre>
+        <p>Play with the above example on <a href="https://jsfiddle.net/retog/xwkp8pa1/">jsFiddle</a>.</p>
         <p>The following code uses jQuery to load the turtle code describing the
             matchers from an element with id <code>matchers</code> and the data
             from en an element with id <code>data</code>. If the data is to be 
@@ -107,12 +123,13 @@ rdf.parseTurtle(matchersTurtle, function (matchers) {
             that the window.location is passed both as the base-IRI to the parser
             as well as as the IRI of the resource to be rendered.
         </p>
-        <pre class="code">rdf.parseTurtle($("#matchers").text(), function (matchers) {
-    rdf.parseTurtle($("#data").text(), function (data) {
+        <pre class="code">N3Parser.parse($("#matchers").text()).then(function (matchers) {
+    N3Parser.parse($("#data").text(), null, window.location.toString()).then(function (data) {
         var rendered = new RDF2h(matchers).render(data, rdf.createNamedNode(window.location.toString()));
-        $("html").html(rendered);
-    }, window.location.toString());
+        $("#html").html(rendered);
+    });
 }, window.location.toString());</pre>
+        <p>Play with the above example on <a href="https://jsfiddle.net/retog/1nnm0fq3/">jsFiddle</a>.</p>
         <a name="matchers"><h2>Defining Matchers</h2></a>
         <p>
             The matcher graph defines instances of <code>r2h:Matcher</code> that 
@@ -166,9 +183,9 @@ rdf.parseTurtle(matchersTurtle, function (matchers) {
         <h2>Templates</h2>
         <p>Templates are normally defined using 
             <a href="https://github.com/janl/mustache.js">mustache.js</a>, they 
-        can be expressed as RDF literals in the matcher graph or refrences by URI
-        (typically an URI with fragment identifier identifying a script element 
-        within the HTML document). The keys used are the following:</p>
+            can be expressed as RDF literals in the matcher graph or refrences by URI
+            (typically an URI with fragment identifier identifying a script element 
+            within the HTML document). The keys used are the following:</p>
 
         <ol>
             <li>The <a href="http://www.w3.org/TR/curie/">CURIE</a> of the 
@@ -211,21 +228,21 @@ rdf.parseTurtle(matchersTurtle, function (matchers) {
             node/graph as `graphNode`.</p>
         <h3>Prefixes</h3>
         <p>For many serialization formats RDF2h learns the prefixes when rdf-ex
-        parses data and matchers, so no explicit registration is necessary to
-        be able to use them in templates. They can be registered explicitely with:</p>
+            parses data and matchers, so no explicit registration is necessary to
+            be able to use them in templates. They can be registered explicitely with:</p>
         <pre class="code">RDF2h.prefixMap["ex"] = "http://example.org/onology/"</pre>
         <h3>Examples</h3>
         <p>For practical examples it is recommended to study the ones provided
-        on the <a href="index.html">try it out page</a>.</p>
+            on the <a href="index.html">try it out page</a>.</p>
         <h2>License</h2>
         <p>RDF2h was created at <a href="http://www.ti.bfh.ch/">Bern University of 
                 Applied Sciences</a> by <a href="https://github.com/retog">Reto Gmür</a>, inspired
             by <a href="http://www.uduvudu.org">Uduvudu</a> and ideas of 
             <a href="https://github.com/ktk">Adrian Gschwend</a>
             and <a href="https://github.com/l00mi">Michael Luggen</a>. Many thanks to 
-            <a href=""https://www.bergnet.org/people/bergi/card#me">Thomas Bergwinkl</a>
-            for <a href="https://github.com/zazukoians/rdf-ext">Rrdf-ext</a>
+            <a href="https://www.bergnet.org/people/bergi/card#me">Thomas Bergwinkl</a>
+            for <a href="https://github.com/zazukoians/rdf-ext">rdf-ext</a>
             and his continuous support.</p>
-        <p>It is licensed under the MIT license of which a copy is included.</p>
+        <p>It is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2 license</a>.</p>
     </body>
 </html>
