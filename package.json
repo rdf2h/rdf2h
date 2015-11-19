@@ -1,6 +1,6 @@
 {
   "name": "rdf2h",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Reto Gmür",
   "description": "Library to render RDF resources.",
   "main": "js/rdf2h-core.js",
