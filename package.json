@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "author": "Reto Gmür",
   "description": "Library to render RDF resources.",
+  "main": "js/rdf2h-core.js",
   "dependencies": {
     "rdf-ext": "0.3.0-rc1",
     "clownface": "0.3.0-rc1",
