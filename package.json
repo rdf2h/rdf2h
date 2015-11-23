@@ -8,10 +8,11 @@
     "rdf-ext": "0.3.0-rc1",
     "clownface": "0.3.0-rc1",
     "mustache": "*",
-    "rdf-parser-n3": "0.3.0-rc1"
+    "rdf-parser-n3": "0.3.0-rc1",
+    "exorcist": "^0.4.0"
   },
   "scripts": {
-    "prepublish": "mkdir -p dist && browserify -r rdf-ext > dist/rdf-ext.js &&  browserify --external rdf-ext -d js/rdf2h-core.js js/logger.js > dist/rdf2h.js && cp node_modules/rdf-parser-n3-browser/dist/n3-parser.js dist/n3-parser.js",
+    "prepublish": "mkdir -p dist && browserify -r rdf-ext -d | exorcist dist/rdf-ext.js.map > dist/rdf-ext.js &&  browserify --external rdf-ext -d -r ./js/rdf2h-core.js:rdf2h | exorcist dist/rdf2h.js.map > dist/rdf2h.js && cp node_modules/rdf-parser-n3-browser/dist/n3-parser.js dist/n3-parser.js",
     "test": "node_modules/.bin/mocha"
   },
   "devDependencies": {
