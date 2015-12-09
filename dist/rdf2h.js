@@ -1317,5 +1317,5 @@ if (typeof module !== 'undefined') {
     module.exports = RDF2h;
 }
 
-},{"./logger.js":1,"clownface":2,"mustache":3,"rdf-ext":"rdf-ext"}]},{},[])
+},{"./logger.js":1,"clownface":2,"mustache":3,"rdf-ext":"rdf-ext"}]},{},["rdf2h"])
 //# sourceMappingURL=rdf2h.js.map
