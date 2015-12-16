@@ -4,8 +4,10 @@
         <title>This will be replaced when the data is loaded</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="js/libs/jquery/jquery.js"></script>
-        <script src="dist/rdf2h.js"></script>
+        <script src="../js/libs/jquery/jquery.js"></script>
+        <script src="../dist/rdf-ext.js"></script>
+        <script src="../dist/rdf2h.js"></script>
+        <script src="../dist/n3-parser.js"></script>
         <script id="data" type="text/turtle">
     @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.
             <> dc:title "Hello world" .
@@ -38,14 +40,14 @@
         <script type="text/javascript">
 $(function () {
     var matchersTtl = $("#matchers").text();
-    rdf.parseTurtle(matchersTtl, function (matchers) {
-        console.log(matchers.toString());
-        rdf.parseTurtle($("#data").text(), function (data) {
-            console.log(data.toString());
+    N3Parser.parse(matchersTtl, null, window.location.toString()).then(function (matchers) {
+        console.log("matchers:\n"+ matchers.toString());
+        N3Parser.parse($("#data").text(), null, window.location.toString()).then(function (data) {
+            console.log("data:\n"+data.toString());
             var rendered = new RDF2h(matchers).render(data, rdf.createNamedNode(window.location.toString()));
             $("html").html(rendered);
-        }, window.location.toString());
-    }, window.location.toString());
+        });
+    });
 })
         </script>
     </head>

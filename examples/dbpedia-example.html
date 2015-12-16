@@ -4,10 +4,10 @@
         <meta charset="UTF-8">
         <title>Remote resource renderer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="js/libs/jquery/jquery.js"></script>
-        <script src="dist/rdf-ext.js"></script>
-        <script src="dist/rdf2h.js"></script>
-        <script src="dist/n3-parser.js"></script>
+        <script src="../js/libs/jquery/jquery.js"></script>
+        <script src="../dist/rdf-ext.js"></script>
+        <script src="../dist/rdf2h.js"></script>
+        <script src="../dist/n3-parser.js"></script>
         <script src="http://cdn.rawgit.com/retog/rdf-store-ldp-browser/0.3.0-rc2d/dist/rdf-store-ldp.js"></script>
         <script id="matchers" type="text/turtle">
             @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -42,7 +42,7 @@ $(function () {
                     null,
                     null,
                     $("#graph").val(),
-                    function (data) {
+                    function (error, data) {
                         console.log(data.toString());
                         var rendered = new RDF2h(matchers).render(data, rdf.createNamedNode($("#resource").val()));
                         $("#result").html(rendered);
@@ -54,8 +54,8 @@ $(function () {
         </script>
     </head>
     <body>
-        Resource: <input type="text" id="resource" value="http://dbpedia.org/resource/Berlin" /><br/>
-        Graph: <input type="text" id="graph" value="http://dbpedia.org/data/Berlin.ttl" /><br/>
+        Resource: <input type="text" id="resource" value="http://dbpedia.org/resource/Bern" /><br/>
+        Graph: <input type="text" id="graph" value="http://dbpedia.org/data/Bern.ttl" /><br/>
         <button id="go">Go</button>
         <div id="result"></div>
     </body>
