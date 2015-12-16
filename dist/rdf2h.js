@@ -1073,15 +1073,27 @@ RDF2h.logger = new Logger();
             var context = this.view.context;
             var currentMatcherIndex = this.view.currentMatcherIndex;
             function resolvePath(path) {
-                if (path === ".") {
-                    return graphNode.nodes();
-                } else {
-                    if (path.endsWith("<-")) {
-                        return graphNode.in(RDF2h.resolveCurie(path.substring(0, path.length - 2))).nodes();
-                    } else {
-                        return graphNode.out(RDF2h.resolveCurie(path)).nodes();
+                //TODO split in sections
+                function resolveSubPath(node, pathSections) {
+                    if (pathSections.length == 0) {
+                        return node.nodes();
                     }
+                    function resolveSection(section) {
+                        if (section === ".") {
+                            return node;
+                        } else {
+                            if (section.endsWith("<-")) {
+                                return node.in(RDF2h.resolveCurie(section.substring(0, section.length - 2)));
+                            } else {
+                                return node.out(RDF2h.resolveCurie(section));
+                            }
+                        }
+                    }
+                    subNode = resolveSection(pathSections[0]);
+                    return resolveSubPath(subNode,pathSections.slice(1))    
                 }
+                var pathSections = path.split("/").filter(function(e) { return e.length > 0})
+                return resolveSubPath(graphNode, pathSections);
             }
             if (name.startsWith("@prefix ")) {
                 var splits = name.split(" ");
