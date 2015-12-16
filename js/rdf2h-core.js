@@ -63,7 +63,6 @@ RDF2h.logger = new Logger();
             var context = this.view.context;
             var currentMatcherIndex = this.view.currentMatcherIndex;
             function resolvePath(path) {
-                //TODO split in sections
                 function resolveSubPath(node, pathSections) {
                     if (pathSections.length == 0) {
                         return node.nodes();
