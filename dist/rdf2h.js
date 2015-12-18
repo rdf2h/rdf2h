@@ -1073,11 +1073,7 @@ RDF2h.logger = new Logger();
             var context = this.view.context;
             var currentMatcherIndex = this.view.currentMatcherIndex;
             function resolvePath(path) {
-                //TODO split in sections
                 function resolveSubPath(node, pathSections) {
-                    if (pathSections.length == 0) {
-                        return node.nodes();
-                    }
                     function resolveSection(section) {
                         if (section === ".") {
                             return node;
@@ -1090,6 +1086,23 @@ RDF2h.logger = new Logger();
                         }
                     }
                     subNode = resolveSection(pathSections[0]);
+                    if (pathSections.length === 1) {
+                        var resultNodes = subNode.nodes();
+                        if (resultNodes.length === 0) {
+                            //handling pseudo properties of literals
+                            if (node.nodes()[0].language) {
+                                if (RDF2h.resolveCurie(pathSections[0]) === "http://purl.org/dc/terms/language") {
+                                    return [rdf.createLiteral(node.nodes()[0].language)];
+                                }
+                            }
+                            if (node.nodes()[0].datatype) {
+                                if (RDF2h.resolveCurie(pathSections[0]) === RDF2h.resolveCurie("rdf:type")) {
+                                    return [node.nodes()[0].datatype];
+                                }
+                            }
+                        }
+                        return resultNodes;
+                    }
                     return resolveSubPath(subNode,pathSections.slice(1))    
                 }
                 var pathSections = path.split("/").filter(function(e) { return e.length > 0})
