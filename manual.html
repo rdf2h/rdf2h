@@ -27,13 +27,13 @@
     <body>
         <h1>RDF2h Manual</h1>
         <p>RDF2h is a tool for recursively rendering RDF resources using 
-            flexible matchers and mustache templates. This document describe 
+            flexible matchers and mustache templates. This document describes
             how to do it. If you want to check things out right in your browser
             <a href="index.html">go here</a>.
         </p>
         <h2>Including RDF2h in your page</h2>
         <p>To use RDF2h you need to add <code>rdf-ext.js</code> and <code>rdf2h.js</code>
-            to your page. So add the following in the head of your HTML page 
+            to your page. Thus, add the following in the <code>&lthead></code> of your HTML page 
             (adapt the paths to match the location of the file):</p>
 
         <div class="code">
@@ -67,7 +67,7 @@
             &lt;script src="//code.jquery.com/jquery-2.1.4.min.js">&lt;/script><br/>
         </div>
         <h2>Invoking RDF2h</h2>
-        <p>RDF2h is instantiated with a graph describing the matchers, the 
+        <p>RDF2h is instantiated with a graph describing the matchers. The 
             matchers are used to match resources with a suitable template, see 
             the section about <a href="#matchers">defining matchers</a> for more 
             details.</p>
@@ -114,7 +114,7 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
         &lt;> dc:title "Hello world" .
 &lt;/script></pre>
         <p>
-            Note that the above turtle contains a relative IRI without 
+            Note that the above turtle-data contains a relative IRI without 
             providing a base IRI so it has to be provided as an argument to the 
             parser. The following invocations assumes the matcher
             graph to be in an element with id <code>matchers</code> and the data
@@ -142,9 +142,9 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
             the <code>r2h:subject</code> or the <code>r2h:object</code> property 
             of the triple pattern.<br/>
             To check if a Matcher matches a specified resource RDF2h will check if 
-            the data graph contains a tripe with the resource at the position 
+            the data graph contains a triple with the resource at the position 
             indicated by <code>r2h:this</code> in the triple pattern and the other
-            specified elements of the triple. For a matcher to match each triple 
+            specified elements of the triple. For a matcher to match, each triple 
             pattern must match at least one triple.<br/>
             The matcher described by the following graph describes a Matcher
             that matches resources of type <code>s:Event</code> that have a
@@ -170,12 +170,12 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
   ]
 ].</pre>
         <h3>Order of matchers</h3>
-        <p>As multiple Matchers might match a resource RDF2h will put all 
-            matchers in an ordered list. The first mathching matcher will be 
+        <p>As multiple Matchers might match a resource, RDF2h will put all 
+            matchers in an ordered list. The first matching matcher will be 
             used. The matcher graph can determine the order of the matcher by 
             using the <code>r2h:before</code> predicate which expresses that
             the subject should be matched before the object. It is up to the
-            matcher graph if it defines a complete list of matchers of just 
+            matcher graph if it defines a complete list of matchers or just 
             specifies some ordering constraints. The ordering of the matchers is
             not defined among matchers that do not appear in <code>r2h:before</code>
             statements or which are in a circular (unsatisfiable) <code>r2h:before</code>
@@ -183,7 +183,7 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
         <h2>Templates</h2>
         <p>Templates are normally defined using 
             <a href="https://github.com/janl/mustache.js">mustache.js</a>, they 
-            can be expressed as RDF literals in the matcher graph or refrences by URI
+            can be expressed as RDF literals in the matcher graph or refrenced by URI
             (typically an URI with fragment identifier identifying a script element 
             within the HTML document). The keys used are the following:</p>
 
@@ -202,14 +202,14 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
                 <code>true</code> if the expression without the "+" would 
                 evaluate to at least one value, to <code>false</code> otherwise</li>
             <li>A single dot (".") denoting the current resource</li>
-            <li>The string ":render " followed by one of the above expression
+            <li>The string ":render " followed by one of the above expressions
                 denoting a resource and optionally a context. This expression will
                 evaluate to the results of rendering the specified resource.</li>
             <li>The string ":continue". This will evaluate to the results of 
                 rendering the current resource applying only matchers that come 
                 after the matcher that resulted in the current template.</li>
         </ol>
-        <p>As an alternative to defining templates with mustache a javascript function.</p>
+        <p>As an alternative to defining templates with mustache, a javascript function can be used:</p>
         <pre class="code">
             r2h:javaScript '''function(n) {
                 var result = "";
@@ -227,10 +227,10 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
         <p>The argument `n` , has the properties `graph`, `node` and the clownface 
             node/graph as `graphNode`.</p>
         <h3>Prefixes</h3>
-        <p>For many serialization formats RDF2h learns the prefixes when rdf-ex
+        <p>For many serialization formats RDF2h learns the prefixes when rdf-ext
             parses data and matchers, so no explicit registration is necessary to
             be able to use them in templates. They can be registered explicitely with:</p>
-        <pre class="code">RDF2h.prefixMap["ex"] = "http://example.org/onology/"</pre>
+        <pre class="code">RDF2h.prefixMap["ex"] = "http://example.org/ontology/"</pre>
         <h3>Examples</h3>
         <p>For practical examples it is recommended to study the ones provided
             on the <a href="index.html">try it out page</a>.</p>
@@ -238,11 +238,12 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
         <p>RDF2h was created at <a href="http://www.ti.bfh.ch/">Bern University of 
                 Applied Sciences</a> by <a href="https://github.com/retog">Reto Gmür</a>, inspired
             by <a href="http://www.uduvudu.org">Uduvudu</a> and ideas of 
-            <a href="https://github.com/ktk">Adrian Gschwend</a>
-            and <a href="https://github.com/l00mi">Michael Luggen</a>. Many thanks to 
+            <a href="https://github.com/ktk">Adrian Gschwend</a>,
+            <a href="https://github.com/l00mi">Michael Luggen</a> and
+            <a href="http://mainini.ch">Pascal Mainini</a>. Many thanks to 
             <a href="https://www.bergnet.org/people/bergi/card#me">Thomas Bergwinkl</a>
             for <a href="https://github.com/zazukoians/rdf-ext">rdf-ext</a>
             and his continuous support.</p>
-        <p>It is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2 license</a>.</p>
+        <p>rdf2h is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2 license</a>.</p>
     </body>
 </html>
