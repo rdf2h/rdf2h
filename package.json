@@ -5,10 +5,10 @@
   "description": "Library to render RDF resources.",
   "main": "js/rdf2h-core.js",
   "dependencies": {
-    "rdf-ext": "0.3.0-rc1",
-    "clownface": "0.3.0-rc1",
+    "rdf-ext": "0.3.0",
+    "clownface": "0.3.0",
     "mustache": "*",
-    "rdf-parser-n3": "0.3.0-rc1",
+    "rdf-parser-n3": "0.3.0",
     "exorcist": "^0.4.0"
   },
   "scripts": {

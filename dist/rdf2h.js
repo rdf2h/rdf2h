@@ -244,6 +244,12 @@ clownface.Graph = function (graph, nodes) {
     return this.nodes().map(this.node)
   }
 
+  this.filter = function (callback) {
+    return clownface.Graph(graph, this.toArray().filter(callback).map(function (cf) {
+      return cf.context.shift()
+    }))
+  }
+
   this.forEach = function (callback) {
     return this.toArray().forEach(callback)
   }
@@ -393,7 +399,7 @@ module.exports = clownface
     define(['exports'], factory); // AMD
   } else {
     global.Mustache = {};
-    factory(Mustache); // script, wsh, asp
+    factory(global.Mustache); // script, wsh, asp
   }
 }(this, function mustacheFactory (mustache) {
 
@@ -444,11 +450,13 @@ module.exports = clownface
     '>': '&gt;',
     '"': '&quot;',
     "'": '&#39;',
-    '/': '&#x2F;'
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
   };
 
   function escapeHtml (string) {
-    return String(string).replace(/[&<>"'\/]/g, function fromEntityMap (s) {
+    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
       return entityMap[s];
     });
   }
@@ -648,19 +656,19 @@ module.exports = clownface
       token = tokens[i];
 
       switch (token[0]) {
-      case '#':
-      case '^':
-        collector.push(token);
-        sections.push(token);
-        collector = token[4] = [];
-        break;
-      case '/':
-        section = sections.pop();
-        section[5] = token[2];
-        collector = sections.length > 0 ? sections[sections.length - 1][4] : nestedTokens;
-        break;
-      default:
-        collector.push(token);
+        case '#':
+        case '^':
+          collector.push(token);
+          sections.push(token);
+          collector = token[4] = [];
+          break;
+        case '/':
+          section = sections.pop();
+          section[5] = token[2];
+          collector = sections.length > 0 ? sections[sections.length - 1][4] : nestedTokens;
+          break;
+        default:
+          collector.push(token);
       }
     }
 
@@ -710,16 +718,16 @@ module.exports = clownface
     var index = this.tail.search(re), match;
 
     switch (index) {
-    case -1:
-      match = this.tail;
-      this.tail = '';
-      break;
-    case 0:
-      match = '';
-      break;
-    default:
-      match = this.tail.substring(0, index);
-      this.tail = this.tail.substring(index);
+      case -1:
+        match = this.tail;
+        this.tail = '';
+        break;
+      case 0:
+        match = '';
+        break;
+      default:
+        match = this.tail.substring(0, index);
+        this.tail = this.tail.substring(index);
     }
 
     this.pos += match.length;
@@ -946,7 +954,7 @@ module.exports = clownface
   };
 
   mustache.name = 'mustache.js';
-  mustache.version = '2.2.0';
+  mustache.version = '2.2.1';
   mustache.tags = [ '{{', '}}' ];
 
   // All high-level mustache.* functions use this writer.
