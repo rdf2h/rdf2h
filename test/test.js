@@ -36,7 +36,7 @@ describe('RDF2h', function () {
             });
         });
         
-        it('Render dataype using pseudo property.', function () {
+        it('Render datatype using pseudo property.', function () {
             var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
                 <http://example.org/> dc:title "10"^^xsd:integer.';
