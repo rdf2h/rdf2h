@@ -1219,6 +1219,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         var p = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#predicate").nodes()[0];
         var o = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#object").nodes()[0];
         if (isThis(s)) {
+            console.log("Literal");
             return renderee.graphNode.out(p).nodes().some(function (e) {
                 return (!o || o.equals(e))
             });
@@ -1309,6 +1310,9 @@ RDF2h.prototype.getRenderer = function (renderee) {
 }
 
 RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
+    if (!node.interfaceName) {
+        node = rdf.createNamedNode(node);
+    }
     if (!context) {
         context = RDF2h.resolveCurie("r2h:Default");
     }

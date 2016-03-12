@@ -64,6 +64,60 @@ describe('RDF2h', function () {
                 });
             });
         });
+        
+        it('Matching based on  datatype pseudo property.', function () {
+            var dataTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+\n\             @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
+                <http://example.org/> dc:title "Test"^^xsd:string.\n\
+                <http://example.org/> rdf:value "10"^^xsd:integer.';
+            var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
+                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+                [ a r2h:Matcher ;\n\
+                  r2h:triplePattern [\n\
+                    r2h:subject r2h:this;\n\
+                    r2h:predicate dc:title;\n\
+                  ];\n\
+                  r2h:template [ \n\
+                    r2h:context r2h:Default;\n\
+                    r2h:mustache "The value: {{{:render rdf:value}}}, The title: {{{:render dc:title}}}"\n\
+                  ]\n\
+                ].\n\
+                [ a r2h:Matcher ;\n\
+                  r2h:triplePattern [\n\
+                    r2h:subject r2h:this;\n\
+                    r2h:predicate rdf:type;\n\
+                    r2h:object xsd:string\n\
+                  ];\n\
+                  r2h:template [ \n\
+                    r2h:context r2h:Default;\n\
+                    r2h:mustache "A String"\n\
+                  ]\n\
+                ].\n\
+                [ a r2h:Matcher ;\n\
+                  r2h:triplePattern [\n\
+                    r2h:subject r2h:this;\n\
+                    r2h:predicate rdf:type;\n\
+                    r2h:object xsd:integer\n\
+                  ];\n\
+                  r2h:template [ \n\
+                    r2h:context r2h:Default;\n\
+                    r2h:mustache "An Integer"\n\
+                  ]\n\
+                ].';
+            //mimeTypeUtil.parsers.parse('text/turtle', 
+            RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
+            return N3Parser.parse(matchersTurtle).then(function (matchers) {
+                return N3Parser.parse(dataTurtle).then(function (data) {
+                    //RDF2h.logger.setLevel(Logger.DEBUG);
+                    var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
+                    console.log("result: "+renderingResult);
+                    assert.equal("The value: An Integer, The title: A String", renderingResult);
+                });
+            });
+        });
 
         it('Once again but with a newline in data', function () {
             var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\

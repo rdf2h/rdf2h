@@ -13,7 +13,7 @@
   },
   "scripts": {
     "prepublish": "mkdir -p dist && browserify -r rdf-ext -d | exorcist dist/rdf-ext.js.map > dist/rdf-ext.js &&  browserify --external rdf-ext -d -r ./js/rdf2h-core.js:rdf2h ./js/rdf2h-core.js | exorcist dist/rdf2h.js.map > dist/rdf2h.js && cp node_modules/rdf-parser-n3-browser/dist/n3-parser.js dist/n3-parser.js",
-    "test": "node_modules/.bin/mocha"
+    "test": "node_modules/.bin/mocha --debug-brk "
   },
   "devDependencies": {
     "browserify": "latest",
