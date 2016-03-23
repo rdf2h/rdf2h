@@ -1219,13 +1219,17 @@ RDF2h.prototype.getRenderer = function (renderee) {
         var p = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#predicate").nodes()[0];
         var o = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#object").nodes()[0];
         if (isThis(s)) {
-            console.log("Literal");
+            if (renderee.node.interfaceName === "Literal") {
+                if (rdf.createNamedNode(RDF2h.resolveCurie("rdf:type")).equals(p)) {
+                    return renderee.node.datatype.equals(o);
+                }
+            }
             return renderee.graphNode.out(p).nodes().some(function (e) {
-                return (!o || o.equals(e))
+                return (!o || o.equals(e));
             });
         } else if (isThis(o)) {
             return renderee.graphNode.in(p).nodes().some(function (e) {
-                return (!s || s.equals(e))
+                return (!s || s.equals(e));
             });
         } else {
             console.error("Triple pattern must have r2h:this as subject or object");
@@ -1304,7 +1308,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
     if (this.startMatcherIndex === 0) {
         return templateRenderer('<div class="missingTemplate">No template found for &lt;{{.}}&gt;</div>');
     } else {
-        return templateRenderer('<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt;</div>');
+        return templateRenderer('<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
     }
 
 }

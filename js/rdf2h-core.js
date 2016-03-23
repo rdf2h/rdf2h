@@ -288,9 +288,9 @@ RDF2h.prototype.getRenderer = function (renderee) {
         }
     }
     if (this.startMatcherIndex === 0) {
-        return templateRenderer('<div class="missingTemplate">No template found for &lt;{{.}}&gt;</div>');
+        return templateRenderer('<div class="missingTemplate">No template found for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
     } else {
-        return templateRenderer('<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt;</div>');
+        return templateRenderer('<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
     }
 
 }
