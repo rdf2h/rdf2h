@@ -48,7 +48,7 @@ function RDF2h(matcherGraph) {
         }
         this.matchers.splice(getInsertPosition(), 0, matcherToPlace);
     }
-    RDF2h.logger.debug("Constructed RDF2h with the following matchers: ", this.matchers);
+    RDF2h.logger.debug("Constructed RDF2h with the following matchers: ", this.matchers.map(function(m) {return m.toString();}));
 }
 
 RDF2h.logger = new Logger();
@@ -235,10 +235,11 @@ RDF2h.prototype.getRenderer = function (renderee) {
         for (var i = 0; i < triplePatterns.length; i++) {
             var cfTp = cf.node(triplePatterns[i]);
             if (!matchPattern(cfTp)) {
-                RDF2h.logger.debug("Matcher "+cfMatcher+" doesn't has tripple patterns matching "+renderee.graphNode);
+                RDF2h.logger.debug("Matcher "+cfMatcher+" doesn't has triple patterns matching "+renderee.graphNode);
                 return false;
             }
         }
+        RDF2h.logger.debug("Matcher "+cfMatcher+" has triple patterns matching "+renderee.graphNode);
         return true;
     }
     function resolveTemplateNode(templateURI) {
