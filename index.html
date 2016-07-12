@@ -333,9 +333,9 @@
     r2h:context r2h:Default;
     r2h:mustache '''
 <h1>Showing all instances of type {{.}}</h1>
-{{#^rdf:type}}
+{{#rdf:type<-}}
   {{{:render .}}}
-{{/^rdf:type}}
+{{/rdf:type<-}}
 
     '''
   ]
@@ -447,9 +447,9 @@ Family Name: {{s:familyName}}
   r2h:template [ 
     r2h:context r2h:Default;
     r2h:mustache '''
-{{#^db:birthPlace}}
+{{#db:birthPlace<-}}
 <p>Place of Birth of: {{{:render .}}}</p>
-{{/^db:birthPlace}}
+{{/db:birthPlace<-}}
 {{{:continue}}}
     '''
   ];
