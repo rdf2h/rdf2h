@@ -192,7 +192,7 @@ N3Parser.parse(matchersTurtle).then(function (matchers) {
             <li>The full URI of the property of the resource being rendered 
                 between angle brackets (&lt; >). This evaluates to the 
                 property values.</li>
-            <li>Any of the above followed by by "&lt;-" to indicate that the 
+            <li>Any of the above preceded by "^" (or followed by "&lt;-") to indicate that the 
                 property is to be followed in reverse direction, i.e. this will 
                 evaluate to the subject of triples with the resource being rendered
                 as object and the specified property as predicate.</li>
