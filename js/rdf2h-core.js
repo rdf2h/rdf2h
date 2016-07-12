@@ -87,7 +87,11 @@ RDF2h.logger = new Logger();
                             if (section.endsWith("<-")) {
                                 return node.in(RDF2h.resolveCurie(section.substring(0, section.length - 2)));
                             } else {
+                                if (section.startsWith("^")) {
+                                return node.in(RDF2h.resolveCurie(section.substring(1)));
+                            } else {
                                 return node.out(RDF2h.resolveCurie(section));
+                            }
                             }
                         }
                     }

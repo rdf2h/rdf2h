@@ -45,6 +45,30 @@ describe('RDF2h', function () {
                 [ a r2h:Matcher ;\n\
                   r2h:template [ \n\
                     r2h:context r2h:Default;\n\
+                    r2h:mustache "Known by: {{^foaf:knows}}"\n\
+                  ]\n\
+                ].';
+            //mimeTypeUtil.parsers.parse('text/turtle', 
+            RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
+            return N3Parser.parse(matchersTurtle).then(function (matchers) {
+                return N3Parser.parse(dataTurtle).then(function (data) {
+                    //RDF2h.logger.setLevel(Logger.DEBUG);
+                    var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
+                    console.log("result: "+renderingResult);
+                    assert.equal("Known by: http:&#x2F;&#x2F;example.org&#x2F;a", renderingResult);
+                });
+            });
+        });
+        
+        it('Applying a simple template with inverse property using legacy syntax.', function () {
+            var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
+                <http://example.org/a> foaf:knows <http://example.org/b>.';
+            var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+                [ a r2h:Matcher ;\n\
+                  r2h:template [ \n\
+                    r2h:context r2h:Default;\n\
                     r2h:mustache "Known by: {{foaf:knows<-}}"\n\
                   ]\n\
                 ].';
