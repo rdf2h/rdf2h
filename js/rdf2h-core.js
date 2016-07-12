@@ -17,11 +17,27 @@ function RDF2h(matcherGraph) {
     var unorderedMatchers = matcherType.in("http://www.w3.org/1999/02/22-rdf-syntax-ns#type").nodes();
     this.matchers = [];
     var self = this;
-    function getLaterNodes(cfn) {
+    function getLaterNodes(node, ancestorPath) {
+        if (!ancestorPath) {
+            ancestorPath = new Array();
+            
+        } else {   
+            if (ancestorPath.some(function(e) {
+                return node.equals(e);
+            })) {
+                RDF2h.logger.error("Circle Detected at "+node);
+                ancestorPath.forEach(function(e) {
+                    console.log(e);
+                });
+                return new Array();
+            }
+        }
+        ancestorPath.push(node);
+        var cfn = cf.node(node);
+        
         var laterNodes = cfn.out("http://rdf2h.github.io/2015/rdf2h#before").nodes();
         for (var i = 0; i < laterNodes.length; i++) {
-            var laterNode = cf.node(laterNodes[i]);
-            var transitives = getLaterNodes(laterNode);
+            var transitives = getLaterNodes(laterNodes[i], ancestorPath.slice(0));
             for (var j = 0; j < transitives.length; j++) {
                 var transitive = transitives[j];
                 if (!laterNodes.some(function (e) {
@@ -35,7 +51,7 @@ function RDF2h(matcherGraph) {
     }
     while (unorderedMatchers.length > 0) {
         var matcherToPlace = unorderedMatchers.pop();
-        var laterNodes = getLaterNodes(cf.node(matcherToPlace));
+        var laterNodes = getLaterNodes(matcherToPlace);
         function getInsertPosition() {
             for (var i = 0; i < self.matchers.length; i++) {
                 if (laterNodes.some(function (e) {
