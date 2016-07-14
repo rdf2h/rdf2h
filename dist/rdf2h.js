@@ -1029,60 +1029,41 @@ rdf.setPrefix("r2h", "http://rdf2h.github.io/2015/rdf2h#");
 function RDF2h(matcherGraph) {
     RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
     this.matcherGraph = matcherGraph;
-    //use cf.in on r2h:Matcher create array of matchers
-    var cf = clownface.Graph(matcherGraph);
-    var matcherType = cf.node("http://rdf2h.github.io/2015/rdf2h#Matcher");
-    var unorderedMatchers = matcherType.in("http://www.w3.org/1999/02/22-rdf-syntax-ns#type").nodes();
-    this.matchers = [];
-    var self = this;
-    function getLaterNodes(node, ancestorPath) {
-        if (!ancestorPath) {
-            ancestorPath = new Array();
-            
-        } else {   
-            if (ancestorPath.some(function(e) {
-                return node.equals(e);
-            })) {
-                RDF2h.logger.error("Circle Detected at "+node);
-                ancestorPath.forEach(function(e) {
-                    console.log(e);
-                });
-                return new Array();
+    var unorderedMatchers = new Array();
+    var rdfTypeProperty = rdf.createNamedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    var matcherType = rdf.createNamedNode("http://rdf2h.github.io/2015/rdf2h#Matcher");
+    var matcherStatements = matcherGraph.match(null, rdfTypeProperty, matcherType);
+    matcherStatements.forEach(function(t) {
+        unorderedMatchers.push(t.subject);
+    });
+    /*Sorting:
+     * 
+     * Choose any matcher that is not the object of any before statement . 
+     * Remove all before statements with that matcher as subject. 
+     * Repeat till there are no more matchers that are not the object of a 
+     * before statement. 
+     * If there are matchers left the before statements are circular.
+     */   
+    var beforeProperty = rdf.createNamedNode("http://rdf2h.github.io/2015/rdf2h#before");
+    var beforeStatements = matcherGraph.match(null,beforeProperty);
+    this.sortedMatchers = [];
+    MATCHERS: while (unorderedMatchers.length > 0) {
+        for (var i = 0; i < unorderedMatchers.length; i++) {
+            var current = unorderedMatchers[i];
+            if (beforeStatements.match(null, beforeProperty, current).length === 0) {
+                this.sortedMatchers.push(current);
+                unorderedMatchers.splice(i,1);
+                beforeStatements.removeMatches(current, beforeProperty);
+                continue MATCHERS;
             }
         }
-        ancestorPath.push(node);
-        var cfn = cf.node(node);
-        
-        var laterNodes = cfn.out("http://rdf2h.github.io/2015/rdf2h#before").nodes();
-        for (var i = 0; i < laterNodes.length; i++) {
-            var transitives = getLaterNodes(laterNodes[i], ancestorPath.slice(0));
-            for (var j = 0; j < transitives.length; j++) {
-                var transitive = transitives[j];
-                if (!laterNodes.some(function (e) {
-                    return (transitive.equals(e));
-                })) {
-                    laterNodes.push(transitive);
-                }
-            }
-        }
-        return laterNodes;
+        RDF2h.logger.error("Circle Detected with:\n"+beforeStatements.toString());
+        break;
     }
-    while (unorderedMatchers.length > 0) {
-        var matcherToPlace = unorderedMatchers.pop();
-        var laterNodes = getLaterNodes(matcherToPlace);
-        function getInsertPosition() {
-            for (var i = 0; i < self.matchers.length; i++) {
-                if (laterNodes.some(function (e) {
-                    return (self.matchers[i].equals(e))
-                })) {
-                    return i;
-                }
-            }
-            return self.matchers.length;
-        }
-        this.matchers.splice(getInsertPosition(), 0, matcherToPlace);
-    }
-    RDF2h.logger.debug("Constructed RDF2h with the following matchers: ", this.matchers.map(function(m) {return m.toString();}));
+    beforeStatements.forEach(function(t) {
+        console.log(unorderedMatchers.indexOf(t.subject.toString()));
+    });
+    RDF2h.logger.debug("Constructed RDF2h with the following matchers: ", this.sortedMatchers.map(function(m) {return m.toString();}));
 }
 
 RDF2h.logger = new Logger();
@@ -1296,8 +1277,8 @@ RDF2h.prototype.getRenderer = function (renderee) {
             return Mustache.render(template, renderee);
         };
     }
-    for (var i = this.startMatcherIndex; i < this.matchers.length; i++) {
-        var matcher = this.matchers[i];
+    for (var i = this.startMatcherIndex; i < this.sortedMatchers.length; i++) {
+        var matcher = this.sortedMatchers[i];
         var cfMatcher = cf.node(matcher);
         if (matches(cfMatcher)) {
             renderee.currentMatcherIndex = i;
