@@ -1,23 +1,25 @@
 /* global rdf, Mustache */
 
 
-var rdf = require("rdf-ext");
-var clownface = require("clownface");
+var rdf = require("rdflib");
+var GraphNode = require("rdfgraphnode");
 var Mustache = require("mustache");
 var Logger = require("./logger.js");
-var NodeSet = require("./node-set.js");
+var NodeSet = new Array(); //require("./node-set.js");
 
-rdf.setPrefix("r2h", "http://rdf2h.github.io/2015/rdf2h#");
+//rdf.setPrefix("r2h", "http://rdf2h.github.io/2015/rdf2h#");
 
 function RDF2h(matcherGraph) {
+    console.log("Initializing with "+matcherGraph.length+" ");
     RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
     this.matcherGraph = matcherGraph;
-    var unorderedMatchers = new NodeSet();
-    var rdfTypeProperty = rdf.createNamedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-    var matcherType = rdf.createNamedNode("http://rdf2h.github.io/2015/rdf2h#Matcher");
-    var matcherStatements = matcherGraph.match(null, rdfTypeProperty, matcherType);
+    var unorderedMatchers = new Array(); //new NodeSet();
+    var rdfTypeProperty = rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    var matcherType = rdf.sym("http://rdf2h.github.io/2015/rdf2h#Matcher");
+    var matcherStatements = matcherGraph.each(null, rdfTypeProperty, matcherType);
+    console.log("Found "+matcherStatements.length+" ");
     matcherStatements.forEach(function(t) {
-        unorderedMatchers.add(t.subject);
+        unorderedMatchers.push(t.subject);
     });
     /*Sorting:
      * 
@@ -27,14 +29,15 @@ function RDF2h(matcherGraph) {
      * before statement. 
      * If there are matchers left the before statements are circular.
      */   
-    var beforeProperty = rdf.createNamedNode("http://rdf2h.github.io/2015/rdf2h#before");
+    var beforeProperty = rdf.sym("http://rdf2h.github.io/2015/rdf2h#before");
     var beforeStatements = matcherGraph.match(null,beforeProperty);
     beforeStatements.forEach(function(t) {
-        unorderedMatchers.add(t.subject);
-        unorderedMatchers.add(t.object);
+        unorderedMatchers.push(t.subject);
+        unorderedMatchers.push(t.object);
     });
     this.sortedMatchers = [];
     var self = this;
+    console.log("Sorting "+unorderedMatchers.length+" matchers");
     while (unorderedMatchers.length > 0) {
         if (!unorderedMatchers.some(function(current) {
             if (beforeStatements.match(null, beforeProperty, current).length === 0) {
@@ -83,7 +86,7 @@ RDF2h.logger = new Logger();
                     }
                     subNode = resolveSection(pathSections[0]);
                     if (pathSections.length === 1) {
-                        var resultNodes = subNode.nodes();
+                        var resultNodes = subNode.nodes;
                         if (resultNodes.length === 0) {
                             //handling pseudo properties of literals
                             if (node.nodes()[0].language) {
@@ -184,8 +187,7 @@ RDF2h.Renderee = function (rdf2h, graph, node, context) {
     this.graph = graph;
     this.node = node;
     this.context = context;
-    var cf = clownface.Graph(graph);
-    this.graphNode = cf.node(node);
+    this.graphNode = GraphNode(node, graph);
 };
 
 RDF2h.Renderee.prototype.toString = function () {
@@ -196,7 +198,6 @@ RDF2h.Renderee.prototype.toString = function () {
 }
 
 RDF2h.prototype.getRenderer = function (renderee) {
-    var cf = clownface.Graph(this.matcherGraph);
 
     function matchPattern(cfTriplePattern) {
         function isThis(node) {
@@ -208,7 +209,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         var o = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#object").nodes()[0];
         if (isThis(s)) {
             if (renderee.node.interfaceName === "Literal") {
-                if (rdf.createNamedNode(RDF2h.resolveCurie("rdf:type")).equals(p)) {
+                if (rdf.sym(RDF2h.resolveCurie("rdf:type")).equals(p)) {
                     return renderee.node.datatype.equals(o);
                 }
             }
@@ -239,7 +240,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
     function matches(cfMatcher) {
         var triplePatterns = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#triplePattern").nodes();
         for (var i = 0; i < triplePatterns.length; i++) {
-            var cfTp = cf.node(triplePatterns[i]);
+            var cfTp = GraphNode(triplePatterns[i], this.matcherGraph);
             if (!matchPattern(cfTp)) {
                 RDF2h.logger.debug("Matcher "+cfMatcher+" doesn't has triple patterns matching "+renderee.graphNode);
                 return false;
@@ -264,16 +265,17 @@ RDF2h.prototype.getRenderer = function (renderee) {
             return Mustache.render(template, renderee);
         };
     }
+    console.log("Looking for a matcher in "+this.sortedMatchers.length);
     for (var i = this.startMatcherIndex; i < this.sortedMatchers.length; i++) {
         var matcher = this.sortedMatchers[i];
-        var cfMatcher = cf.node(matcher);
+        var cfMatcher = GraphNode(matcher, this.matcherGraph);
         if (matches(cfMatcher)) {
             renderee.currentMatcherIndex = i;
             //r2h:template seems not to work here
             var templateNodes = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#template").nodes();
             for (var j = 0; j < templateNodes.length; j++) {
                 var templateNode = templateNodes[j];
-                var cfTemplate = cf.node(templateNode);
+                var cfTemplate = GraphNode(templateNode, this.matcherGraph);
                 if (!matchesContext(cfTemplate)) {
                     continue;
                 }
@@ -304,7 +306,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
 
 RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
     if (!node.interfaceName) {
-        node = rdf.createNamedNode(node);
+        node = rdf.sym(node);
     }
     if (!context) {
         context = RDF2h.resolveCurie("r2h:Default");
@@ -320,7 +322,7 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
     return renderer(renderee);
 }
 
-RDF2h.prefixMap = rdf.prefixes;
+RDF2h.prefixMap = {};
 RDF2h.prefixMap["s"] = "http://schema.org/";
 /*rdf.prefixes.addAll({
     "s": "http://schema.org/"

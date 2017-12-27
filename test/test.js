@@ -1,9 +1,9 @@
 var assert = require('assert');
 var RDF2h = require('../js/rdf2h-core.js');
 var Logger = require('../js/logger.js');
-var rdf = require('rdf-ext');
-var N3Parser = require('rdf-parser-n3');
-var clownface = require('clownface');
+var rdf = require('rdflib');
+//var N3Parser = require('rdf-parser-n3');
+//var clownface = require('clownface');
 //var mimeTypeUtil = require('rdf-mime-type-util');
 
 describe('RDF2h', function () {
@@ -26,14 +26,16 @@ describe('RDF2h', function () {
                 ].';
             //mimeTypeUtil.parsers.parse('text/turtle', 
             RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
-            return N3Parser.parse(matchersTurtle).then(function (matchers) {
-                return N3Parser.parse(dataTurtle).then(function (data) {
-                    //RDF2h.logger.setLevel(Logger.DEBUG);
-                    var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
-                    console.log("result: "+renderingResult);
-                    assert.equal("The title: An example", renderingResult);
-                });
-            });
+            var matchers = rdf.graph();
+            rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+            var data = rdf.graph();
+            rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+
+            //RDF2h.logger.setLevel(Logger.DEBUG);
+            var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
+            console.log("result: "+renderingResult);
+            assert.equal("The title: An example", renderingResult);
+
         });
         
         it('Applying a simple template with inverse property.', function () {
