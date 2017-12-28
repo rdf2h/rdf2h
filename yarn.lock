@@ -1126,9 +1126,8 @@ rdf-store-inmemory@^0.3.0:
     rdf-ext "^0.3.0"
     rdf-store-abstract "^0.3.0"
 
-rdfgraphnode@^1.0.1:
+"rdfgraphnode@file:../GraphNodeJS":
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/rdfgraphnode/-/rdfgraphnode-1.0.1.tgz#465e428b2edbc4de48a92579829fc80e205afeea"
   dependencies:
     rdflib "^0.16.5"
 

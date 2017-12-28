@@ -10,7 +10,7 @@
     "mustache": "*",
     "rdf-ext": "0.3.0",
     "rdf-parser-n3": "0.3.0",
-    "rdfgraphnode": "^1.0.1",
+    "rdfgraphnode": "file:../GraphNodeJS",
     "rdfjs": "^0.0.1",
     "rdflib": "^0.16.5"
   },

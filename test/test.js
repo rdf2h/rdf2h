@@ -37,7 +37,7 @@ describe('RDF2h', function () {
             assert.equal("The title: An example", renderingResult);
 
         });
-        
+        /*
         it('Applying a simple template with inverse property.', function () {
             var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
@@ -253,6 +253,7 @@ describe('RDF2h', function () {
                 });
             });
         });
+        */
     });
 });
 
