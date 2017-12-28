@@ -62,10 +62,9 @@ function RDF2h(matcherGraph) {
 RDF2h.logger = new Logger();
 
 RDF2h.ns = function(suffix) {
-    console.log("hello");
     return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
-}
-console.log("bah");
+};
+
 (function () {
     var r2h = RDF2h.ns;
     var origLokup = Mustache.Context.prototype.lookup;

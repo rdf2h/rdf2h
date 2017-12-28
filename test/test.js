@@ -37,7 +37,7 @@ describe('RDF2h', function () {
             assert.equal("The title: An example", renderingResult);
 
         });
-        /*
+        
         it('Applying a simple template with inverse property.', function () {
             var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
@@ -52,16 +52,16 @@ describe('RDF2h', function () {
                 ].';
             //mimeTypeUtil.parsers.parse('text/turtle', 
             RDF2h.prefixMap['foaf'] = "http://xmlns.com/foaf/0.1/";
-            return N3Parser.parse(matchersTurtle).then(function (matchers) {
-                return N3Parser.parse(dataTurtle).then(function (data) {
-                    //RDF2h.logger.setLevel(Logger.DEBUG);
-                    var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
-                    console.log("result: "+renderingResult);
-                    assert.equal("Known by: http:&#x2F;&#x2F;example.org&#x2F;a", renderingResult);
-                });
-            });
+            var matchers = rdf.graph();
+            rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+            var data = rdf.graph();
+            rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+            //RDF2h.logger.setLevel(Logger.DEBUG);
+            var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
+            console.log("result: "+renderingResult);
+            assert.equal("Known by: http:&#x2F;&#x2F;example.org&#x2F;a", renderingResult);
         });
-        
+        /*
         it('Applying a simple template with inverse property using <- syntax.', function () {
             var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
