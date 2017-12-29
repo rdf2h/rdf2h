@@ -103,7 +103,7 @@ RDF2h.ns = function(suffix) {
                                 }
                             }
                             if (node.nodes[0].datatype) {
-                                if (RDF2h.resolveCurie(pathSections[0]) === RDF2h.resolveCurie("rdf:type")) {
+                                if (RDF2h.resolveCurie(pathSections[0]).equals(RDF2h.resolveCurie("rdf:type"))) {
                                     return [node.nodes[0].datatype];
                                 }
                             }
@@ -198,8 +198,8 @@ RDF2h.Renderee = function (rdf2h, graph, node, context) {
 };
 
 RDF2h.Renderee.prototype.toString = function () {
-    if (this.node.nominalValue) {
-        return this.node.nominalValue;
+    if (this.node.value) {
+        return this.node.value;
     }
     return this.node.toString();
 }
@@ -217,7 +217,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         var o = cfTriplePattern.out(r2h("object")).nodes[0];
         if (isThis(s)) {
             if (renderee.node.termType === "Literal") {
-                if (rdf.sym(RDF2h.resolveCurie("rdf:type")).equals(p)) {
+                if (RDF2h.resolveCurie("rdf:type").equals(p)) {
                     return renderee.node.datatype.equals(o);
                 }
             }
@@ -291,7 +291,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
                         out(r2h("javaScript")).
                         nodes[0];
                 if (jsNode) {
-                    return eval("var f = "+jsNode.nominalValue+"; f;");
+                    return eval("var f = "+jsNode.value+"; f;");
                 }
                 var mustacheNode = cfTemplate.
                         out(r2h("mustache")).
@@ -333,6 +333,7 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
 RDF2h.prefixMap = {};
 RDF2h.prefixMap["r2h"] = "http://rdf2h.github.io/2015/rdf2h#";
 RDF2h.prefixMap["s"] = "http://schema.org/";
+RDF2h.prefixMap["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 /*rdf.prefixes.addAll({
     "s": "http://schema.org/"
 });*/
