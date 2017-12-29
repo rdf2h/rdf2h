@@ -114,7 +114,7 @@ describe('RDF2h', function () {
             console.log("result: "+renderingResult);
             assert.equal("The type title: http://www.w3.org/2001/XMLSchema#integer", renderingResult);
         });
-        /*
+        
         it('Render language using pseudo property.', function () {
             var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
@@ -134,14 +134,15 @@ describe('RDF2h', function () {
                   ]\n\
                 ].'; 
             RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
-            return N3Parser.parse(matchersTurtle).then(function (matchers) {
-                return N3Parser.parse(dataTurtle).then(function (data) {
-                    //RDF2h.logger.setLevel(Logger.DEBUG);
-                    var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
-                    console.log("result: "+renderingResult);
-                    assert.equal("The title language: it", renderingResult);
-                });
-            });
+            var matchers = rdf.graph();
+            rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+            var data = rdf.graph();
+            rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+            //RDF2h.logger.setLevel(Logger.DEBUG);
+            var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
+            console.log("result: "+renderingResult);
+            assert.equal("The title language: it", renderingResult);
+        
         });
         
         it('Matching based on  datatype pseudo property.', function () {
@@ -188,14 +189,14 @@ describe('RDF2h', function () {
                 ].';
             //mimeTypeUtil.parsers.parse('text/turtle', 
             RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
-            return N3Parser.parse(matchersTurtle).then(function (matchers) {
-                return N3Parser.parse(dataTurtle).then(function (data) {
-                    //RDF2h.logger.setLevel(Logger.DEBUG);
-                    var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
-                    console.log("result: "+renderingResult);
-                    assert.equal("The value: An Integer, The title: A String", renderingResult);
-                });
-            });
+            var matchers = rdf.graph();
+            rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+            var data = rdf.graph();
+            rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+            //RDF2h.logger.setLevel(Logger.DEBUG);
+            var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
+            console.log("result: "+renderingResult);
+            assert.equal("The value: An Integer, The title: A String", renderingResult);
         });
 
         it('Once again but with a newline in data', function () {
@@ -216,14 +217,14 @@ describe('RDF2h', function () {
                 ].';
             //mimeTypeUtil.parsers.parse('text/turtle', 
             RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
-            return N3Parser.parse(matchersTurtle).then(function (matchers) {
-                return N3Parser.parse(dataTurtle).then(function (data) {
+            var matchers = rdf.graph();
+            rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+            var data = rdf.graph();
+            rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
                     //RDF2h.logger.setLevel(Logger.DEBUG);
                     var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
                     console.log("result: "+renderingResult);
                     assert.equal("The title: \nAn example", renderingResult);
-                });
-            });
         });
         
         it('Once again but with a newline in template', function () {
@@ -244,16 +245,15 @@ describe('RDF2h', function () {
                 ].';
             //mimeTypeUtil.parsers.parse('text/turtle', 
             RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
-            return N3Parser.parse(matchersTurtle).then(function (matchers) {
-                return N3Parser.parse(dataTurtle).then(function (data) {
+            var matchers = rdf.graph();
+            rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+            var data = rdf.graph();
+            rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
                     //RDF2h.logger.setLevel(Logger.DEBUG);
                     var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
                     console.log("result: "+renderingResult);
                     assert.equal("The title: \nAn example", renderingResult);
-                });
-            });
-        });
-        */
+        });        
     });
 });
 

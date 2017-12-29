@@ -98,8 +98,8 @@ RDF2h.ns = function(suffix) {
                         if (resultNodes.length === 0) {
                             //handling pseudo properties of literals
                             if (node.nodes[0].language) {
-                                if (RDF2h.resolveCurie(pathSections[0]) === "http://purl.org/dc/terms/language") {
-                                    return [rdf.createLiteral(node.nodes[0].language)];
+                                if (RDF2h.resolveCurie(pathSections[0]).equals(rdf.sym("http://purl.org/dc/terms/language"))) {
+                                    return [rdf.literal(node.nodes[0].language)];
                                 }
                             }
                             if (node.nodes[0].datatype) {
@@ -313,7 +313,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
 }
 
 RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
-    if (!node.interfaceName) {
+    if (!node.termType) {
         node = rdf.sym(node);
     }
     if (!context) {
@@ -334,6 +334,7 @@ RDF2h.prefixMap = {};
 RDF2h.prefixMap["r2h"] = "http://rdf2h.github.io/2015/rdf2h#";
 RDF2h.prefixMap["s"] = "http://schema.org/";
 RDF2h.prefixMap["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
 /*rdf.prefixes.addAll({
     "s": "http://schema.org/"
 });*/
