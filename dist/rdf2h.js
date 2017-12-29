@@ -65,54 +65,6 @@ if (typeof window !== 'undefined') {
 }
 
 },{}],2:[function(require,module,exports){
-var rdf = require("rdf-ext");
-
-function NodeSet() {
-    this._g = new rdf.Graph();
-    this.length = 0;
-};
-
-NodeSet._filler = rdf.createNamedNode("http://ignored/");
-
-NodeSet._node2Triple = function(node) {
-    return rdf.createTriple(node, NodeSet._filler, NodeSet._filler);
-};
-
-NodeSet.prototype.add = function(node) {
-    this._g.add(NodeSet._node2Triple(node));
-    this.length = this._g.length;
-};
-
-NodeSet.prototype.remove = function(node) {
-    this._g.removeMatches(node, NodeSet._filler, NodeSet._filler);
-    this.length = this._g.length;
-};
-
-NodeSet.prototype.contains = function(node) {
-    this._g.match(node, NodeSet._filler, NodeSet._filler).length > 0;
-    this.length = this._g.length;
-};
-
-NodeSet.prototype.forEach = function(callback) {
-    this._g.forEach(function(t) {
-        callback(t.subject);
-    });
-};
-
-NodeSet.prototype.some = function(callback) {
-    return this._g.some(function(t) {
-        return callback(t.subject);
-    });
-};
-
-if (typeof module !== 'undefined') {
-    module.exports = NodeSet;
-}
-if (typeof window !== 'undefined') {
-    window.NodeSet = NodeSet;
-}
-
-},{"rdf-ext":"rdf-ext"}],3:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -607,7 +559,7 @@ var objectKeys = Object.keys || function (obj) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"util/":138}],4:[function(require,module,exports){
+},{"util/":137}],3:[function(require,module,exports){
 (function (process){
 /*!
  * async
@@ -1735,7 +1687,7 @@ var objectKeys = Object.keys || function (obj) {
 
 }).call(this,require('_process'))
 
-},{"_process":72}],5:[function(require,module,exports){
+},{"_process":71}],4:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -1851,9 +1803,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (process,Buffer){
 'use strict';
 /* eslint camelcase: "off" */
@@ -2266,7 +2218,7 @@ Zlib.prototype._reset = function () {
 exports.Zlib = Zlib;
 }).call(this,require('_process'),require("buffer").Buffer)
 
-},{"_process":72,"assert":3,"buffer":9,"pako/lib/zlib/constants":62,"pako/lib/zlib/deflate.js":64,"pako/lib/zlib/inflate.js":66,"pako/lib/zlib/zstream":70}],8:[function(require,module,exports){
+},{"_process":71,"assert":2,"buffer":8,"pako/lib/zlib/constants":61,"pako/lib/zlib/deflate.js":63,"pako/lib/zlib/inflate.js":65,"pako/lib/zlib/zstream":69}],7:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -2879,7 +2831,7 @@ util.inherits(InflateRaw, Zlib);
 util.inherits(Unzip, Zlib);
 }).call(this,require('_process'))
 
-},{"./binding":7,"_process":72,"assert":3,"buffer":9,"stream":126,"util":138}],9:[function(require,module,exports){
+},{"./binding":6,"_process":71,"assert":2,"buffer":8,"stream":125,"util":137}],8:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -4595,7 +4547,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":5,"ieee754":37}],10:[function(require,module,exports){
+},{"base64-js":4,"ieee754":37}],9:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -4661,7 +4613,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4773,7 +4725,7 @@ function objectToString(o) {
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
 
-},{"../../is-buffer/index.js":39}],12:[function(require,module,exports){
+},{"../../is-buffer/index.js":39}],11:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -4891,7 +4843,7 @@ function checkEncoding(name) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"./iconv-loader":13,"buffer":9,"iconv-lite":35}],13:[function(require,module,exports){
+},{"./iconv-loader":12,"buffer":8,"iconv-lite":35}],12:[function(require,module,exports){
 'use strict';
 
 var iconv_package;
@@ -4907,7 +4859,984 @@ try {
 
 module.exports = Iconv;
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
+(function (process,global){
+/*!
+ * @overview es6-promise - a tiny implementation of Promises/A+.
+ * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
+ * @license   Licensed under MIT license
+ *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
+ * @version   2.3.0
+ */
+
+(function() {
+    "use strict";
+    function lib$es6$promise$utils$$objectOrFunction(x) {
+      return typeof x === 'function' || (typeof x === 'object' && x !== null);
+    }
+
+    function lib$es6$promise$utils$$isFunction(x) {
+      return typeof x === 'function';
+    }
+
+    function lib$es6$promise$utils$$isMaybeThenable(x) {
+      return typeof x === 'object' && x !== null;
+    }
+
+    var lib$es6$promise$utils$$_isArray;
+    if (!Array.isArray) {
+      lib$es6$promise$utils$$_isArray = function (x) {
+        return Object.prototype.toString.call(x) === '[object Array]';
+      };
+    } else {
+      lib$es6$promise$utils$$_isArray = Array.isArray;
+    }
+
+    var lib$es6$promise$utils$$isArray = lib$es6$promise$utils$$_isArray;
+    var lib$es6$promise$asap$$len = 0;
+    var lib$es6$promise$asap$$toString = {}.toString;
+    var lib$es6$promise$asap$$vertxNext;
+    var lib$es6$promise$asap$$customSchedulerFn;
+
+    var lib$es6$promise$asap$$asap = function asap(callback, arg) {
+      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
+      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
+      lib$es6$promise$asap$$len += 2;
+      if (lib$es6$promise$asap$$len === 2) {
+        // If len is 2, that means that we need to schedule an async flush.
+        // If additional callbacks are queued before the queue is flushed, they
+        // will be processed by this flush that we are scheduling.
+        if (lib$es6$promise$asap$$customSchedulerFn) {
+          lib$es6$promise$asap$$customSchedulerFn(lib$es6$promise$asap$$flush);
+        } else {
+          lib$es6$promise$asap$$scheduleFlush();
+        }
+      }
+    }
+
+    function lib$es6$promise$asap$$setScheduler(scheduleFn) {
+      lib$es6$promise$asap$$customSchedulerFn = scheduleFn;
+    }
+
+    function lib$es6$promise$asap$$setAsap(asapFn) {
+      lib$es6$promise$asap$$asap = asapFn;
+    }
+
+    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
+    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
+    var lib$es6$promise$asap$$BrowserMutationObserver = lib$es6$promise$asap$$browserGlobal.MutationObserver || lib$es6$promise$asap$$browserGlobal.WebKitMutationObserver;
+    var lib$es6$promise$asap$$isNode = typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+
+    // test for web worker but not in IE10
+    var lib$es6$promise$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
+      typeof importScripts !== 'undefined' &&
+      typeof MessageChannel !== 'undefined';
+
+    // node
+    function lib$es6$promise$asap$$useNextTick() {
+      var nextTick = process.nextTick;
+      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+      // setImmediate should be used instead instead
+      var version = process.versions.node.match(/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/);
+      if (Array.isArray(version) && version[1] === '0' && version[2] === '10') {
+        nextTick = setImmediate;
+      }
+      return function() {
+        nextTick(lib$es6$promise$asap$$flush);
+      };
+    }
+
+    // vertx
+    function lib$es6$promise$asap$$useVertxTimer() {
+      return function() {
+        lib$es6$promise$asap$$vertxNext(lib$es6$promise$asap$$flush);
+      };
+    }
+
+    function lib$es6$promise$asap$$useMutationObserver() {
+      var iterations = 0;
+      var observer = new lib$es6$promise$asap$$BrowserMutationObserver(lib$es6$promise$asap$$flush);
+      var node = document.createTextNode('');
+      observer.observe(node, { characterData: true });
+
+      return function() {
+        node.data = (iterations = ++iterations % 2);
+      };
+    }
+
+    // web worker
+    function lib$es6$promise$asap$$useMessageChannel() {
+      var channel = new MessageChannel();
+      channel.port1.onmessage = lib$es6$promise$asap$$flush;
+      return function () {
+        channel.port2.postMessage(0);
+      };
+    }
+
+    function lib$es6$promise$asap$$useSetTimeout() {
+      return function() {
+        setTimeout(lib$es6$promise$asap$$flush, 1);
+      };
+    }
+
+    var lib$es6$promise$asap$$queue = new Array(1000);
+    function lib$es6$promise$asap$$flush() {
+      for (var i = 0; i < lib$es6$promise$asap$$len; i+=2) {
+        var callback = lib$es6$promise$asap$$queue[i];
+        var arg = lib$es6$promise$asap$$queue[i+1];
+
+        callback(arg);
+
+        lib$es6$promise$asap$$queue[i] = undefined;
+        lib$es6$promise$asap$$queue[i+1] = undefined;
+      }
+
+      lib$es6$promise$asap$$len = 0;
+    }
+
+    function lib$es6$promise$asap$$attemptVertex() {
+      try {
+        var r = require;
+        var vertx = r('vertx');
+        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
+        return lib$es6$promise$asap$$useVertxTimer();
+      } catch(e) {
+        return lib$es6$promise$asap$$useSetTimeout();
+      }
+    }
+
+    var lib$es6$promise$asap$$scheduleFlush;
+    // Decide what async method to use to triggering processing of queued callbacks:
+    if (lib$es6$promise$asap$$isNode) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
+    } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
+    } else if (lib$es6$promise$asap$$isWorker) {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
+    } else if (lib$es6$promise$asap$$browserWindow === undefined && typeof require === 'function') {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertex();
+    } else {
+      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
+    }
+
+    function lib$es6$promise$$internal$$noop() {}
+
+    var lib$es6$promise$$internal$$PENDING   = void 0;
+    var lib$es6$promise$$internal$$FULFILLED = 1;
+    var lib$es6$promise$$internal$$REJECTED  = 2;
+
+    var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+
+    function lib$es6$promise$$internal$$selfFullfillment() {
+      return new TypeError("You cannot resolve a promise with itself");
+    }
+
+    function lib$es6$promise$$internal$$cannotReturnOwn() {
+      return new TypeError('A promises callback cannot return that same promise.');
+    }
+
+    function lib$es6$promise$$internal$$getThen(promise) {
+      try {
+        return promise.then;
+      } catch(error) {
+        lib$es6$promise$$internal$$GET_THEN_ERROR.error = error;
+        return lib$es6$promise$$internal$$GET_THEN_ERROR;
+      }
+    }
+
+    function lib$es6$promise$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+      try {
+        then.call(value, fulfillmentHandler, rejectionHandler);
+      } catch(e) {
+        return e;
+      }
+    }
+
+    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
+       lib$es6$promise$asap$$asap(function(promise) {
+        var sealed = false;
+        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
+          if (sealed) { return; }
+          sealed = true;
+          if (thenable !== value) {
+            lib$es6$promise$$internal$$resolve(promise, value);
+          } else {
+            lib$es6$promise$$internal$$fulfill(promise, value);
+          }
+        }, function(reason) {
+          if (sealed) { return; }
+          sealed = true;
+
+          lib$es6$promise$$internal$$reject(promise, reason);
+        }, 'Settle: ' + (promise._label || ' unknown promise'));
+
+        if (!sealed && error) {
+          sealed = true;
+          lib$es6$promise$$internal$$reject(promise, error);
+        }
+      }, promise);
+    }
+
+    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
+      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
+        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
+      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
+        lib$es6$promise$$internal$$reject(promise, thenable._result);
+      } else {
+        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
+          lib$es6$promise$$internal$$resolve(promise, value);
+        }, function(reason) {
+          lib$es6$promise$$internal$$reject(promise, reason);
+        });
+      }
+    }
+
+    function lib$es6$promise$$internal$$handleMaybeThenable(promise, maybeThenable) {
+      if (maybeThenable.constructor === promise.constructor) {
+        lib$es6$promise$$internal$$handleOwnThenable(promise, maybeThenable);
+      } else {
+        var then = lib$es6$promise$$internal$$getThen(maybeThenable);
+
+        if (then === lib$es6$promise$$internal$$GET_THEN_ERROR) {
+          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$GET_THEN_ERROR.error);
+        } else if (then === undefined) {
+          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+        } else if (lib$es6$promise$utils$$isFunction(then)) {
+          lib$es6$promise$$internal$$handleForeignThenable(promise, maybeThenable, then);
+        } else {
+          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+        }
+      }
+    }
+
+    function lib$es6$promise$$internal$$resolve(promise, value) {
+      if (promise === value) {
+        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFullfillment());
+      } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
+        lib$es6$promise$$internal$$handleMaybeThenable(promise, value);
+      } else {
+        lib$es6$promise$$internal$$fulfill(promise, value);
+      }
+    }
+
+    function lib$es6$promise$$internal$$publishRejection(promise) {
+      if (promise._onerror) {
+        promise._onerror(promise._result);
+      }
+
+      lib$es6$promise$$internal$$publish(promise);
+    }
+
+    function lib$es6$promise$$internal$$fulfill(promise, value) {
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+
+      promise._result = value;
+      promise._state = lib$es6$promise$$internal$$FULFILLED;
+
+      if (promise._subscribers.length !== 0) {
+        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, promise);
+      }
+    }
+
+    function lib$es6$promise$$internal$$reject(promise, reason) {
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+      promise._state = lib$es6$promise$$internal$$REJECTED;
+      promise._result = reason;
+
+      lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publishRejection, promise);
+    }
+
+    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
+      var subscribers = parent._subscribers;
+      var length = subscribers.length;
+
+      parent._onerror = null;
+
+      subscribers[length] = child;
+      subscribers[length + lib$es6$promise$$internal$$FULFILLED] = onFulfillment;
+      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
+
+      if (length === 0 && parent._state) {
+        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, parent);
+      }
+    }
+
+    function lib$es6$promise$$internal$$publish(promise) {
+      var subscribers = promise._subscribers;
+      var settled = promise._state;
+
+      if (subscribers.length === 0) { return; }
+
+      var child, callback, detail = promise._result;
+
+      for (var i = 0; i < subscribers.length; i += 3) {
+        child = subscribers[i];
+        callback = subscribers[i + settled];
+
+        if (child) {
+          lib$es6$promise$$internal$$invokeCallback(settled, child, callback, detail);
+        } else {
+          callback(detail);
+        }
+      }
+
+      promise._subscribers.length = 0;
+    }
+
+    function lib$es6$promise$$internal$$ErrorObject() {
+      this.error = null;
+    }
+
+    var lib$es6$promise$$internal$$TRY_CATCH_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+
+    function lib$es6$promise$$internal$$tryCatch(callback, detail) {
+      try {
+        return callback(detail);
+      } catch(e) {
+        lib$es6$promise$$internal$$TRY_CATCH_ERROR.error = e;
+        return lib$es6$promise$$internal$$TRY_CATCH_ERROR;
+      }
+    }
+
+    function lib$es6$promise$$internal$$invokeCallback(settled, promise, callback, detail) {
+      var hasCallback = lib$es6$promise$utils$$isFunction(callback),
+          value, error, succeeded, failed;
+
+      if (hasCallback) {
+        value = lib$es6$promise$$internal$$tryCatch(callback, detail);
+
+        if (value === lib$es6$promise$$internal$$TRY_CATCH_ERROR) {
+          failed = true;
+          error = value.error;
+          value = null;
+        } else {
+          succeeded = true;
+        }
+
+        if (promise === value) {
+          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$cannotReturnOwn());
+          return;
+        }
+
+      } else {
+        value = detail;
+        succeeded = true;
+      }
+
+      if (promise._state !== lib$es6$promise$$internal$$PENDING) {
+        // noop
+      } else if (hasCallback && succeeded) {
+        lib$es6$promise$$internal$$resolve(promise, value);
+      } else if (failed) {
+        lib$es6$promise$$internal$$reject(promise, error);
+      } else if (settled === lib$es6$promise$$internal$$FULFILLED) {
+        lib$es6$promise$$internal$$fulfill(promise, value);
+      } else if (settled === lib$es6$promise$$internal$$REJECTED) {
+        lib$es6$promise$$internal$$reject(promise, value);
+      }
+    }
+
+    function lib$es6$promise$$internal$$initializePromise(promise, resolver) {
+      try {
+        resolver(function resolvePromise(value){
+          lib$es6$promise$$internal$$resolve(promise, value);
+        }, function rejectPromise(reason) {
+          lib$es6$promise$$internal$$reject(promise, reason);
+        });
+      } catch(e) {
+        lib$es6$promise$$internal$$reject(promise, e);
+      }
+    }
+
+    function lib$es6$promise$enumerator$$Enumerator(Constructor, input) {
+      var enumerator = this;
+
+      enumerator._instanceConstructor = Constructor;
+      enumerator.promise = new Constructor(lib$es6$promise$$internal$$noop);
+
+      if (enumerator._validateInput(input)) {
+        enumerator._input     = input;
+        enumerator.length     = input.length;
+        enumerator._remaining = input.length;
+
+        enumerator._init();
+
+        if (enumerator.length === 0) {
+          lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
+        } else {
+          enumerator.length = enumerator.length || 0;
+          enumerator._enumerate();
+          if (enumerator._remaining === 0) {
+            lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
+          }
+        }
+      } else {
+        lib$es6$promise$$internal$$reject(enumerator.promise, enumerator._validationError());
+      }
+    }
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._validateInput = function(input) {
+      return lib$es6$promise$utils$$isArray(input);
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._validationError = function() {
+      return new Error('Array Methods must be provided an Array');
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._init = function() {
+      this._result = new Array(this.length);
+    };
+
+    var lib$es6$promise$enumerator$$default = lib$es6$promise$enumerator$$Enumerator;
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._enumerate = function() {
+      var enumerator = this;
+
+      var length  = enumerator.length;
+      var promise = enumerator.promise;
+      var input   = enumerator._input;
+
+      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+        enumerator._eachEntry(input[i], i);
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
+      var enumerator = this;
+      var c = enumerator._instanceConstructor;
+
+      if (lib$es6$promise$utils$$isMaybeThenable(entry)) {
+        if (entry.constructor === c && entry._state !== lib$es6$promise$$internal$$PENDING) {
+          entry._onerror = null;
+          enumerator._settledAt(entry._state, i, entry._result);
+        } else {
+          enumerator._willSettleAt(c.resolve(entry), i);
+        }
+      } else {
+        enumerator._remaining--;
+        enumerator._result[i] = entry;
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
+      var enumerator = this;
+      var promise = enumerator.promise;
+
+      if (promise._state === lib$es6$promise$$internal$$PENDING) {
+        enumerator._remaining--;
+
+        if (state === lib$es6$promise$$internal$$REJECTED) {
+          lib$es6$promise$$internal$$reject(promise, value);
+        } else {
+          enumerator._result[i] = value;
+        }
+      }
+
+      if (enumerator._remaining === 0) {
+        lib$es6$promise$$internal$$fulfill(promise, enumerator._result);
+      }
+    };
+
+    lib$es6$promise$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
+      var enumerator = this;
+
+      lib$es6$promise$$internal$$subscribe(promise, undefined, function(value) {
+        enumerator._settledAt(lib$es6$promise$$internal$$FULFILLED, i, value);
+      }, function(reason) {
+        enumerator._settledAt(lib$es6$promise$$internal$$REJECTED, i, reason);
+      });
+    };
+    function lib$es6$promise$promise$all$$all(entries) {
+      return new lib$es6$promise$enumerator$$default(this, entries).promise;
+    }
+    var lib$es6$promise$promise$all$$default = lib$es6$promise$promise$all$$all;
+    function lib$es6$promise$promise$race$$race(entries) {
+      /*jshint validthis:true */
+      var Constructor = this;
+
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+
+      if (!lib$es6$promise$utils$$isArray(entries)) {
+        lib$es6$promise$$internal$$reject(promise, new TypeError('You must pass an array to race.'));
+        return promise;
+      }
+
+      var length = entries.length;
+
+      function onFulfillment(value) {
+        lib$es6$promise$$internal$$resolve(promise, value);
+      }
+
+      function onRejection(reason) {
+        lib$es6$promise$$internal$$reject(promise, reason);
+      }
+
+      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+        lib$es6$promise$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
+      }
+
+      return promise;
+    }
+    var lib$es6$promise$promise$race$$default = lib$es6$promise$promise$race$$race;
+    function lib$es6$promise$promise$resolve$$resolve(object) {
+      /*jshint validthis:true */
+      var Constructor = this;
+
+      if (object && typeof object === 'object' && object.constructor === Constructor) {
+        return object;
+      }
+
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+      lib$es6$promise$$internal$$resolve(promise, object);
+      return promise;
+    }
+    var lib$es6$promise$promise$resolve$$default = lib$es6$promise$promise$resolve$$resolve;
+    function lib$es6$promise$promise$reject$$reject(reason) {
+      /*jshint validthis:true */
+      var Constructor = this;
+      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+      lib$es6$promise$$internal$$reject(promise, reason);
+      return promise;
+    }
+    var lib$es6$promise$promise$reject$$default = lib$es6$promise$promise$reject$$reject;
+
+    var lib$es6$promise$promise$$counter = 0;
+
+    function lib$es6$promise$promise$$needsResolver() {
+      throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+    }
+
+    function lib$es6$promise$promise$$needsNew() {
+      throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+    }
+
+    var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
+    /**
+      Promise objects represent the eventual result of an asynchronous operation. The
+      primary way of interacting with a promise is through its `then` method, which
+      registers callbacks to receive either a promise's eventual value or the reason
+      why the promise cannot be fulfilled.
+
+      Terminology
+      -----------
+
+      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
+      - `thenable` is an object or function that defines a `then` method.
+      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
+      - `exception` is a value that is thrown using the throw statement.
+      - `reason` is a value that indicates why a promise was rejected.
+      - `settled` the final resting state of a promise, fulfilled or rejected.
+
+      A promise can be in one of three states: pending, fulfilled, or rejected.
+
+      Promises that are fulfilled have a fulfillment value and are in the fulfilled
+      state.  Promises that are rejected have a rejection reason and are in the
+      rejected state.  A fulfillment value is never a thenable.
+
+      Promises can also be said to *resolve* a value.  If this value is also a
+      promise, then the original promise's settled state will match the value's
+      settled state.  So a promise that *resolves* a promise that rejects will
+      itself reject, and a promise that *resolves* a promise that fulfills will
+      itself fulfill.
+
+
+      Basic Usage:
+      ------------
+
+      ```js
+      var promise = new Promise(function(resolve, reject) {
+        // on success
+        resolve(value);
+
+        // on failure
+        reject(reason);
+      });
+
+      promise.then(function(value) {
+        // on fulfillment
+      }, function(reason) {
+        // on rejection
+      });
+      ```
+
+      Advanced Usage:
+      ---------------
+
+      Promises shine when abstracting away asynchronous interactions such as
+      `XMLHttpRequest`s.
+
+      ```js
+      function getJSON(url) {
+        return new Promise(function(resolve, reject){
+          var xhr = new XMLHttpRequest();
+
+          xhr.open('GET', url);
+          xhr.onreadystatechange = handler;
+          xhr.responseType = 'json';
+          xhr.setRequestHeader('Accept', 'application/json');
+          xhr.send();
+
+          function handler() {
+            if (this.readyState === this.DONE) {
+              if (this.status === 200) {
+                resolve(this.response);
+              } else {
+                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
+              }
+            }
+          };
+        });
+      }
+
+      getJSON('/posts.json').then(function(json) {
+        // on fulfillment
+      }, function(reason) {
+        // on rejection
+      });
+      ```
+
+      Unlike callbacks, promises are great composable primitives.
+
+      ```js
+      Promise.all([
+        getJSON('/posts'),
+        getJSON('/comments')
+      ]).then(function(values){
+        values[0] // => postsJSON
+        values[1] // => commentsJSON
+
+        return values;
+      });
+      ```
+
+      @class Promise
+      @param {function} resolver
+      Useful for tooling.
+      @constructor
+    */
+    function lib$es6$promise$promise$$Promise(resolver) {
+      this._id = lib$es6$promise$promise$$counter++;
+      this._state = undefined;
+      this._result = undefined;
+      this._subscribers = [];
+
+      if (lib$es6$promise$$internal$$noop !== resolver) {
+        if (!lib$es6$promise$utils$$isFunction(resolver)) {
+          lib$es6$promise$promise$$needsResolver();
+        }
+
+        if (!(this instanceof lib$es6$promise$promise$$Promise)) {
+          lib$es6$promise$promise$$needsNew();
+        }
+
+        lib$es6$promise$$internal$$initializePromise(this, resolver);
+      }
+    }
+
+    lib$es6$promise$promise$$Promise.all = lib$es6$promise$promise$all$$default;
+    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
+    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
+    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
+    lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
+    lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
+    lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
+
+    lib$es6$promise$promise$$Promise.prototype = {
+      constructor: lib$es6$promise$promise$$Promise,
+
+    /**
+      The primary way of interacting with a promise is through its `then` method,
+      which registers callbacks to receive either a promise's eventual value or the
+      reason why the promise cannot be fulfilled.
+
+      ```js
+      findUser().then(function(user){
+        // user is available
+      }, function(reason){
+        // user is unavailable, and you are given the reason why
+      });
+      ```
+
+      Chaining
+      --------
+
+      The return value of `then` is itself a promise.  This second, 'downstream'
+      promise is resolved with the return value of the first promise's fulfillment
+      or rejection handler, or rejected if the handler throws an exception.
+
+      ```js
+      findUser().then(function (user) {
+        return user.name;
+      }, function (reason) {
+        return 'default name';
+      }).then(function (userName) {
+        // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+        // will be `'default name'`
+      });
+
+      findUser().then(function (user) {
+        throw new Error('Found user, but still unhappy');
+      }, function (reason) {
+        throw new Error('`findUser` rejected and we're unhappy');
+      }).then(function (value) {
+        // never reached
+      }, function (reason) {
+        // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+        // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+      });
+      ```
+      If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+
+      ```js
+      findUser().then(function (user) {
+        throw new PedagogicalException('Upstream error');
+      }).then(function (value) {
+        // never reached
+      }).then(function (value) {
+        // never reached
+      }, function (reason) {
+        // The `PedgagocialException` is propagated all the way down to here
+      });
+      ```
+
+      Assimilation
+      ------------
+
+      Sometimes the value you want to propagate to a downstream promise can only be
+      retrieved asynchronously. This can be achieved by returning a promise in the
+      fulfillment or rejection handler. The downstream promise will then be pending
+      until the returned promise is settled. This is called *assimilation*.
+
+      ```js
+      findUser().then(function (user) {
+        return findCommentsByAuthor(user);
+      }).then(function (comments) {
+        // The user's comments are now available
+      });
+      ```
+
+      If the assimliated promise rejects, then the downstream promise will also reject.
+
+      ```js
+      findUser().then(function (user) {
+        return findCommentsByAuthor(user);
+      }).then(function (comments) {
+        // If `findCommentsByAuthor` fulfills, we'll have the value here
+      }, function (reason) {
+        // If `findCommentsByAuthor` rejects, we'll have the reason here
+      });
+      ```
+
+      Simple Example
+      --------------
+
+      Synchronous Example
+
+      ```javascript
+      var result;
+
+      try {
+        result = findResult();
+        // success
+      } catch(reason) {
+        // failure
+      }
+      ```
+
+      Errback Example
+
+      ```js
+      findResult(function(result, err){
+        if (err) {
+          // failure
+        } else {
+          // success
+        }
+      });
+      ```
+
+      Promise Example;
+
+      ```javascript
+      findResult().then(function(result){
+        // success
+      }, function(reason){
+        // failure
+      });
+      ```
+
+      Advanced Example
+      --------------
+
+      Synchronous Example
+
+      ```javascript
+      var author, books;
+
+      try {
+        author = findAuthor();
+        books  = findBooksByAuthor(author);
+        // success
+      } catch(reason) {
+        // failure
+      }
+      ```
+
+      Errback Example
+
+      ```js
+
+      function foundBooks(books) {
+
+      }
+
+      function failure(reason) {
+
+      }
+
+      findAuthor(function(author, err){
+        if (err) {
+          failure(err);
+          // failure
+        } else {
+          try {
+            findBoooksByAuthor(author, function(books, err) {
+              if (err) {
+                failure(err);
+              } else {
+                try {
+                  foundBooks(books);
+                } catch(reason) {
+                  failure(reason);
+                }
+              }
+            });
+          } catch(error) {
+            failure(err);
+          }
+          // success
+        }
+      });
+      ```
+
+      Promise Example;
+
+      ```javascript
+      findAuthor().
+        then(findBooksByAuthor).
+        then(function(books){
+          // found books
+      }).catch(function(reason){
+        // something went wrong
+      });
+      ```
+
+      @method then
+      @param {Function} onFulfilled
+      @param {Function} onRejected
+      Useful for tooling.
+      @return {Promise}
+    */
+      then: function(onFulfillment, onRejection) {
+        var parent = this;
+        var state = parent._state;
+
+        if (state === lib$es6$promise$$internal$$FULFILLED && !onFulfillment || state === lib$es6$promise$$internal$$REJECTED && !onRejection) {
+          return this;
+        }
+
+        var child = new this.constructor(lib$es6$promise$$internal$$noop);
+        var result = parent._result;
+
+        if (state) {
+          var callback = arguments[state - 1];
+          lib$es6$promise$asap$$asap(function(){
+            lib$es6$promise$$internal$$invokeCallback(state, child, callback, result);
+          });
+        } else {
+          lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection);
+        }
+
+        return child;
+      },
+
+    /**
+      `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+      as the catch block of a try/catch statement.
+
+      ```js
+      function findAuthor(){
+        throw new Error('couldn't find that author');
+      }
+
+      // synchronous
+      try {
+        findAuthor();
+      } catch(reason) {
+        // something went wrong
+      }
+
+      // async with promises
+      findAuthor().catch(function(reason){
+        // something went wrong
+      });
+      ```
+
+      @method catch
+      @param {Function} onRejection
+      Useful for tooling.
+      @return {Promise}
+    */
+      'catch': function(onRejection) {
+        return this.then(null, onRejection);
+      }
+    };
+    function lib$es6$promise$polyfill$$polyfill() {
+      var local;
+
+      if (typeof global !== 'undefined') {
+          local = global;
+      } else if (typeof self !== 'undefined') {
+          local = self;
+      } else {
+          try {
+              local = Function('return this')();
+          } catch (e) {
+              throw new Error('polyfill failed because global object is unavailable in this environment');
+          }
+      }
+
+      var P = local.Promise;
+
+      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
+        return;
+      }
+
+      local.Promise = lib$es6$promise$promise$$default;
+    }
+    var lib$es6$promise$polyfill$$default = lib$es6$promise$polyfill$$polyfill;
+
+    var lib$es6$promise$umd$$ES6Promise = {
+      'Promise': lib$es6$promise$promise$$default,
+      'polyfill': lib$es6$promise$polyfill$$default
+    };
+
+    /* global define:true module:true window: true */
+    if (typeof define === 'function' && define['amd']) {
+      define(function() { return lib$es6$promise$umd$$ES6Promise; });
+    } else if (typeof module !== 'undefined' && module['exports']) {
+      module['exports'] = lib$es6$promise$umd$$ES6Promise;
+    } else if (typeof this !== 'undefined') {
+      this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
+    }
+
+    lib$es6$promise$polyfill$$default();
+}).call(this);
+
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+
+},{"_process":71}],14:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5244,7 +6173,7 @@ function validateParams (params) {
   return params
 }
 
-},{"http":127,"url":133}],16:[function(require,module,exports){
+},{"http":126,"url":132}],16:[function(require,module,exports){
 "use strict";
 var Buffer = require("buffer").Buffer;
 
@@ -5801,7 +6730,7 @@ function findIdx(table, val) {
 }
 
 
-},{"buffer":9}],17:[function(require,module,exports){
+},{"buffer":8}],17:[function(require,module,exports){
 "use strict";
 
 // Description of supported double byte encodings and aliases.
@@ -6193,7 +7122,7 @@ InternalDecoderCesu8.prototype.end = function() {
     return res;
 }
 
-},{"buffer":9,"string_decoder":131}],20:[function(require,module,exports){
+},{"buffer":8,"string_decoder":130}],20:[function(require,module,exports){
 "use strict";
 var Buffer = require("buffer").Buffer;
 
@@ -6268,7 +7197,7 @@ SBCSDecoder.prototype.write = function(buf) {
 SBCSDecoder.prototype.end = function() {
 }
 
-},{"buffer":9}],21:[function(require,module,exports){
+},{"buffer":8}],21:[function(require,module,exports){
 "use strict";
 
 // Generated data for sbcs codec. Don't edit manually. Regenerate using generation/gen-sbcs.js script.
@@ -8284,7 +9213,7 @@ function detectEncoding(buf, defaultEncoding) {
 
 
 
-},{"buffer":9}],32:[function(require,module,exports){
+},{"buffer":8}],32:[function(require,module,exports){
 "use strict";
 var Buffer = require("buffer").Buffer;
 
@@ -8576,7 +9505,7 @@ Utf7IMAPDecoder.prototype.end = function() {
 
 
 
-},{"buffer":9}],33:[function(require,module,exports){
+},{"buffer":8}],33:[function(require,module,exports){
 "use strict";
 
 var BOMChar = '\uFEFF';
@@ -8847,7 +9776,7 @@ module.exports = function (iconv) {
     }
 }
 
-},{"buffer":9,"stream":126}],35:[function(require,module,exports){
+},{"buffer":8,"stream":125}],35:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -9000,7 +9929,7 @@ if ("Ā" != "\u0100") {
 
 }).call(this,require('_process'))
 
-},{"../encodings":18,"./bom-handling":33,"./extend-node":34,"./streams":36,"_process":72,"buffer":9}],36:[function(require,module,exports){
+},{"../encodings":18,"./bom-handling":33,"./extend-node":34,"./streams":36,"_process":71,"buffer":8}],36:[function(require,module,exports){
 "use strict";
 
 var Buffer = require("buffer").Buffer,
@@ -9123,7 +10052,7 @@ IconvLiteDecoderStream.prototype.collect = function(cb) {
 }
 
 
-},{"buffer":9,"stream":126}],37:[function(require,module,exports){
+},{"buffer":8,"stream":125}],37:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -17483,986 +18412,9 @@ return factory;
 
 })();
 
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},"/node_modules/jsonld/js")
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},"/node_modules\\jsonld\\js")
 
-},{"_process":72,"crypto":42,"es6-promise":44,"http":42,"jsonld-request":42,"pkginfo":42,"request":42,"util":42,"xmldom":42}],44:[function(require,module,exports){
-(function (process,global){
-/*!
- * @overview es6-promise - a tiny implementation of Promises/A+.
- * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
- * @license   Licensed under MIT license
- *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   2.3.0
- */
-
-(function() {
-    "use strict";
-    function lib$es6$promise$utils$$objectOrFunction(x) {
-      return typeof x === 'function' || (typeof x === 'object' && x !== null);
-    }
-
-    function lib$es6$promise$utils$$isFunction(x) {
-      return typeof x === 'function';
-    }
-
-    function lib$es6$promise$utils$$isMaybeThenable(x) {
-      return typeof x === 'object' && x !== null;
-    }
-
-    var lib$es6$promise$utils$$_isArray;
-    if (!Array.isArray) {
-      lib$es6$promise$utils$$_isArray = function (x) {
-        return Object.prototype.toString.call(x) === '[object Array]';
-      };
-    } else {
-      lib$es6$promise$utils$$_isArray = Array.isArray;
-    }
-
-    var lib$es6$promise$utils$$isArray = lib$es6$promise$utils$$_isArray;
-    var lib$es6$promise$asap$$len = 0;
-    var lib$es6$promise$asap$$toString = {}.toString;
-    var lib$es6$promise$asap$$vertxNext;
-    var lib$es6$promise$asap$$customSchedulerFn;
-
-    var lib$es6$promise$asap$$asap = function asap(callback, arg) {
-      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
-      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
-      lib$es6$promise$asap$$len += 2;
-      if (lib$es6$promise$asap$$len === 2) {
-        // If len is 2, that means that we need to schedule an async flush.
-        // If additional callbacks are queued before the queue is flushed, they
-        // will be processed by this flush that we are scheduling.
-        if (lib$es6$promise$asap$$customSchedulerFn) {
-          lib$es6$promise$asap$$customSchedulerFn(lib$es6$promise$asap$$flush);
-        } else {
-          lib$es6$promise$asap$$scheduleFlush();
-        }
-      }
-    }
-
-    function lib$es6$promise$asap$$setScheduler(scheduleFn) {
-      lib$es6$promise$asap$$customSchedulerFn = scheduleFn;
-    }
-
-    function lib$es6$promise$asap$$setAsap(asapFn) {
-      lib$es6$promise$asap$$asap = asapFn;
-    }
-
-    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
-    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
-    var lib$es6$promise$asap$$BrowserMutationObserver = lib$es6$promise$asap$$browserGlobal.MutationObserver || lib$es6$promise$asap$$browserGlobal.WebKitMutationObserver;
-    var lib$es6$promise$asap$$isNode = typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
-
-    // test for web worker but not in IE10
-    var lib$es6$promise$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
-      typeof importScripts !== 'undefined' &&
-      typeof MessageChannel !== 'undefined';
-
-    // node
-    function lib$es6$promise$asap$$useNextTick() {
-      var nextTick = process.nextTick;
-      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
-      // setImmediate should be used instead instead
-      var version = process.versions.node.match(/^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$/);
-      if (Array.isArray(version) && version[1] === '0' && version[2] === '10') {
-        nextTick = setImmediate;
-      }
-      return function() {
-        nextTick(lib$es6$promise$asap$$flush);
-      };
-    }
-
-    // vertx
-    function lib$es6$promise$asap$$useVertxTimer() {
-      return function() {
-        lib$es6$promise$asap$$vertxNext(lib$es6$promise$asap$$flush);
-      };
-    }
-
-    function lib$es6$promise$asap$$useMutationObserver() {
-      var iterations = 0;
-      var observer = new lib$es6$promise$asap$$BrowserMutationObserver(lib$es6$promise$asap$$flush);
-      var node = document.createTextNode('');
-      observer.observe(node, { characterData: true });
-
-      return function() {
-        node.data = (iterations = ++iterations % 2);
-      };
-    }
-
-    // web worker
-    function lib$es6$promise$asap$$useMessageChannel() {
-      var channel = new MessageChannel();
-      channel.port1.onmessage = lib$es6$promise$asap$$flush;
-      return function () {
-        channel.port2.postMessage(0);
-      };
-    }
-
-    function lib$es6$promise$asap$$useSetTimeout() {
-      return function() {
-        setTimeout(lib$es6$promise$asap$$flush, 1);
-      };
-    }
-
-    var lib$es6$promise$asap$$queue = new Array(1000);
-    function lib$es6$promise$asap$$flush() {
-      for (var i = 0; i < lib$es6$promise$asap$$len; i+=2) {
-        var callback = lib$es6$promise$asap$$queue[i];
-        var arg = lib$es6$promise$asap$$queue[i+1];
-
-        callback(arg);
-
-        lib$es6$promise$asap$$queue[i] = undefined;
-        lib$es6$promise$asap$$queue[i+1] = undefined;
-      }
-
-      lib$es6$promise$asap$$len = 0;
-    }
-
-    function lib$es6$promise$asap$$attemptVertex() {
-      try {
-        var r = require;
-        var vertx = r('vertx');
-        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
-        return lib$es6$promise$asap$$useVertxTimer();
-      } catch(e) {
-        return lib$es6$promise$asap$$useSetTimeout();
-      }
-    }
-
-    var lib$es6$promise$asap$$scheduleFlush;
-    // Decide what async method to use to triggering processing of queued callbacks:
-    if (lib$es6$promise$asap$$isNode) {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
-    } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
-    } else if (lib$es6$promise$asap$$isWorker) {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
-    } else if (lib$es6$promise$asap$$browserWindow === undefined && typeof require === 'function') {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertex();
-    } else {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
-    }
-
-    function lib$es6$promise$$internal$$noop() {}
-
-    var lib$es6$promise$$internal$$PENDING   = void 0;
-    var lib$es6$promise$$internal$$FULFILLED = 1;
-    var lib$es6$promise$$internal$$REJECTED  = 2;
-
-    var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
-
-    function lib$es6$promise$$internal$$selfFullfillment() {
-      return new TypeError("You cannot resolve a promise with itself");
-    }
-
-    function lib$es6$promise$$internal$$cannotReturnOwn() {
-      return new TypeError('A promises callback cannot return that same promise.');
-    }
-
-    function lib$es6$promise$$internal$$getThen(promise) {
-      try {
-        return promise.then;
-      } catch(error) {
-        lib$es6$promise$$internal$$GET_THEN_ERROR.error = error;
-        return lib$es6$promise$$internal$$GET_THEN_ERROR;
-      }
-    }
-
-    function lib$es6$promise$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
-      try {
-        then.call(value, fulfillmentHandler, rejectionHandler);
-      } catch(e) {
-        return e;
-      }
-    }
-
-    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
-       lib$es6$promise$asap$$asap(function(promise) {
-        var sealed = false;
-        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
-          if (sealed) { return; }
-          sealed = true;
-          if (thenable !== value) {
-            lib$es6$promise$$internal$$resolve(promise, value);
-          } else {
-            lib$es6$promise$$internal$$fulfill(promise, value);
-          }
-        }, function(reason) {
-          if (sealed) { return; }
-          sealed = true;
-
-          lib$es6$promise$$internal$$reject(promise, reason);
-        }, 'Settle: ' + (promise._label || ' unknown promise'));
-
-        if (!sealed && error) {
-          sealed = true;
-          lib$es6$promise$$internal$$reject(promise, error);
-        }
-      }, promise);
-    }
-
-    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
-      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
-        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
-      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
-        lib$es6$promise$$internal$$reject(promise, thenable._result);
-      } else {
-        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
-          lib$es6$promise$$internal$$resolve(promise, value);
-        }, function(reason) {
-          lib$es6$promise$$internal$$reject(promise, reason);
-        });
-      }
-    }
-
-    function lib$es6$promise$$internal$$handleMaybeThenable(promise, maybeThenable) {
-      if (maybeThenable.constructor === promise.constructor) {
-        lib$es6$promise$$internal$$handleOwnThenable(promise, maybeThenable);
-      } else {
-        var then = lib$es6$promise$$internal$$getThen(maybeThenable);
-
-        if (then === lib$es6$promise$$internal$$GET_THEN_ERROR) {
-          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$GET_THEN_ERROR.error);
-        } else if (then === undefined) {
-          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
-        } else if (lib$es6$promise$utils$$isFunction(then)) {
-          lib$es6$promise$$internal$$handleForeignThenable(promise, maybeThenable, then);
-        } else {
-          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
-        }
-      }
-    }
-
-    function lib$es6$promise$$internal$$resolve(promise, value) {
-      if (promise === value) {
-        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFullfillment());
-      } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
-        lib$es6$promise$$internal$$handleMaybeThenable(promise, value);
-      } else {
-        lib$es6$promise$$internal$$fulfill(promise, value);
-      }
-    }
-
-    function lib$es6$promise$$internal$$publishRejection(promise) {
-      if (promise._onerror) {
-        promise._onerror(promise._result);
-      }
-
-      lib$es6$promise$$internal$$publish(promise);
-    }
-
-    function lib$es6$promise$$internal$$fulfill(promise, value) {
-      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
-
-      promise._result = value;
-      promise._state = lib$es6$promise$$internal$$FULFILLED;
-
-      if (promise._subscribers.length !== 0) {
-        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, promise);
-      }
-    }
-
-    function lib$es6$promise$$internal$$reject(promise, reason) {
-      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
-      promise._state = lib$es6$promise$$internal$$REJECTED;
-      promise._result = reason;
-
-      lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publishRejection, promise);
-    }
-
-    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
-      var subscribers = parent._subscribers;
-      var length = subscribers.length;
-
-      parent._onerror = null;
-
-      subscribers[length] = child;
-      subscribers[length + lib$es6$promise$$internal$$FULFILLED] = onFulfillment;
-      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
-
-      if (length === 0 && parent._state) {
-        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, parent);
-      }
-    }
-
-    function lib$es6$promise$$internal$$publish(promise) {
-      var subscribers = promise._subscribers;
-      var settled = promise._state;
-
-      if (subscribers.length === 0) { return; }
-
-      var child, callback, detail = promise._result;
-
-      for (var i = 0; i < subscribers.length; i += 3) {
-        child = subscribers[i];
-        callback = subscribers[i + settled];
-
-        if (child) {
-          lib$es6$promise$$internal$$invokeCallback(settled, child, callback, detail);
-        } else {
-          callback(detail);
-        }
-      }
-
-      promise._subscribers.length = 0;
-    }
-
-    function lib$es6$promise$$internal$$ErrorObject() {
-      this.error = null;
-    }
-
-    var lib$es6$promise$$internal$$TRY_CATCH_ERROR = new lib$es6$promise$$internal$$ErrorObject();
-
-    function lib$es6$promise$$internal$$tryCatch(callback, detail) {
-      try {
-        return callback(detail);
-      } catch(e) {
-        lib$es6$promise$$internal$$TRY_CATCH_ERROR.error = e;
-        return lib$es6$promise$$internal$$TRY_CATCH_ERROR;
-      }
-    }
-
-    function lib$es6$promise$$internal$$invokeCallback(settled, promise, callback, detail) {
-      var hasCallback = lib$es6$promise$utils$$isFunction(callback),
-          value, error, succeeded, failed;
-
-      if (hasCallback) {
-        value = lib$es6$promise$$internal$$tryCatch(callback, detail);
-
-        if (value === lib$es6$promise$$internal$$TRY_CATCH_ERROR) {
-          failed = true;
-          error = value.error;
-          value = null;
-        } else {
-          succeeded = true;
-        }
-
-        if (promise === value) {
-          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$cannotReturnOwn());
-          return;
-        }
-
-      } else {
-        value = detail;
-        succeeded = true;
-      }
-
-      if (promise._state !== lib$es6$promise$$internal$$PENDING) {
-        // noop
-      } else if (hasCallback && succeeded) {
-        lib$es6$promise$$internal$$resolve(promise, value);
-      } else if (failed) {
-        lib$es6$promise$$internal$$reject(promise, error);
-      } else if (settled === lib$es6$promise$$internal$$FULFILLED) {
-        lib$es6$promise$$internal$$fulfill(promise, value);
-      } else if (settled === lib$es6$promise$$internal$$REJECTED) {
-        lib$es6$promise$$internal$$reject(promise, value);
-      }
-    }
-
-    function lib$es6$promise$$internal$$initializePromise(promise, resolver) {
-      try {
-        resolver(function resolvePromise(value){
-          lib$es6$promise$$internal$$resolve(promise, value);
-        }, function rejectPromise(reason) {
-          lib$es6$promise$$internal$$reject(promise, reason);
-        });
-      } catch(e) {
-        lib$es6$promise$$internal$$reject(promise, e);
-      }
-    }
-
-    function lib$es6$promise$enumerator$$Enumerator(Constructor, input) {
-      var enumerator = this;
-
-      enumerator._instanceConstructor = Constructor;
-      enumerator.promise = new Constructor(lib$es6$promise$$internal$$noop);
-
-      if (enumerator._validateInput(input)) {
-        enumerator._input     = input;
-        enumerator.length     = input.length;
-        enumerator._remaining = input.length;
-
-        enumerator._init();
-
-        if (enumerator.length === 0) {
-          lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
-        } else {
-          enumerator.length = enumerator.length || 0;
-          enumerator._enumerate();
-          if (enumerator._remaining === 0) {
-            lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
-          }
-        }
-      } else {
-        lib$es6$promise$$internal$$reject(enumerator.promise, enumerator._validationError());
-      }
-    }
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._validateInput = function(input) {
-      return lib$es6$promise$utils$$isArray(input);
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._validationError = function() {
-      return new Error('Array Methods must be provided an Array');
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._init = function() {
-      this._result = new Array(this.length);
-    };
-
-    var lib$es6$promise$enumerator$$default = lib$es6$promise$enumerator$$Enumerator;
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._enumerate = function() {
-      var enumerator = this;
-
-      var length  = enumerator.length;
-      var promise = enumerator.promise;
-      var input   = enumerator._input;
-
-      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
-        enumerator._eachEntry(input[i], i);
-      }
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
-      var enumerator = this;
-      var c = enumerator._instanceConstructor;
-
-      if (lib$es6$promise$utils$$isMaybeThenable(entry)) {
-        if (entry.constructor === c && entry._state !== lib$es6$promise$$internal$$PENDING) {
-          entry._onerror = null;
-          enumerator._settledAt(entry._state, i, entry._result);
-        } else {
-          enumerator._willSettleAt(c.resolve(entry), i);
-        }
-      } else {
-        enumerator._remaining--;
-        enumerator._result[i] = entry;
-      }
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
-      var enumerator = this;
-      var promise = enumerator.promise;
-
-      if (promise._state === lib$es6$promise$$internal$$PENDING) {
-        enumerator._remaining--;
-
-        if (state === lib$es6$promise$$internal$$REJECTED) {
-          lib$es6$promise$$internal$$reject(promise, value);
-        } else {
-          enumerator._result[i] = value;
-        }
-      }
-
-      if (enumerator._remaining === 0) {
-        lib$es6$promise$$internal$$fulfill(promise, enumerator._result);
-      }
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
-      var enumerator = this;
-
-      lib$es6$promise$$internal$$subscribe(promise, undefined, function(value) {
-        enumerator._settledAt(lib$es6$promise$$internal$$FULFILLED, i, value);
-      }, function(reason) {
-        enumerator._settledAt(lib$es6$promise$$internal$$REJECTED, i, reason);
-      });
-    };
-    function lib$es6$promise$promise$all$$all(entries) {
-      return new lib$es6$promise$enumerator$$default(this, entries).promise;
-    }
-    var lib$es6$promise$promise$all$$default = lib$es6$promise$promise$all$$all;
-    function lib$es6$promise$promise$race$$race(entries) {
-      /*jshint validthis:true */
-      var Constructor = this;
-
-      var promise = new Constructor(lib$es6$promise$$internal$$noop);
-
-      if (!lib$es6$promise$utils$$isArray(entries)) {
-        lib$es6$promise$$internal$$reject(promise, new TypeError('You must pass an array to race.'));
-        return promise;
-      }
-
-      var length = entries.length;
-
-      function onFulfillment(value) {
-        lib$es6$promise$$internal$$resolve(promise, value);
-      }
-
-      function onRejection(reason) {
-        lib$es6$promise$$internal$$reject(promise, reason);
-      }
-
-      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
-        lib$es6$promise$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
-      }
-
-      return promise;
-    }
-    var lib$es6$promise$promise$race$$default = lib$es6$promise$promise$race$$race;
-    function lib$es6$promise$promise$resolve$$resolve(object) {
-      /*jshint validthis:true */
-      var Constructor = this;
-
-      if (object && typeof object === 'object' && object.constructor === Constructor) {
-        return object;
-      }
-
-      var promise = new Constructor(lib$es6$promise$$internal$$noop);
-      lib$es6$promise$$internal$$resolve(promise, object);
-      return promise;
-    }
-    var lib$es6$promise$promise$resolve$$default = lib$es6$promise$promise$resolve$$resolve;
-    function lib$es6$promise$promise$reject$$reject(reason) {
-      /*jshint validthis:true */
-      var Constructor = this;
-      var promise = new Constructor(lib$es6$promise$$internal$$noop);
-      lib$es6$promise$$internal$$reject(promise, reason);
-      return promise;
-    }
-    var lib$es6$promise$promise$reject$$default = lib$es6$promise$promise$reject$$reject;
-
-    var lib$es6$promise$promise$$counter = 0;
-
-    function lib$es6$promise$promise$$needsResolver() {
-      throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
-    }
-
-    function lib$es6$promise$promise$$needsNew() {
-      throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
-    }
-
-    var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
-    /**
-      Promise objects represent the eventual result of an asynchronous operation. The
-      primary way of interacting with a promise is through its `then` method, which
-      registers callbacks to receive either a promise's eventual value or the reason
-      why the promise cannot be fulfilled.
-
-      Terminology
-      -----------
-
-      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
-      - `thenable` is an object or function that defines a `then` method.
-      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
-      - `exception` is a value that is thrown using the throw statement.
-      - `reason` is a value that indicates why a promise was rejected.
-      - `settled` the final resting state of a promise, fulfilled or rejected.
-
-      A promise can be in one of three states: pending, fulfilled, or rejected.
-
-      Promises that are fulfilled have a fulfillment value and are in the fulfilled
-      state.  Promises that are rejected have a rejection reason and are in the
-      rejected state.  A fulfillment value is never a thenable.
-
-      Promises can also be said to *resolve* a value.  If this value is also a
-      promise, then the original promise's settled state will match the value's
-      settled state.  So a promise that *resolves* a promise that rejects will
-      itself reject, and a promise that *resolves* a promise that fulfills will
-      itself fulfill.
-
-
-      Basic Usage:
-      ------------
-
-      ```js
-      var promise = new Promise(function(resolve, reject) {
-        // on success
-        resolve(value);
-
-        // on failure
-        reject(reason);
-      });
-
-      promise.then(function(value) {
-        // on fulfillment
-      }, function(reason) {
-        // on rejection
-      });
-      ```
-
-      Advanced Usage:
-      ---------------
-
-      Promises shine when abstracting away asynchronous interactions such as
-      `XMLHttpRequest`s.
-
-      ```js
-      function getJSON(url) {
-        return new Promise(function(resolve, reject){
-          var xhr = new XMLHttpRequest();
-
-          xhr.open('GET', url);
-          xhr.onreadystatechange = handler;
-          xhr.responseType = 'json';
-          xhr.setRequestHeader('Accept', 'application/json');
-          xhr.send();
-
-          function handler() {
-            if (this.readyState === this.DONE) {
-              if (this.status === 200) {
-                resolve(this.response);
-              } else {
-                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
-              }
-            }
-          };
-        });
-      }
-
-      getJSON('/posts.json').then(function(json) {
-        // on fulfillment
-      }, function(reason) {
-        // on rejection
-      });
-      ```
-
-      Unlike callbacks, promises are great composable primitives.
-
-      ```js
-      Promise.all([
-        getJSON('/posts'),
-        getJSON('/comments')
-      ]).then(function(values){
-        values[0] // => postsJSON
-        values[1] // => commentsJSON
-
-        return values;
-      });
-      ```
-
-      @class Promise
-      @param {function} resolver
-      Useful for tooling.
-      @constructor
-    */
-    function lib$es6$promise$promise$$Promise(resolver) {
-      this._id = lib$es6$promise$promise$$counter++;
-      this._state = undefined;
-      this._result = undefined;
-      this._subscribers = [];
-
-      if (lib$es6$promise$$internal$$noop !== resolver) {
-        if (!lib$es6$promise$utils$$isFunction(resolver)) {
-          lib$es6$promise$promise$$needsResolver();
-        }
-
-        if (!(this instanceof lib$es6$promise$promise$$Promise)) {
-          lib$es6$promise$promise$$needsNew();
-        }
-
-        lib$es6$promise$$internal$$initializePromise(this, resolver);
-      }
-    }
-
-    lib$es6$promise$promise$$Promise.all = lib$es6$promise$promise$all$$default;
-    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
-    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
-    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
-    lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
-    lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
-    lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
-
-    lib$es6$promise$promise$$Promise.prototype = {
-      constructor: lib$es6$promise$promise$$Promise,
-
-    /**
-      The primary way of interacting with a promise is through its `then` method,
-      which registers callbacks to receive either a promise's eventual value or the
-      reason why the promise cannot be fulfilled.
-
-      ```js
-      findUser().then(function(user){
-        // user is available
-      }, function(reason){
-        // user is unavailable, and you are given the reason why
-      });
-      ```
-
-      Chaining
-      --------
-
-      The return value of `then` is itself a promise.  This second, 'downstream'
-      promise is resolved with the return value of the first promise's fulfillment
-      or rejection handler, or rejected if the handler throws an exception.
-
-      ```js
-      findUser().then(function (user) {
-        return user.name;
-      }, function (reason) {
-        return 'default name';
-      }).then(function (userName) {
-        // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
-        // will be `'default name'`
-      });
-
-      findUser().then(function (user) {
-        throw new Error('Found user, but still unhappy');
-      }, function (reason) {
-        throw new Error('`findUser` rejected and we're unhappy');
-      }).then(function (value) {
-        // never reached
-      }, function (reason) {
-        // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
-        // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
-      });
-      ```
-      If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-
-      ```js
-      findUser().then(function (user) {
-        throw new PedagogicalException('Upstream error');
-      }).then(function (value) {
-        // never reached
-      }).then(function (value) {
-        // never reached
-      }, function (reason) {
-        // The `PedgagocialException` is propagated all the way down to here
-      });
-      ```
-
-      Assimilation
-      ------------
-
-      Sometimes the value you want to propagate to a downstream promise can only be
-      retrieved asynchronously. This can be achieved by returning a promise in the
-      fulfillment or rejection handler. The downstream promise will then be pending
-      until the returned promise is settled. This is called *assimilation*.
-
-      ```js
-      findUser().then(function (user) {
-        return findCommentsByAuthor(user);
-      }).then(function (comments) {
-        // The user's comments are now available
-      });
-      ```
-
-      If the assimliated promise rejects, then the downstream promise will also reject.
-
-      ```js
-      findUser().then(function (user) {
-        return findCommentsByAuthor(user);
-      }).then(function (comments) {
-        // If `findCommentsByAuthor` fulfills, we'll have the value here
-      }, function (reason) {
-        // If `findCommentsByAuthor` rejects, we'll have the reason here
-      });
-      ```
-
-      Simple Example
-      --------------
-
-      Synchronous Example
-
-      ```javascript
-      var result;
-
-      try {
-        result = findResult();
-        // success
-      } catch(reason) {
-        // failure
-      }
-      ```
-
-      Errback Example
-
-      ```js
-      findResult(function(result, err){
-        if (err) {
-          // failure
-        } else {
-          // success
-        }
-      });
-      ```
-
-      Promise Example;
-
-      ```javascript
-      findResult().then(function(result){
-        // success
-      }, function(reason){
-        // failure
-      });
-      ```
-
-      Advanced Example
-      --------------
-
-      Synchronous Example
-
-      ```javascript
-      var author, books;
-
-      try {
-        author = findAuthor();
-        books  = findBooksByAuthor(author);
-        // success
-      } catch(reason) {
-        // failure
-      }
-      ```
-
-      Errback Example
-
-      ```js
-
-      function foundBooks(books) {
-
-      }
-
-      function failure(reason) {
-
-      }
-
-      findAuthor(function(author, err){
-        if (err) {
-          failure(err);
-          // failure
-        } else {
-          try {
-            findBoooksByAuthor(author, function(books, err) {
-              if (err) {
-                failure(err);
-              } else {
-                try {
-                  foundBooks(books);
-                } catch(reason) {
-                  failure(reason);
-                }
-              }
-            });
-          } catch(error) {
-            failure(err);
-          }
-          // success
-        }
-      });
-      ```
-
-      Promise Example;
-
-      ```javascript
-      findAuthor().
-        then(findBooksByAuthor).
-        then(function(books){
-          // found books
-      }).catch(function(reason){
-        // something went wrong
-      });
-      ```
-
-      @method then
-      @param {Function} onFulfilled
-      @param {Function} onRejected
-      Useful for tooling.
-      @return {Promise}
-    */
-      then: function(onFulfillment, onRejection) {
-        var parent = this;
-        var state = parent._state;
-
-        if (state === lib$es6$promise$$internal$$FULFILLED && !onFulfillment || state === lib$es6$promise$$internal$$REJECTED && !onRejection) {
-          return this;
-        }
-
-        var child = new this.constructor(lib$es6$promise$$internal$$noop);
-        var result = parent._result;
-
-        if (state) {
-          var callback = arguments[state - 1];
-          lib$es6$promise$asap$$asap(function(){
-            lib$es6$promise$$internal$$invokeCallback(state, child, callback, result);
-          });
-        } else {
-          lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection);
-        }
-
-        return child;
-      },
-
-    /**
-      `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
-      as the catch block of a try/catch statement.
-
-      ```js
-      function findAuthor(){
-        throw new Error('couldn't find that author');
-      }
-
-      // synchronous
-      try {
-        findAuthor();
-      } catch(reason) {
-        // something went wrong
-      }
-
-      // async with promises
-      findAuthor().catch(function(reason){
-        // something went wrong
-      });
-      ```
-
-      @method catch
-      @param {Function} onRejection
-      Useful for tooling.
-      @return {Promise}
-    */
-      'catch': function(onRejection) {
-        return this.then(null, onRejection);
-      }
-    };
-    function lib$es6$promise$polyfill$$polyfill() {
-      var local;
-
-      if (typeof global !== 'undefined') {
-          local = global;
-      } else if (typeof self !== 'undefined') {
-          local = self;
-      } else {
-          try {
-              local = Function('return this')();
-          } catch (e) {
-              throw new Error('polyfill failed because global object is unavailable in this environment');
-          }
-      }
-
-      var P = local.Promise;
-
-      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
-        return;
-      }
-
-      local.Promise = lib$es6$promise$promise$$default;
-    }
-    var lib$es6$promise$polyfill$$default = lib$es6$promise$polyfill$$polyfill;
-
-    var lib$es6$promise$umd$$ES6Promise = {
-      'Promise': lib$es6$promise$promise$$default,
-      'polyfill': lib$es6$promise$polyfill$$default
-    };
-
-    /* global define:true module:true window: true */
-    if (typeof define === 'function' && define['amd']) {
-      define(function() { return lib$es6$promise$umd$$ES6Promise; });
-    } else if (typeof module !== 'undefined' && module['exports']) {
-      module['exports'] = lib$es6$promise$umd$$ES6Promise;
-    } else if (typeof this !== 'undefined') {
-      this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
-    }
-
-    lib$es6$promise$polyfill$$default();
-}).call(this);
-
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-
-},{"_process":72}],45:[function(require,module,exports){
+},{"_process":71,"crypto":42,"es6-promise":13,"http":42,"jsonld-request":42,"pkginfo":42,"request":42,"util":42,"xmldom":42}],44:[function(require,module,exports){
 /*!
  * mustache.js - Logic-less {{mustache}} templates with JavaScript
  * http://github.com/janl/mustache.js
@@ -19094,7 +19046,7 @@ return factory;
   return mustache;
 }));
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // Replace local require by a lazy loader
 var globalRequire = require;
 require = function () {};
@@ -19122,7 +19074,7 @@ Object.keys(exports).forEach(function (submodule) {
   });
 });
 
-},{"./lib/N3Lexer":47,"./lib/N3Parser":48,"./lib/N3Store":49,"./lib/N3StreamParser":50,"./lib/N3StreamWriter":51,"./lib/N3Util":52,"./lib/N3Writer":53}],47:[function(require,module,exports){
+},{"./lib/N3Lexer":46,"./lib/N3Parser":47,"./lib/N3Store":48,"./lib/N3StreamParser":49,"./lib/N3StreamWriter":50,"./lib/N3Util":51,"./lib/N3Writer":52}],46:[function(require,module,exports){
 // **N3Lexer** tokenizes N3 documents.
 var fromCharCode = String.fromCharCode;
 var immediately = typeof setImmediate === 'function' ? setImmediate :
@@ -19483,7 +19435,7 @@ N3Lexer.prototype = {
 // Export the `N3Lexer` class as a whole.
 module.exports = N3Lexer;
 
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // **N3Parser** parses N3 documents.
 var N3Lexer = require('./N3Lexer');
 
@@ -20185,7 +20137,7 @@ function noop() {}
 // Export the `N3Parser` class as a whole.
 module.exports = N3Parser;
 
-},{"./N3Lexer":47}],49:[function(require,module,exports){
+},{"./N3Lexer":46}],48:[function(require,module,exports){
 // **N3Store** objects store N3 triples by graph in memory.
 
 var expandPrefixedName = require('./N3Util').expandPrefixedName;
@@ -20544,7 +20496,7 @@ N3Store.prototype = {
 // Export the `N3Store` class as a whole.
 module.exports = N3Store;
 
-},{"./N3Util":52}],50:[function(require,module,exports){
+},{"./N3Util":51}],49:[function(require,module,exports){
 // **N3StreamParser** parses an N3 stream into a triple stream
 var Transform = require('stream').Transform,
     util = require('util'),
@@ -20580,7 +20532,7 @@ util.inherits(N3StreamParser, Transform);
 // Export the `N3StreamParser` class as a whole.
 module.exports = N3StreamParser;
 
-},{"./N3Parser.js":48,"stream":126,"util":138}],51:[function(require,module,exports){
+},{"./N3Parser.js":47,"stream":125,"util":137}],50:[function(require,module,exports){
 // **N3StreamWriter** serializes a triple stream into an N3 stream
 var Transform = require('stream').Transform,
     util = require('util'),
@@ -20612,7 +20564,7 @@ util.inherits(N3StreamWriter, Transform);
 // Export the `N3StreamWriter` class as a whole.
 module.exports = N3StreamWriter;
 
-},{"./N3Writer.js":53,"stream":126,"util":138}],52:[function(require,module,exports){
+},{"./N3Writer.js":52,"stream":125,"util":137}],51:[function(require,module,exports){
 // **N3Util** provides N3 utility functions
 
 var Xsd = 'http://www.w3.org/2001/XMLSchema#';
@@ -20730,7 +20682,7 @@ function applyToThis(f) {
 // Expose N3Util, attaching all functions to it
 module.exports = addN3Util(addN3Util);
 
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 // **N3Writer** writes N3 documents.
 
 // Matches a literal as represented in memory by the N3 library
@@ -21060,7 +21012,7 @@ function characterReplacer(character) {
 // Export the `N3Writer` class as a whole.
 module.exports = N3Writer;
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 (function (global,Buffer){
 
 /**
@@ -21336,7 +21288,7 @@ Fetch.Request = Request;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
 
-},{"./lib/body":55,"./lib/fetch-error":56,"./lib/headers":57,"./lib/request":58,"./lib/response":59,"buffer":9,"http":127,"https":15,"stream":126,"url":133,"zlib":8}],55:[function(require,module,exports){
+},{"./lib/body":54,"./lib/fetch-error":55,"./lib/headers":56,"./lib/request":57,"./lib/response":58,"buffer":8,"http":126,"https":15,"stream":125,"url":132,"zlib":7}],54:[function(require,module,exports){
 (function (global,Buffer){
 
 /**
@@ -21602,7 +21554,7 @@ Body.Promise = global.Promise;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
 
-},{"./fetch-error":56,"buffer":9,"encoding":12,"is-stream":40,"stream":126}],56:[function(require,module,exports){
+},{"./fetch-error":55,"buffer":8,"encoding":11,"is-stream":40,"stream":125}],55:[function(require,module,exports){
 
 /**
  * fetch-error.js
@@ -21637,7 +21589,7 @@ function FetchError(message, type, systemError) {
 
 require('util').inherits(FetchError, Error);
 
-},{"util":138}],57:[function(require,module,exports){
+},{"util":137}],56:[function(require,module,exports){
 
 /**
  * headers.js
@@ -21780,7 +21732,7 @@ Headers.prototype.raw = function() {
 	return this._headers;
 };
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 
 /**
  * request.js
@@ -21857,7 +21809,7 @@ Request.prototype.clone = function() {
 	return new Request(this);
 };
 
-},{"./body":55,"./headers":57,"url":133}],59:[function(require,module,exports){
+},{"./body":54,"./headers":56,"url":132}],58:[function(require,module,exports){
 
 /**
  * response.js
@@ -21909,7 +21861,7 @@ Response.prototype.clone = function() {
 	});
 };
 
-},{"./body":55,"./headers":57,"http":127}],60:[function(require,module,exports){
+},{"./body":54,"./headers":56,"http":126}],59:[function(require,module,exports){
 'use strict';
 
 
@@ -22016,7 +21968,7 @@ exports.setTyped = function (on) {
 
 exports.setTyped(TYPED_OK);
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -22069,7 +22021,7 @@ function adler32(adler, buf, len, pos) {
 
 module.exports = adler32;
 
-},{}],62:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -22139,7 +22091,7 @@ module.exports = {
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
 
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -22200,7 +22152,7 @@ function crc32(crc, buf, len, pos) {
 
 module.exports = crc32;
 
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -24076,7 +24028,7 @@ exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
 
-},{"../utils/common":60,"./adler32":61,"./crc32":63,"./messages":68,"./trees":69}],65:[function(require,module,exports){
+},{"../utils/common":59,"./adler32":60,"./crc32":62,"./messages":67,"./trees":68}],64:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -24423,7 +24375,7 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],66:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -25981,7 +25933,7 @@ exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
 
-},{"../utils/common":60,"./adler32":61,"./crc32":63,"./inffast":65,"./inftrees":67}],67:[function(require,module,exports){
+},{"../utils/common":59,"./adler32":60,"./crc32":62,"./inffast":64,"./inftrees":66}],66:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -26326,7 +26278,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":60}],68:[function(require,module,exports){
+},{"../utils/common":59}],67:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -26360,7 +26312,7 @@ module.exports = {
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
 
-},{}],69:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -27582,7 +27534,7 @@ exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
 
-},{"../utils/common":60}],70:[function(require,module,exports){
+},{"../utils/common":59}],69:[function(require,module,exports){
 'use strict';
 
 // (C) 1995-2013 Jean-loup Gailly and Mark Adler
@@ -27631,7 +27583,7 @@ function ZStream() {
 
 module.exports = ZStream;
 
-},{}],71:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -27679,7 +27631,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 
 }).call(this,require('_process'))
 
-},{"_process":72}],72:[function(require,module,exports){
+},{"_process":71}],71:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -27865,7 +27817,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],73:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -28403,7 +28355,7 @@ process.umask = function() { return 0; };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],74:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28489,7 +28441,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],75:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28576,13 +28528,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],76:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":74,"./encode":75}],77:[function(require,module,exports){
+},{"./decode":73,"./encode":74}],76:[function(require,module,exports){
 /**
  * Node Status:
  * 
@@ -28617,14 +28569,14 @@ GraphNode.Impl = class {
         
         get graph() {
             if (!this._graph) {
-                throw "Operation not possible as no Graph is available, try fetching first";
+                throw Error("Operation not possible as no Graph is available, try fetching first");
             }
             return this._graph;
         }
         
         get node() {
             if (this.nodes.length !== 1) {
-                throw "Operation not possible as this GraphNode is underdetermined";
+                throw Error("Operation not possible as this GraphNode is underdetermined");
             }
             return this.nodes[0];
         }
@@ -28717,7 +28669,7 @@ GraphNode.rdfFetch = function(uri, options, login) {
 };
 
 module.exports = GraphNode;
-},{"rdflib":87}],78:[function(require,module,exports){
+},{"rdflib":86}],77:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -28809,7 +28761,7 @@ BlankNode.prototype.isBlank = 1;
 BlankNode.prototype.isVar = 1;
 
 module.exports = BlankNode;
-},{"./class-order":79,"./node":95}],79:[function(require,module,exports){
+},{"./class-order":78,"./node":94}],78:[function(require,module,exports){
 'use strict';
 
 var ClassOrder = {
@@ -28822,7 +28774,7 @@ var ClassOrder = {
 };
 
 module.exports = ClassOrder;
-},{}],80:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -28907,7 +28859,7 @@ Collection.prototype.compareTerm = BlankNode.prototype.compareTerm;
 Collection.prototype.isVar = 0;
 
 module.exports = Collection;
-},{"./blank-node":78,"./class-order":79,"./node":95}],81:[function(require,module,exports){
+},{"./blank-node":77,"./class-order":78,"./node":94}],80:[function(require,module,exports){
 'use strict';
 
 module.exports.convertToJson = convertToJson;
@@ -28970,7 +28922,7 @@ function convertToNQuads(n3String, nquadCallback) {
     nquadCallback(err, nquadString);
   });
 }
-},{"async":4,"jsonld":43,"n3":46}],82:[function(require,module,exports){
+},{"async":3,"jsonld":43,"n3":45}],81:[function(require,module,exports){
 'use strict';
 
 var _indexedFormula = require('./indexed-formula');
@@ -29050,7 +29002,7 @@ module.exports.collection = collection;
 module.exports.fetcher = fetcher;
 module.exports.lit = lit;
 module.exports.st = st;
-},{"./blank-node":78,"./collection":80,"./default-graph":83,"./fetcher":85,"./indexed-formula":88,"./literal":90,"./named-node":93,"./statement":105,"./variable":110}],83:[function(require,module,exports){
+},{"./blank-node":77,"./collection":79,"./default-graph":82,"./fetcher":84,"./indexed-formula":87,"./literal":89,"./named-node":92,"./statement":104,"./variable":109}],82:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29087,7 +29039,7 @@ var DefaultGraph = function (_Node) {
 }(Node);
 
 module.exports = DefaultGraph;
-},{"./node":95}],84:[function(require,module,exports){
+},{"./node":94}],83:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -29129,7 +29081,7 @@ var Empty = function (_Node) {
 Empty.termType = 'empty';
 
 module.exports = Empty;
-},{"./node":95}],85:[function(require,module,exports){
+},{"./node":94}],84:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -30914,7 +30866,7 @@ var Fetcher = function () {
 module.exports = Fetcher;
 module.exports.HANDLERS = HANDLERS;
 module.exports.CONTENT_TYPE_BY_EXT = CONTENT_TYPE_BY_EXT;
-},{"./log":91,"./n3parser":92,"./named-node":93,"./namespace":94,"./parse":96,"./rdfaparser":100,"./rdfxmlparser":101,"./serialize":102,"./uri":108,"./util":109,"node-fetch":54}],86:[function(require,module,exports){
+},{"./log":90,"./n3parser":91,"./named-node":92,"./namespace":93,"./parse":95,"./rdfaparser":99,"./rdfxmlparser":100,"./serialize":101,"./uri":107,"./util":108,"node-fetch":53}],85:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -31537,7 +31489,7 @@ Formula.prototype.variable = function (name) {
 };
 
 module.exports = Formula;
-},{"./blank-node":78,"./class-order":79,"./collection":80,"./literal":90,"./log":91,"./named-node":93,"./namespace":94,"./node":95,"./serialize":102,"./statement":105,"./variable":110}],87:[function(require,module,exports){
+},{"./blank-node":77,"./class-order":78,"./collection":79,"./literal":89,"./log":90,"./named-node":92,"./namespace":93,"./node":94,"./serialize":101,"./statement":104,"./variable":109}],86:[function(require,module,exports){
 'use strict';
 
 var _indexedFormula = require('./indexed-formula');
@@ -31600,7 +31552,7 @@ $rdf.quad = $rdf.DataFactory.quad;
 $rdf.triple = $rdf.DataFactory.triple;
 
 module.exports = $rdf;
-},{"./blank-node":78,"./collection":80,"./convert":81,"./data-factory":82,"./empty":84,"./fetcher":85,"./formula":86,"./indexed-formula":88,"./jsonparser":89,"./literal":90,"./log":91,"./n3parser":92,"./named-node":93,"./namespace":94,"./node":95,"./parse":96,"./patch-parser":97,"./query":99,"./query-to-sparql":98,"./rdfaparser":100,"./rdfxmlparser":101,"./serialize":102,"./serializer":103,"./sparql-to-query":104,"./statement":105,"./update-manager":106,"./updates-via":107,"./uri":108,"./util":109,"./variable":110}],88:[function(require,module,exports){
+},{"./blank-node":77,"./collection":79,"./convert":80,"./data-factory":81,"./empty":83,"./fetcher":84,"./formula":85,"./indexed-formula":87,"./jsonparser":88,"./literal":89,"./log":90,"./n3parser":91,"./named-node":92,"./namespace":93,"./node":94,"./parse":95,"./patch-parser":96,"./query":98,"./query-to-sparql":97,"./rdfaparser":99,"./rdfxmlparser":100,"./serialize":101,"./serializer":102,"./sparql-to-query":103,"./statement":104,"./update-manager":105,"./updates-via":106,"./uri":107,"./util":108,"./variable":109}],87:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -32508,7 +32460,7 @@ exports.default = IndexedFormula;
 
 
 IndexedFormula.handleRDFType = handleRDFType;
-},{"./formula":86,"./node":95,"./query":99,"./statement":105,"./util":109,"./variable":110}],89:[function(require,module,exports){
+},{"./formula":85,"./node":94,"./query":98,"./statement":104,"./util":108,"./variable":109}],88:[function(require,module,exports){
 'use strict';
 
 var jsonParser = function () {
@@ -32566,7 +32518,7 @@ var jsonParser = function () {
 }();
 
 module.exports = jsonParser;
-},{}],90:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -32749,7 +32701,7 @@ Literal.prototype.lang = '';
 Literal.prototype.isVar = 0;
 
 module.exports = Literal;
-},{"./class-order":79,"./named-node":93,"./node":95,"./xsd":111}],91:[function(require,module,exports){
+},{"./class-order":78,"./named-node":92,"./node":94,"./xsd":110}],90:[function(require,module,exports){
 "use strict";
 
 /**
@@ -32776,7 +32728,7 @@ module.exports = {
     return;
   }
 };
-},{}],92:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -34270,7 +34222,7 @@ var N3Parser = function () {
 }();
 
 module.exports = N3Parser;
-},{"./uri":108,"./util":109}],93:[function(require,module,exports){
+},{"./uri":107,"./util":108}],92:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -34402,7 +34354,7 @@ NamedNode.prototype.classOrder = ClassOrder['NamedNode'];
 NamedNode.prototype.isVar = 0;
 
 module.exports = NamedNode;
-},{"./class-order":79,"./node":95}],94:[function(require,module,exports){
+},{"./class-order":78,"./node":94}],93:[function(require,module,exports){
 'use strict';
 
 var NamedNode = require('./named-node');
@@ -34414,7 +34366,7 @@ function Namespace(nsuri) {
 }
 
 module.exports = Namespace;
-},{"./named-node":93}],95:[function(require,module,exports){
+},{"./named-node":92}],94:[function(require,module,exports){
 'use strict';
 /**
  * The superclass of all RDF Statement objects, that is
@@ -34519,7 +34471,7 @@ Node.fromValue = function fromValue(value) {
   }
   return Literal.fromValue(value);
 };
-},{"./collection":80,"./literal":90,"./named-node":93}],96:[function(require,module,exports){
+},{"./collection":79,"./literal":89,"./named-node":92}],95:[function(require,module,exports){
 'use strict';
 
 module.exports = parse;
@@ -34665,7 +34617,7 @@ function parse(str, kb, base, contentType, callback) {
     }
   }
 }
-},{"./blank-node":78,"./literal":90,"./n3parser":92,"./named-node":93,"./patch-parser":97,"./rdfaparser":100,"./rdfxmlparser":101,"./util":109,"jsonld":43,"n3":46}],97:[function(require,module,exports){
+},{"./blank-node":77,"./literal":89,"./n3parser":91,"./named-node":92,"./patch-parser":96,"./rdfaparser":99,"./rdfxmlparser":100,"./util":108,"jsonld":43,"n3":45}],96:[function(require,module,exports){
 'use strict';
 
 // Parse a simple SPARL-Update subset syntax for patches.
@@ -34761,7 +34713,7 @@ function sparqlUpdateParser(str, kb, base) {
   } // while
   // return clauses
 }
-},{"./n3parser":92,"./namespace":94}],98:[function(require,module,exports){
+},{"./n3parser":91,"./namespace":93}],97:[function(require,module,exports){
 'use strict';
 
 var log = require('./log');
@@ -34839,7 +34791,7 @@ function queryToSPARQL(query) {
 }
 
 module.exports = queryToSPARQL;
-},{"./log":91}],99:[function(require,module,exports){
+},{"./log":90}],98:[function(require,module,exports){
 'use strict';
 
 var _indexedFormula = require('./indexed-formula');
@@ -35398,7 +35350,7 @@ function indexedFormulaQuery(myQuery, callback, fetcher, onDone) {
 
 module.exports.Query = Query;
 module.exports.indexedFormulaQuery = indexedFormulaQuery;
-},{"./indexed-formula":88,"./log":91,"./uri":108}],100:[function(require,module,exports){
+},{"./indexed-formula":87,"./log":90,"./uri":107}],99:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -36351,7 +36303,7 @@ RDFaProcessor.dateTimeTypes = [{ pattern: /-?P(?:[0-9]+Y)?(?:[0-9]+M)?(?:[0-9]+D
   type: 'http://www.w3.org/2001/XMLSchema#gYear' }];
 
 module.exports = RDFaProcessor;
-},{"./blank-node":78,"./data-factory":82,"./literal":90,"./named-node":93,"./uri":108,"./util":109}],101:[function(require,module,exports){
+},{"./blank-node":77,"./data-factory":81,"./literal":89,"./named-node":92,"./uri":107,"./util":108}],100:[function(require,module,exports){
 'use strict';
 
 /**
@@ -36800,7 +36752,7 @@ var RDFParser = function RDFParser(store) {
 };
 
 module.exports = RDFParser;
-},{"./uri":108}],102:[function(require,module,exports){
+},{"./uri":107}],101:[function(require,module,exports){
 'use strict';
 
 module.exports = serialize;
@@ -36878,7 +36830,7 @@ function serialize(target, kb, base, contentType, callback, options) {
     }
   }
 }
-},{"./convert":81,"./serializer":103}],103:[function(require,module,exports){
+},{"./convert":80,"./serializer":102}],102:[function(require,module,exports){
 'use strict';
 
 /*      Serialization of RDF Graphs
@@ -37833,7 +37785,7 @@ var Serializer = function () {
 }();
 
 module.exports = Serializer;
-},{"./blank-node":78,"./named-node":93,"./uri":108,"./util":109,"./xsd":111}],104:[function(require,module,exports){
+},{"./blank-node":77,"./named-node":92,"./uri":107,"./util":108,"./xsd":110}],103:[function(require,module,exports){
 'use strict';
 
 // Converting between SPARQL queries and the $rdf query API
@@ -38329,7 +38281,7 @@ function SPARQLToQuery(SPARQL, testMode, kb) {
 }
 
 module.exports = SPARQLToQuery;
-},{"./log":91,"./query":99}],105:[function(require,module,exports){
+},{"./log":90,"./query":98}],104:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -38393,7 +38345,7 @@ var Statement = function () {
 }();
 
 module.exports = Statement;
-},{"./node":95}],106:[function(require,module,exports){
+},{"./node":94}],105:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -39471,7 +39423,7 @@ var UpdateManager = function () {
 }();
 
 module.exports = UpdateManager;
-},{"./data-factory":82,"./fetcher":85,"./indexed-formula":88,"./namespace":94,"./serializer":103,"./uri":108,"./util":109}],107:[function(require,module,exports){
+},{"./data-factory":81,"./fetcher":84,"./indexed-formula":87,"./namespace":93,"./serializer":102,"./uri":107,"./util":108}],106:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -39657,7 +39609,7 @@ var UpdatesVia = function () {
 
 module.exports.UpdatesSocket = UpdatesSocket;
 module.exports.UpdatesVia = UpdatesVia;
-},{"./data-factory":82}],108:[function(require,module,exports){
+},{"./data-factory":81}],107:[function(require,module,exports){
 'use strict';
 
 /*
@@ -39844,7 +39796,7 @@ function refTo(base, uri) {
   }
   return s + uri.slice(i);
 }
-},{"./named-node":93}],109:[function(require,module,exports){
+},{"./named-node":92}],108:[function(require,module,exports){
 'use strict';
 
 /**
@@ -40253,7 +40205,7 @@ function stackString(e) {
   }
   return str;
 }
-},{"./log":91,"./named-node":93,"./uri":108,"xmldom":139}],110:[function(require,module,exports){
+},{"./log":90,"./named-node":92,"./uri":107,"xmldom":138}],109:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -40331,7 +40283,7 @@ Variable.prototype.classOrder = ClassOrder['Variable'];
 Variable.prototype.isVar = 1;
 
 module.exports = Variable;
-},{"./class-order":79,"./node":95,"./uri":108}],111:[function(require,module,exports){
+},{"./class-order":78,"./node":94,"./uri":107}],110:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -40351,10 +40303,10 @@ XSD.langString = new NamedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#langS
 XSD.string = new NamedNode('http://www.w3.org/2001/XMLSchema#string');
 
 module.exports = XSD;
-},{"./named-node":93}],112:[function(require,module,exports){
+},{"./named-node":92}],111:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":113}],113:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":112}],112:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -40479,7 +40431,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":115,"./_stream_writable":117,"core-util-is":11,"inherits":38,"process-nextick-args":71}],114:[function(require,module,exports){
+},{"./_stream_readable":114,"./_stream_writable":116,"core-util-is":10,"inherits":38,"process-nextick-args":70}],113:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -40527,7 +40479,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":116,"core-util-is":11,"inherits":38}],115:[function(require,module,exports){
+},{"./_stream_transform":115,"core-util-is":10,"inherits":38}],114:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -41538,7 +41490,7 @@ function indexOf(xs, x) {
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./_stream_duplex":113,"./internal/streams/BufferList":118,"./internal/streams/destroy":119,"./internal/streams/stream":120,"_process":72,"core-util-is":11,"events":14,"inherits":38,"isarray":41,"process-nextick-args":71,"safe-buffer":125,"string_decoder/":131,"util":6}],116:[function(require,module,exports){
+},{"./_stream_duplex":112,"./internal/streams/BufferList":117,"./internal/streams/destroy":118,"./internal/streams/stream":119,"_process":71,"core-util-is":10,"events":14,"inherits":38,"isarray":41,"process-nextick-args":70,"safe-buffer":124,"string_decoder/":130,"util":5}],115:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -41753,7 +41705,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":113,"core-util-is":11,"inherits":38}],117:[function(require,module,exports){
+},{"./_stream_duplex":112,"core-util-is":10,"inherits":38}],116:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -42421,7 +42373,7 @@ Writable.prototype._destroy = function (err, cb) {
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./_stream_duplex":113,"./internal/streams/destroy":119,"./internal/streams/stream":120,"_process":72,"core-util-is":11,"inherits":38,"process-nextick-args":71,"safe-buffer":125,"util-deprecate":135}],118:[function(require,module,exports){
+},{"./_stream_duplex":112,"./internal/streams/destroy":118,"./internal/streams/stream":119,"_process":71,"core-util-is":10,"inherits":38,"process-nextick-args":70,"safe-buffer":124,"util-deprecate":134}],117:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -42496,7 +42448,7 @@ module.exports = function () {
 
   return BufferList;
 }();
-},{"safe-buffer":125}],119:[function(require,module,exports){
+},{"safe-buffer":124}],118:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -42569,13 +42521,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":71}],120:[function(require,module,exports){
+},{"process-nextick-args":70}],119:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":14}],121:[function(require,module,exports){
+},{"events":14}],120:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":122}],122:[function(require,module,exports){
+},{"./readable":121}],121:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -42584,13 +42536,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":113,"./lib/_stream_passthrough.js":114,"./lib/_stream_readable.js":115,"./lib/_stream_transform.js":116,"./lib/_stream_writable.js":117}],123:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":112,"./lib/_stream_passthrough.js":113,"./lib/_stream_readable.js":114,"./lib/_stream_transform.js":115,"./lib/_stream_writable.js":116}],122:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":122}],124:[function(require,module,exports){
+},{"./readable":121}],123:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":117}],125:[function(require,module,exports){
+},{"./lib/_stream_writable.js":116}],124:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -42654,7 +42606,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":9}],126:[function(require,module,exports){
+},{"buffer":8}],125:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -42783,7 +42735,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":14,"inherits":38,"readable-stream/duplex.js":112,"readable-stream/passthrough.js":121,"readable-stream/readable.js":122,"readable-stream/transform.js":123,"readable-stream/writable.js":124}],127:[function(require,module,exports){
+},{"events":14,"inherits":38,"readable-stream/duplex.js":111,"readable-stream/passthrough.js":120,"readable-stream/readable.js":121,"readable-stream/transform.js":122,"readable-stream/writable.js":123}],126:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
@@ -42866,7 +42818,7 @@ http.METHODS = [
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./lib/request":129,"builtin-status-codes":10,"url":133,"xtend":142}],128:[function(require,module,exports){
+},{"./lib/request":128,"builtin-status-codes":9,"url":132,"xtend":141}],127:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -42940,7 +42892,7 @@ xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],129:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -43251,7 +43203,7 @@ var unsafeHeaders = [
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
 
-},{"./capability":128,"./response":130,"_process":72,"buffer":9,"inherits":38,"readable-stream":122,"to-arraybuffer":132}],130:[function(require,module,exports){
+},{"./capability":127,"./response":129,"_process":71,"buffer":8,"inherits":38,"readable-stream":121,"to-arraybuffer":131}],129:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -43438,7 +43390,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
 
-},{"./capability":128,"_process":72,"buffer":9,"inherits":38,"readable-stream":122}],131:[function(require,module,exports){
+},{"./capability":127,"_process":71,"buffer":8,"inherits":38,"readable-stream":121}],130:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -43711,7 +43663,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":125}],132:[function(require,module,exports){
+},{"safe-buffer":124}],131:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -43740,7 +43692,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":9}],133:[function(require,module,exports){
+},{"buffer":8}],132:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -44474,7 +44426,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":134,"punycode":73,"querystring":76}],134:[function(require,module,exports){
+},{"./util":133,"punycode":72,"querystring":75}],133:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -44492,7 +44444,7 @@ module.exports = {
   }
 };
 
-},{}],135:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 (function (global){
 
 /**
@@ -44564,16 +44516,16 @@ function config (name) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],136:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 arguments[4][38][0].apply(exports,arguments)
-},{"dup":38}],137:[function(require,module,exports){
+},{"dup":38}],136:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],138:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -45164,7 +45116,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./support/isBuffer":137,"_process":72,"inherits":136}],139:[function(require,module,exports){
+},{"./support/isBuffer":136,"_process":71,"inherits":135}],138:[function(require,module,exports){
 function DOMParser(options){
 	this.options = options ||{locator:{}};
 	
@@ -45417,7 +45369,7 @@ function appendElement (hander,node) {
 	exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":140,"./sax":141}],140:[function(require,module,exports){
+},{"./dom":139,"./sax":140}],139:[function(require,module,exports){
 /*
  * DOM Level 2
  * Object DOMException
@@ -46663,7 +46615,7 @@ try{
 	exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],141:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
 //[4a]   	NameChar	   ::=   	NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
 //[5]   	Name	   ::=   	NameStartChar (NameChar)*
@@ -47298,7 +47250,7 @@ function split(source,start){
 exports.XMLReader = XMLReader;
 
 
-},{}],142:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -47327,21 +47279,23 @@ var rdf = require("rdflib");
 var GraphNode = require("rdfgraphnode");
 var Mustache = require("mustache");
 var Logger = require("./logger.js");
-var NodeSet = require("./node-set.js");
+var NodeSet = new Array(); //require("./node-set.js");
 
-//rdf.setPrefix("r2h", "http://rdf2h.github.io/2015/rdf2h#");
 
 function RDF2h(matcherGraph) {
+    function r2h(suffix) {
+        return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
+    }
     console.log("Initializing with "+matcherGraph.length+" ");
     RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
     this.matcherGraph = matcherGraph;
-    var unorderedMatchers = new NodeSet();
+    var unorderedMatchers = new Array(); //new NodeSet();
     var rdfTypeProperty = rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-    var matcherType = rdf.sym("http://rdf2h.github.io/2015/rdf2h#Matcher");
-    var matcherStatements = matcherGraph.any(null, rdfTypeProperty, matcherType);
+    var matcherType = r2h("Matcher");
+    var matcherStatements = matcherGraph.statementsMatching(null, rdfTypeProperty, matcherType);
     console.log("Found "+matcherStatements.length+" ");
     matcherStatements.forEach(function(t) {
-        unorderedMatchers.add(t.subject);
+        unorderedMatchers.push(t.subject);
     });
     /*Sorting:
      * 
@@ -47351,21 +47305,22 @@ function RDF2h(matcherGraph) {
      * before statement. 
      * If there are matchers left the before statements are circular.
      */   
-    var beforeProperty = rdf.sym("http://rdf2h.github.io/2015/rdf2h#before");
-    var beforeStatements = matcherGraph.match(null,beforeProperty);
+    var beforeProperty = r2h("before");
+    var beforeStatements = matcherGraph.statementsMatching(null,beforeProperty);
     beforeStatements.forEach(function(t) {
-        unorderedMatchers.add(t.subject);
-        unorderedMatchers.add(t.object);
+        unorderedMatchers.push(t.subject);
+        unorderedMatchers.push(t.object);
     });
     this.sortedMatchers = [];
     var self = this;
     console.log("Sorting "+unorderedMatchers.length+" matchers");
     while (unorderedMatchers.length > 0) {
         if (!unorderedMatchers.some(function(current) {
-            if (beforeStatements.match(null, beforeProperty, current).length === 0) {
+            //TODO if (beforeStatements.match(null, beforeProperty, current).length === 0) {
+            if (true) {
                 self.sortedMatchers.push(current);
-                unorderedMatchers.remove(current);
-                beforeStatements.removeMatches(current, beforeProperty);
+                unorderedMatchers = unorderedMatchers.filter(n => !n.equals(current));
+                //FIXME beforeStatements.removeMatches(current, beforeProperty);
                 return true; //stop iteration over unorderedMatchers
             } else {
                 return false;
@@ -47380,7 +47335,12 @@ function RDF2h(matcherGraph) {
 
 RDF2h.logger = new Logger();
 
+RDF2h.ns = function(suffix) {
+    return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
+};
+
 (function () {
+    var r2h = RDF2h.ns;
     var origLokup = Mustache.Context.prototype.lookup;
     Mustache.Context.prototype.lookup = function (name) {
         if (this.view instanceof RDF2h.Renderee) {
@@ -47411,14 +47371,14 @@ RDF2h.logger = new Logger();
                         var resultNodes = subNode.nodes;
                         if (resultNodes.length === 0) {
                             //handling pseudo properties of literals
-                            if (node.nodes()[0].language) {
-                                if (RDF2h.resolveCurie(pathSections[0]) === "http://purl.org/dc/terms/language") {
-                                    return [rdf.createLiteral(node.nodes()[0].language)];
+                            if (node.nodes[0].language) {
+                                if (RDF2h.resolveCurie(pathSections[0]).equals(rdf.sym("http://purl.org/dc/terms/language"))) {
+                                    return [rdf.literal(node.nodes[0].language)];
                                 }
                             }
-                            if (node.nodes()[0].datatype) {
-                                if (RDF2h.resolveCurie(pathSections[0]) === RDF2h.resolveCurie("rdf:type")) {
-                                    return [node.nodes()[0].datatype];
+                            if (node.nodes[0].datatype) {
+                                if (RDF2h.resolveCurie(pathSections[0]).equals(RDF2h.resolveCurie("rdf:type"))) {
+                                    return [node.nodes[0].datatype];
                                 }
                             }
                         }
@@ -47467,10 +47427,10 @@ RDF2h.logger = new Logger();
                 if (!subContext) {
                     subContext = context;
                 }
-                if (graphNode.nodes().length > 1) {
+                if (graphNode.nodes.length > 1) {
                     RDF2h.logger.warn(":continue invoked in context with more than one node, this shouldn't be possible!")
                 }
-                return rdf2h.render(graph, graphNode.nodes()[0], subContext, currentMatcherIndex + 1);
+                return rdf2h.render(graph, graphNode.nodes[0], subContext, currentMatcherIndex + 1);
 
             }
             if (name.startsWith("+")) {
@@ -47497,7 +47457,6 @@ RDF2h.logger = new Logger();
     };
 })();
 
-
 RDF2h.Renderee = function (rdf2h, graph, node, context) {
     if (!node) {
         throw "no node specficied!";
@@ -47513,33 +47472,34 @@ RDF2h.Renderee = function (rdf2h, graph, node, context) {
 };
 
 RDF2h.Renderee.prototype.toString = function () {
-    if (this.node.nominalValue) {
-        return this.node.nominalValue;
+    if (this.node.value) {
+        return this.node.value;
     }
     return this.node.toString();
 }
 
 RDF2h.prototype.getRenderer = function (renderee) {
-
+    var r2h = RDF2h.ns;
     function matchPattern(cfTriplePattern) {
         function isThis(node) {
-            return (node && (node.interfaceName === "NamedNode") &&
-                    (node.toString() === "http://rdf2h.github.io/2015/rdf2h#this"));
+            return node.equals(RDF2h.ns("this"));
+            //return (node && (node.interfaceName === "NamedNode") &&
+            //        (node.toString() === "http://rdf2h.github.io/2015/rdf2h#this"));
         }
-        var s = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#subject").nodes()[0];
-        var p = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#predicate").nodes()[0];
-        var o = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#object").nodes()[0];
+        var s = cfTriplePattern.out(r2h("subject")).nodes[0];
+        var p = cfTriplePattern.out(r2h("predicate")).nodes[0];
+        var o = cfTriplePattern.out(r2h("object")).nodes[0];
         if (isThis(s)) {
-            if (renderee.node.interfaceName === "Literal") {
-                if (rdf.sym(RDF2h.resolveCurie("rdf:type")).equals(p)) {
+            if (renderee.node.termType === "Literal") {
+                if (RDF2h.resolveCurie("rdf:type").equals(p)) {
                     return renderee.node.datatype.equals(o);
                 }
             }
-            return renderee.graphNode.out(p).nodes().some(function (e) {
+            return renderee.graphNode.out(p).nodes.some(function (e) {
                 return (!o || o.equals(e));
             });
         } else if (isThis(o)) {
-            return renderee.graphNode.in(p).nodes().some(function (e) {
+            return renderee.graphNode.in(p).nodes.some(function (e) {
                 return (!s || s.equals(e));
             });
         } else {
@@ -47547,22 +47507,23 @@ RDF2h.prototype.getRenderer = function (renderee) {
         }
     }
     function matchesContext(cfTemplate) {
-        var contexts = cfTemplate.out("http://rdf2h.github.io/2015/rdf2h#context").nodes();
+        var contexts = cfTemplate.out(r2h("context")).nodes;
         if (contexts.length === 0) {
             RDF2h.logger.trace("template "+cfTemplate+" specifies no context, thus accepting it for "+renderee.context);
             return true;
         }
         return contexts.some(function(context) {
-            if (renderee.context == context) {
+            if (renderee.context.equals(context)) {
                 RDF2h.logger.trace("template "+cfTemplate+" matches the context "+renderee.context);
                 return true;
             }
         });
     }
+    var self = this;
     function matches(cfMatcher) {
-        var triplePatterns = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#triplePattern").nodes();
+        var triplePatterns = cfMatcher.out(r2h("triplePattern")).nodes;
         for (var i = 0; i < triplePatterns.length; i++) {
-            var cfTp = GraphNode(triplePatterns[i], this.matcherGraph);
+            var cfTp = GraphNode(triplePatterns[i], self.matcherGraph);
             if (!matchPattern(cfTp)) {
                 RDF2h.logger.debug("Matcher "+cfMatcher+" doesn't has triple patterns matching "+renderee.graphNode);
                 return false;
@@ -47593,8 +47554,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         var cfMatcher = GraphNode(matcher, this.matcherGraph);
         if (matches(cfMatcher)) {
             renderee.currentMatcherIndex = i;
-            //r2h:template seems not to work here
-            var templateNodes = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#template").nodes();
+            var templateNodes = cfMatcher.out(r2h("template")).nodes;
             for (var j = 0; j < templateNodes.length; j++) {
                 var templateNode = templateNodes[j];
                 var cfTemplate = GraphNode(templateNode, this.matcherGraph);
@@ -47602,18 +47562,18 @@ RDF2h.prototype.getRenderer = function (renderee) {
                     continue;
                 }
                 var jsNode = cfTemplate.
-                        out("http://rdf2h.github.io/2015/rdf2h#javaScript").
-                        nodes()[0];
+                        out(r2h("javaScript")).
+                        nodes[0];
                 if (jsNode) {
-                    return eval("var f = "+jsNode.nominalValue+"; f;");
+                    return eval("var f = "+jsNode.value+"; f;");
                 }
                 var mustacheNode = cfTemplate.
-                        out("http://rdf2h.github.io/2015/rdf2h#mustache").
-                        nodes()[0];
-                if (mustacheNode.interfaceName === "NamedNode") {
-                    return templateRenderer(resolveTemplateNode(mustacheNode.nominalValue));
+                        out(r2h("mustache")).
+                        node;
+                if (mustacheNode.termType === "NamedNode") {
+                    return templateRenderer(resolveTemplateNode(mustacheNode.value));
                 }
-                return templateRenderer(mustacheNode.nominalValue);
+                return templateRenderer(mustacheNode.value);
             }
             RDF2h.logger.debug("Matcher "+cfMatcher+" has not template with matching context");
         }
@@ -47627,11 +47587,11 @@ RDF2h.prototype.getRenderer = function (renderee) {
 }
 
 RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
-    if (!node.interfaceName) {
+    if (!node.termType) {
         node = rdf.sym(node);
     }
     if (!context) {
-        context = RDF2h.resolveCurie("r2h:Default");
+        context = RDF2h.ns("Default");
     }
     //wrap all in one object that gets special care by lookup
     var renderee = new RDF2h.Renderee(this, graph, node, context);
@@ -47645,7 +47605,10 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
 }
 
 RDF2h.prefixMap = {};
+RDF2h.prefixMap["r2h"] = "http://rdf2h.github.io/2015/rdf2h#";
 RDF2h.prefixMap["s"] = "http://schema.org/";
+RDF2h.prefixMap["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
 /*rdf.prefixes.addAll({
     "s": "http://schema.org/"
 });*/
@@ -47656,9 +47619,9 @@ RDF2h.resolveCurie = function (curie) {
     var prefix = splits[0];
     var suffix = splits[1];
     if (RDF2h.prefixMap[prefix]) {
-        return RDF2h.prefixMap[prefix] + suffix;
+        return rdf.sym(RDF2h.prefixMap[prefix] + suffix);
     } else {
-        return curie;
+        return rdf.sym(curie);
     }
 
 };
@@ -47671,5 +47634,5 @@ if (typeof module !== 'undefined') {
     module.exports = RDF2h;
 }
 
-},{"./logger.js":1,"./node-set.js":2,"mustache":45,"rdfgraphnode":77,"rdflib":87}]},{},["rdf2h"])
+},{"./logger.js":1,"mustache":44,"rdfgraphnode":76,"rdflib":86}]},{},["rdf2h"])
 //# sourceMappingURL=rdf2h.js.map

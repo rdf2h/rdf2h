@@ -1061,7 +1061,7 @@ randomfill@^1.0.3:
     randombytes "^2.0.5"
     safe-buffer "^5.1.0"
 
-rdf-ext@0.3.0, rdf-ext@^0.3.0, rdf-ext@^0.3.0-rc1:
+rdf-ext@^0.3.0, rdf-ext@^0.3.0-rc1:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/rdf-ext/-/rdf-ext-0.3.0.tgz#954bd7b8d117083c8a2ea9d2a2d2775a0773fe02"
   dependencies:
@@ -1085,7 +1085,7 @@ rdf-normalize@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/rdf-normalize/-/rdf-normalize-0.3.0.tgz#2761f5b21d246325b8fb3c4e93df959f62f966a8"
 
-rdf-parser-abstract@^0.3.0, rdf-parser-abstract@^0.3.0-rc1:
+rdf-parser-abstract@^0.3.0-rc1:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/rdf-parser-abstract/-/rdf-parser-abstract-0.3.2.tgz#5a72066d0606879c1b5d6681002d202dcf3a5808"
   dependencies:
@@ -1098,14 +1098,6 @@ rdf-parser-n3-browser@0.3.0-rc1c:
   resolved "https://registry.yarnpkg.com/rdf-parser-n3-browser/-/rdf-parser-n3-browser-0.3.0-rc1c.tgz#82621b2c6967bf8962820c89207db88cf06368eb"
   dependencies:
     rdf-parser-n3 "0.3.0-rc1"
-
-rdf-parser-n3@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/rdf-parser-n3/-/rdf-parser-n3-0.3.0.tgz#33f1e4a93007fb7562d5d00b6466343181995d69"
-  dependencies:
-    n3 "^0.4.5"
-    rdf-ext "^0.3.0"
-    rdf-parser-abstract "^0.3.0"
 
 rdf-parser-n3@0.3.0-rc1:
   version "0.3.0-rc1"
@@ -1131,10 +1123,6 @@ rdfgraphnode@^1.0.2:
   resolved "https://registry.yarnpkg.com/rdfgraphnode/-/rdfgraphnode-1.0.2.tgz#7fea5b597318935ce9720b82462977fae0d58cda"
   dependencies:
     rdflib "^0.16.5"
-
-rdfjs@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/rdfjs/-/rdfjs-0.0.1.tgz#93b31a427d5d89b459e81965a9ffd892b3263e4b"
 
 rdflib@^0.16.5:
   version "0.16.5"

@@ -153,10 +153,10 @@ RDF2h.ns = function(suffix) {
                 if (!subContext) {
                     subContext = context;
                 }
-                if (graphNode.nodes().length > 1) {
+                if (graphNode.nodes.length > 1) {
                     RDF2h.logger.warn(":continue invoked in context with more than one node, this shouldn't be possible!")
                 }
-                return rdf2h.render(graph, graphNode.nodes()[0], subContext, currentMatcherIndex + 1);
+                return rdf2h.render(graph, graphNode.nodes[0], subContext, currentMatcherIndex + 1);
 
             }
             if (name.startsWith("+")) {
