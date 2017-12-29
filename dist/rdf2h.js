@@ -47606,7 +47606,7 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
 
 RDF2h.prefixMap = {};
 RDF2h.prefixMap["r2h"] = "http://rdf2h.github.io/2015/rdf2h#";
-RDF2h.prefixMap["s"] = "http://schema.org/";
+RDF2h.prefixMap["schema"] = "http://schema.org/";
 RDF2h.prefixMap["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
 /*rdf.prefixes.addAll({

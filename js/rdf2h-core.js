@@ -12,14 +12,14 @@ function RDF2h(matcherGraph) {
     function r2h(suffix) {
         return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
     }
-    console.log("Initializing with "+matcherGraph.length+" ");
-    RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
+    if (RDF2h.logger === Logger.INFO) {
+        RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
+    }
     this.matcherGraph = matcherGraph;
     var unorderedMatchers = new Array(); //new NodeSet();
     var rdfTypeProperty = rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     var matcherType = r2h("Matcher");
     var matcherStatements = matcherGraph.statementsMatching(null, rdfTypeProperty, matcherType);
-    console.log("Found "+matcherStatements.length+" ");
     matcherStatements.forEach(function(t) {
         unorderedMatchers.push(t.subject);
     });
@@ -39,7 +39,6 @@ function RDF2h(matcherGraph) {
     });
     this.sortedMatchers = [];
     var self = this;
-    console.log("Sorting "+unorderedMatchers.length+" matchers");
     while (unorderedMatchers.length > 0) {
         if (!unorderedMatchers.some(function(current) {
             //TODO if (beforeStatements.match(null, beforeProperty, current).length === 0) {
@@ -274,7 +273,6 @@ RDF2h.prototype.getRenderer = function (renderee) {
             return Mustache.render(template, renderee);
         };
     }
-    console.log("Looking for a matcher in "+this.sortedMatchers.length);
     for (var i = this.startMatcherIndex; i < this.sortedMatchers.length; i++) {
         var matcher = this.sortedMatchers[i];
         var cfMatcher = GraphNode(matcher, this.matcherGraph);
