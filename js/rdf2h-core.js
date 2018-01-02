@@ -1,23 +1,27 @@
 /* global rdf, Mustache */
 
 
-var rdf = require("rdf-ext");
-var clownface = require("clownface");
+var rdf = require("rdflib");
+var GraphNode = require("rdfgraphnode");
 var Mustache = require("mustache");
 var Logger = require("./logger.js");
-var NodeSet = require("./node-set.js");
+var NodeSet = new Array(); //require("./node-set.js");
 
-rdf.setPrefix("r2h", "http://rdf2h.github.io/2015/rdf2h#");
 
 function RDF2h(matcherGraph) {
-    RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
+    function r2h(suffix) {
+        return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
+    }
+    if (RDF2h.logger === Logger.INFO) {
+        RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
+    }
     this.matcherGraph = matcherGraph;
-    var unorderedMatchers = new NodeSet();
-    var rdfTypeProperty = rdf.createNamedNode("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-    var matcherType = rdf.createNamedNode("http://rdf2h.github.io/2015/rdf2h#Matcher");
-    var matcherStatements = matcherGraph.match(null, rdfTypeProperty, matcherType);
+    var unorderedMatchers = new Array(); //new NodeSet();
+    var rdfTypeProperty = rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    var matcherType = r2h("Matcher");
+    var matcherStatements = matcherGraph.statementsMatching(null, rdfTypeProperty, matcherType);
     matcherStatements.forEach(function(t) {
-        unorderedMatchers.add(t.subject);
+        unorderedMatchers.push(t.subject);
     });
     /*Sorting:
      * 
@@ -27,20 +31,21 @@ function RDF2h(matcherGraph) {
      * before statement. 
      * If there are matchers left the before statements are circular.
      */   
-    var beforeProperty = rdf.createNamedNode("http://rdf2h.github.io/2015/rdf2h#before");
-    var beforeStatements = matcherGraph.match(null,beforeProperty);
+    var beforeProperty = r2h("before");
+    var beforeStatements = matcherGraph.statementsMatching(null,beforeProperty);
     beforeStatements.forEach(function(t) {
-        unorderedMatchers.add(t.subject);
-        unorderedMatchers.add(t.object);
+        unorderedMatchers.push(t.subject);
+        unorderedMatchers.push(t.object);
     });
     this.sortedMatchers = [];
     var self = this;
     while (unorderedMatchers.length > 0) {
         if (!unorderedMatchers.some(function(current) {
-            if (beforeStatements.match(null, beforeProperty, current).length === 0) {
+            //TODO if (beforeStatements.match(null, beforeProperty, current).length === 0) {
+            if (true) {
                 self.sortedMatchers.push(current);
-                unorderedMatchers.remove(current);
-                beforeStatements.removeMatches(current, beforeProperty);
+                unorderedMatchers = unorderedMatchers.filter(n => !n.equals(current));
+                //FIXME beforeStatements.removeMatches(current, beforeProperty);
                 return true; //stop iteration over unorderedMatchers
             } else {
                 return false;
@@ -55,7 +60,12 @@ function RDF2h(matcherGraph) {
 
 RDF2h.logger = new Logger();
 
+RDF2h.ns = function(suffix) {
+    return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
+};
+
 (function () {
+    var r2h = RDF2h.ns;
     var origLokup = Mustache.Context.prototype.lookup;
     Mustache.Context.prototype.lookup = function (name) {
         if (this.view instanceof RDF2h.Renderee) {
@@ -83,17 +93,17 @@ RDF2h.logger = new Logger();
                     }
                     subNode = resolveSection(pathSections[0]);
                     if (pathSections.length === 1) {
-                        var resultNodes = subNode.nodes();
+                        var resultNodes = subNode.nodes;
                         if (resultNodes.length === 0) {
                             //handling pseudo properties of literals
-                            if (node.nodes()[0].language) {
-                                if (RDF2h.resolveCurie(pathSections[0]) === "http://purl.org/dc/terms/language") {
-                                    return [rdf.createLiteral(node.nodes()[0].language)];
+                            if (node.nodes[0].language) {
+                                if (RDF2h.resolveCurie(pathSections[0]).equals(rdf.sym("http://purl.org/dc/terms/language"))) {
+                                    return [rdf.literal(node.nodes[0].language)];
                                 }
                             }
-                            if (node.nodes()[0].datatype) {
-                                if (RDF2h.resolveCurie(pathSections[0]) === RDF2h.resolveCurie("rdf:type")) {
-                                    return [node.nodes()[0].datatype];
+                            if (node.nodes[0].datatype) {
+                                if (RDF2h.resolveCurie(pathSections[0]).equals(RDF2h.resolveCurie("rdf:type"))) {
+                                    return [node.nodes[0].datatype];
                                 }
                             }
                         }
@@ -142,10 +152,10 @@ RDF2h.logger = new Logger();
                 if (!subContext) {
                     subContext = context;
                 }
-                if (graphNode.nodes().length > 1) {
+                if (graphNode.nodes.length > 1) {
                     RDF2h.logger.warn(":continue invoked in context with more than one node, this shouldn't be possible!")
                 }
-                return rdf2h.render(graph, graphNode.nodes()[0], subContext, currentMatcherIndex + 1);
+                return rdf2h.render(graph, graphNode.nodes[0], subContext, currentMatcherIndex + 1);
 
             }
             if (name.startsWith("+")) {
@@ -172,7 +182,6 @@ RDF2h.logger = new Logger();
     };
 })();
 
-
 RDF2h.Renderee = function (rdf2h, graph, node, context) {
     if (!node) {
         throw "no node specficied!";
@@ -184,39 +193,38 @@ RDF2h.Renderee = function (rdf2h, graph, node, context) {
     this.graph = graph;
     this.node = node;
     this.context = context;
-    var cf = clownface.Graph(graph);
-    this.graphNode = cf.node(node);
+    this.graphNode = GraphNode(node, graph);
 };
 
 RDF2h.Renderee.prototype.toString = function () {
-    if (this.node.nominalValue) {
-        return this.node.nominalValue;
+    if (this.node.value) {
+        return this.node.value;
     }
     return this.node.toString();
 }
 
 RDF2h.prototype.getRenderer = function (renderee) {
-    var cf = clownface.Graph(this.matcherGraph);
-
+    var r2h = RDF2h.ns;
     function matchPattern(cfTriplePattern) {
         function isThis(node) {
-            return (node && (node.interfaceName === "NamedNode") &&
-                    (node.toString() === "http://rdf2h.github.io/2015/rdf2h#this"));
+            return node && node.equals(RDF2h.ns("this"));
+            //return (node && (node.interfaceName === "NamedNode") &&
+            //        (node.toString() === "http://rdf2h.github.io/2015/rdf2h#this"));
         }
-        var s = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#subject").nodes()[0];
-        var p = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#predicate").nodes()[0];
-        var o = cfTriplePattern.out("http://rdf2h.github.io/2015/rdf2h#object").nodes()[0];
+        var s = cfTriplePattern.out(r2h("subject")).nodes[0];
+        var p = cfTriplePattern.out(r2h("predicate")).nodes[0];
+        var o = cfTriplePattern.out(r2h("object")).nodes[0];
         if (isThis(s)) {
-            if (renderee.node.interfaceName === "Literal") {
-                if (rdf.createNamedNode(RDF2h.resolveCurie("rdf:type")).equals(p)) {
+            if (renderee.node.termType === "Literal") {
+                if (RDF2h.resolveCurie("rdf:type").equals(p)) {
                     return renderee.node.datatype.equals(o);
                 }
             }
-            return renderee.graphNode.out(p).nodes().some(function (e) {
+            return renderee.graphNode.out(p).nodes.some(function (e) {
                 return (!o || o.equals(e));
             });
         } else if (isThis(o)) {
-            return renderee.graphNode.in(p).nodes().some(function (e) {
+            return renderee.graphNode.in(p).nodes.some(function (e) {
                 return (!s || s.equals(e));
             });
         } else {
@@ -224,22 +232,23 @@ RDF2h.prototype.getRenderer = function (renderee) {
         }
     }
     function matchesContext(cfTemplate) {
-        var contexts = cfTemplate.out("http://rdf2h.github.io/2015/rdf2h#context").nodes();
+        var contexts = cfTemplate.out(r2h("context")).nodes;
         if (contexts.length === 0) {
             RDF2h.logger.trace("template "+cfTemplate+" specifies no context, thus accepting it for "+renderee.context);
             return true;
         }
         return contexts.some(function(context) {
-            if (renderee.context == context) {
+            if (renderee.context.equals(context)) {
                 RDF2h.logger.trace("template "+cfTemplate+" matches the context "+renderee.context);
                 return true;
             }
         });
     }
+    var self = this;
     function matches(cfMatcher) {
-        var triplePatterns = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#triplePattern").nodes();
+        var triplePatterns = cfMatcher.out(r2h("triplePattern")).nodes;
         for (var i = 0; i < triplePatterns.length; i++) {
-            var cfTp = cf.node(triplePatterns[i]);
+            var cfTp = GraphNode(triplePatterns[i], self.matcherGraph);
             if (!matchPattern(cfTp)) {
                 RDF2h.logger.debug("Matcher "+cfMatcher+" doesn't has triple patterns matching "+renderee.graphNode);
                 return false;
@@ -266,30 +275,29 @@ RDF2h.prototype.getRenderer = function (renderee) {
     }
     for (var i = this.startMatcherIndex; i < this.sortedMatchers.length; i++) {
         var matcher = this.sortedMatchers[i];
-        var cfMatcher = cf.node(matcher);
+        var cfMatcher = GraphNode(matcher, this.matcherGraph);
         if (matches(cfMatcher)) {
             renderee.currentMatcherIndex = i;
-            //r2h:template seems not to work here
-            var templateNodes = cfMatcher.out("http://rdf2h.github.io/2015/rdf2h#template").nodes();
+            var templateNodes = cfMatcher.out(r2h("template")).nodes;
             for (var j = 0; j < templateNodes.length; j++) {
                 var templateNode = templateNodes[j];
-                var cfTemplate = cf.node(templateNode);
+                var cfTemplate = GraphNode(templateNode, this.matcherGraph);
                 if (!matchesContext(cfTemplate)) {
                     continue;
                 }
                 var jsNode = cfTemplate.
-                        out("http://rdf2h.github.io/2015/rdf2h#javaScript").
-                        nodes()[0];
+                        out(r2h("javaScript")).
+                        nodes[0];
                 if (jsNode) {
-                    return eval("var f = "+jsNode.nominalValue+"; f;");
+                    return eval("var f = "+jsNode.value+"; f;");
                 }
                 var mustacheNode = cfTemplate.
-                        out("http://rdf2h.github.io/2015/rdf2h#mustache").
-                        nodes()[0];
-                if (mustacheNode.interfaceName === "NamedNode") {
-                    return templateRenderer(resolveTemplateNode(mustacheNode.nominalValue));
+                        out(r2h("mustache")).
+                        node;
+                if (mustacheNode.termType === "NamedNode") {
+                    return templateRenderer(resolveTemplateNode(mustacheNode.value));
                 }
-                return templateRenderer(mustacheNode.nominalValue);
+                return templateRenderer(mustacheNode.value);
             }
             RDF2h.logger.debug("Matcher "+cfMatcher+" has not template with matching context");
         }
@@ -303,11 +311,11 @@ RDF2h.prototype.getRenderer = function (renderee) {
 }
 
 RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
-    if (!node.interfaceName) {
-        node = rdf.createNamedNode(node);
+    if (!node.termType) {
+        node = rdf.sym(node);
     }
     if (!context) {
-        context = RDF2h.resolveCurie("r2h:Default");
+        context = RDF2h.ns("Default");
     }
     //wrap all in one object that gets special care by lookup
     var renderee = new RDF2h.Renderee(this, graph, node, context);
@@ -320,8 +328,11 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
     return renderer(renderee);
 }
 
-RDF2h.prefixMap = rdf.prefixes;
-RDF2h.prefixMap["s"] = "http://schema.org/";
+RDF2h.prefixMap = {};
+RDF2h.prefixMap["r2h"] = "http://rdf2h.github.io/2015/rdf2h#";
+RDF2h.prefixMap["schema"] = "http://schema.org/";
+RDF2h.prefixMap["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
 /*rdf.prefixes.addAll({
     "s": "http://schema.org/"
 });*/
@@ -332,9 +343,9 @@ RDF2h.resolveCurie = function (curie) {
     var prefix = splits[0];
     var suffix = splits[1];
     if (RDF2h.prefixMap[prefix]) {
-        return RDF2h.prefixMap[prefix] + suffix;
+        return rdf.sym(RDF2h.prefixMap[prefix] + suffix);
     } else {
-        return curie;
+        return rdf.sym(curie);
     }
 
 };

@@ -1,11 +1,11 @@
-var rdf = require("rdf-ext");
+var rdf = require("rdflib");
 
 function NodeSet() {
     this._g = new rdf.Graph();
     this.length = 0;
 };
 
-NodeSet._filler = rdf.createNamedNode("http://ignored/");
+NodeSet._filler = rdf.sym("http://ignored/");
 
 NodeSet._node2Triple = function(node) {
     return rdf.createTriple(node, NodeSet._filler, NodeSet._filler);

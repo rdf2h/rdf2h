@@ -16,9 +16,8 @@
         <script src="//cdn.jsdelivr.net/bluebird/3.4.7/bluebird.min.js"></script>
 
         <script src="js/libs/jquery/jquery.js"></script>
-        <script src="dist/rdf-ext.js"></script>
+        <script src="https://solid.github.io/releases/rdflib.js/rdflib-0.16.2.min.js"></script>
         <script src="dist/rdf2h.js"></script>
-        <script src="dist/n3-parser.js"></script>
         <script>
             if (!String.prototype.endsWith) {
                 String.prototype.endsWith = function (ending) {
@@ -37,16 +36,17 @@
             }
             $(function () {
                 $(".apply").on("click", function () {
-                    N3Parser.parse($("#data").val()).then(function (data) {
-                        console.log(data.toString());
-                        var resource = rdf.createNamedNode($('#resource').val());
-                        N3Parser.parse($("#matchers").val()).then(function (matchers) {
-                            var rdf2h = new RDF2h(matchers);
-                            var rendered = rdf2h.render(data, resource);
-                            $("#output-window").text(rendered);
-                            $("#output-window-html").html(rendered);
-                        });
-                    })
+                    var data = $rdf.graph();
+                    $rdf.parse($("#data").val(), data, "http://example.org/data", "text/turtle");
+                    console.log(data.toString());
+                    var resource = $rdf.sym($('#resource').val());
+                    var matchers = $rdf.graph();
+                    $rdf.parse($("#matchers").val(), matchers, "http://example.org/matchers/", "text/turtle");
+                    var rdf2h = new RDF2h(matchers);
+                    var rendered = rdf2h.render(data, resource);
+                    $("#output-window").text(rendered);
+                    $("#output-window-html").html(rendered);
+                
                 });
 
                 var showSample = function (exampleId) {
@@ -222,7 +222,7 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <h1>{{s:givenName}} {{s:additionalName}} {{s:familyName}}</h1>
             {{#+s:knows}}
             <h2>Knows</h2>
@@ -237,7 +237,7 @@
             {{/s:knows}}                             
             </ul>                         
             {{/+s:knows}} 
-            '''
+            """
             ]
             ].
         </script>
@@ -297,9 +297,9 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <li>The last one: {{rdf:first}}</li> 
-            '''
+            """
             ]
             ] r2h:before <namedMatcher1>. 
             <namedMatcher1> a r2h:Matcher ;
@@ -309,18 +309,19 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <li>{{rdf:first}}</li> 
             {{{:render rdf:rest}}}
-            '''
+            """
             ].
             <namedMatcher1> r2h:before
             [ a r2h:Matcher ;
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
+            {{@prefix ex: <http://schema.example.org/>}}
             <ul>{{{:render ex:list}}}</ul> 
-            '''
+            """
             ]
             ]. </script>
 
@@ -348,13 +349,13 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <h1>Showing all instances of type {{.}}</h1>
             {{#rdf:type<-}}
             {{{:render .}}}
             {{/rdf:type<-}}
 
-            '''
+            """
             ]
             ].
 
@@ -366,13 +367,13 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <hr/>
             <div>
             Given Name(s): {{s:givenName}} {{s:additionalName}}<br/>
             Family Name: {{s:familyName}}
             </div>
-            '''
+            """
             ]
             ].
         </script>
@@ -435,10 +436,10 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <h1>{{rdfs:label}}</h1>
             {{{:continue}}}
-            '''
+            """
             ];
             r2h:before <comment>.
 
@@ -449,10 +450,10 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <p>{{rdfs:comment}}</p>
             {{{:continue}}}
-            '''
+            """
             ];
             r2h:before <birthplace>.
 
@@ -463,12 +464,12 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             {{#db:birthPlace<-}}
             <p>Place of Birth of: {{{:render .}}}</p>
             {{/db:birthPlace<-}}
             {{{:continue}}}
-            '''
+            """
             ];
             r2h:before <end>.
 
@@ -479,9 +480,9 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             the end
-            '''
+            """
             ].
 
             <person> a r2h:Matcher ;
@@ -491,9 +492,9 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             {{foaf:givenName}}
-            '''
+            """
             ];
             r2h:before <label>.
 
@@ -510,12 +511,12 @@
 
             dbr:Lucerne
             rdfs:label "Lucerne";
-            rdfs:comment '''Lucerne (/ˌluːˈsɜrn/; German: Luzern, [luˈtsɛrn] ; 
+            rdfs:comment """Lucerne (/ˌluːˈsɜrn/; German: Luzern, [luˈtsɛrn] ; 
             French: Lucerne, [lysɛʁn]; Italian: Lucerna, [luˈtʃɛrna]; Romansh: 
             Lucerna; Lucerne Swiss-German: Lozärn) is a city in north-central 
             Switzerland, in the German-speaking portion of that country. Lucerne is 
             the capital of the Canton of Lucerne and the capital of the district of 
-            the same name.'''.
+            the same name.""".
 
             dbr:Robert_Wuellner db:birthPlace dbr:Lucerne; foaf:givenName "Robert".
             dbr:Sibylle_Pasche db:birthPlace dbr:Lucerne; foaf:givenName "Sibylle".
@@ -541,11 +542,11 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
+            r2h:mustache """
             <h3>{{.}} knows (sorted):</h3>
             <ul>{{{:continue}}}
             </ul>
-            '''
+            """
             ];
             r2h:before <sortedKnows>
             ].
@@ -556,7 +557,7 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:javaScript '''function(n) {
+            r2h:javaScript """function(n) {
             var result = "";
             var known = n.graphNode.out(RDF2h.resolveCurie("s:knows")).toArray();
             known.sort(function(a,b) {
@@ -567,7 +568,7 @@
             result += n.rdf2h.render(n.graph, k.nodes()[0], n.context);
             });
             return result;
-            }'''
+            }"""
             ].
             <person> a r2h:Matcher ;
             r2h:triplePattern [
@@ -576,8 +577,8 @@
             ];
             r2h:template [ 
             r2h:context r2h:Default;
-            r2h:mustache '''
-            <li>{{s:givenName}}</li>'''
+            r2h:mustache """
+            <li>{{s:givenName}}</li>"""
             ].
         </script>
 
