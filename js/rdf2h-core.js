@@ -207,7 +207,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
     var r2h = RDF2h.ns;
     function matchPattern(cfTriplePattern) {
         function isThis(node) {
-            return node.equals(RDF2h.ns("this"));
+            return node && node.equals(RDF2h.ns("this"));
             //return (node && (node.interfaceName === "NamedNode") &&
             //        (node.toString() === "http://rdf2h.github.io/2015/rdf2h#this"));
         }
