@@ -12,6 +12,7 @@ function RDF2h(matcherGraph) {
     function r2h(suffix) {
         return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
     }
+    console.info("RDF2h created");
     if (RDF2h.logger === Logger.INFO) {
         RDF2h.logger.info("To see more debug output invoke RDF2h.logger.setLevel(Logger.DEBUG) or even RDF2h.logger.setLevel(Logger.TRACE)");
     }

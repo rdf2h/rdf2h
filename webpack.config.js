@@ -4,8 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
    entry: path.resolve(__dirname, 'src', 'index.js'),
    output: {
-      path: path.resolve(__dirname, 'output', 'js'),
-      filename: 'bundle.js'
+      path: path.resolve(__dirname, 'output'),
+      filename: 'js/bundle.js'
    },
    resolve: {
       extensions: ['.js', '.jsx']
@@ -29,7 +29,7 @@ module.exports = {
    devtool: 'source-map',
    plugins: [
     new HtmlWebpackPlugin({
-      filename: '../index.html',
+      filename: 'index.html',
       title: 'Try RDF2h in your browser',
       template: 'webpack-templates/index.ejs', // Load a custom template (ejs by default see the FAQ for details) 
     })

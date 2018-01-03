@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "node_modules/.bin/mocha",
-    "start": "webpack-dev-server --hot --inline --content-base output",
+    "start": "webpack-dev-server --hot --inline --content-base public",
     "build": "ncp public/ output/ && webpack -p"
   },
   "devDependencies": {
