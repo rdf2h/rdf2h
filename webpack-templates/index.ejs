@@ -4,7 +4,7 @@
 
         <meta charset="UTF-8">
 
-        <title>Try RDF2h in your web browser</title>
+        <title><%= htmlWebpackPlugin.options.title %>!</title>
         <meta name="description" content="">
         <meta name="author" content="">
 
@@ -16,6 +16,7 @@
         <script src="//cdn.jsdelivr.net/bluebird/3.4.7/bluebird.min.js"></script>
 
         <script src="js/libs/jquery/jquery.js"></script>
+        <script src="https://solid.github.io/releases/rdflib.js/rdflib-0.16.2.min.js"></script>
 
         <script>
             if (!String.prototype.endsWith) {

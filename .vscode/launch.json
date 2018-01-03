@@ -8,8 +8,10 @@
             "name": "localhost",
             "type": "chrome",
             "request": "launch",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceRoot}/src"
+            "url": "http://localhost:8080/",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true,
+            "trace":true
         },
         {
             "type": "chrome",
