@@ -1,13 +1,11 @@
 var assert = require('assert');
-var RDF2h = require('../src/index.js');
-var Logger = require('../src/logger.js');
+var RDF2h = require('../src/rdf2h.js');
 var rdf = require('rdflib');
 //var N3Parser = require('rdf-parser-n3');
 //var clownface = require('clownface');
 //var mimeTypeUtil = require('rdf-mime-type-util');
 
 describe('RDF2h', function () {
-  RDF2h.logger.setLevel(Logger.DEBUG)
   describe('#render()', function () {
     it('Applying a simple template, using default prefixes.', function () {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
@@ -139,7 +137,6 @@ describe('RDF2h', function () {
       rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
       var data = rdf.graph();
       rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
-      //RDF2h.logger.setLevel(Logger.DEBUG);
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
       console.log("result: " + renderingResult);
       assert.equal("The title language: it", renderingResult);
@@ -194,7 +191,6 @@ describe('RDF2h', function () {
       rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
       var data = rdf.graph();
       rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
-      //RDF2h.logger.setLevel(Logger.DEBUG);
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
       console.log("result: " + renderingResult);
       assert.equal("The value: An Integer, The title: A String", renderingResult);
