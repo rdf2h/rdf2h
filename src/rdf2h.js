@@ -68,7 +68,6 @@ RDF2h.ns = function(suffix) {
     var r2h = RDF2h.ns;
     var origLokup = Mustache.Context.prototype.lookup;
     Mustache.Context.prototype.lookup = function (name) {
-        alert("looking up!");
         if (this.view instanceof RDF2h.Renderee) {
             var rdf2h = this.view.rdf2h;
             var graphNode = this.view.graphNode;
