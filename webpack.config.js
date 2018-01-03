@@ -2,10 +2,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
-   entry: path.resolve(__dirname, 'src', 'index.js'),
+   entry: path.resolve(__dirname, 'src', 'rdf2h.js'),
    output: {
       path: path.resolve(__dirname, 'output'),
-      filename: 'js/bundle.js'
+      filename: 'js/rdf2h.js'
    },
    resolve: {
       extensions: ['.js', '.jsx']
@@ -31,7 +31,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       title: 'Try RDF2h in your browser',
-      template: 'webpack-templates/index.ejs', // Load a custom template (ejs by default see the FAQ for details) 
+      template: 'pages/index.ejs', // Load a custom template (ejs by default see the FAQ for details) 
     })
   ]
 };

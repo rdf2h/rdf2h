@@ -3,7 +3,7 @@
   "version": "0.5.1",
   "author": "Reto Gmür",
   "description": "Library to render RDF resources.",
-  "main": "js/rdf2h-core.js",
+  "main": "src/rdf2h.js",
   "homepage": "http://rdf2h.github.io/rdf2h/",
   "dependencies": {
     "mustache": "*",
@@ -12,8 +12,8 @@
   },
   "scripts": {
     "test": "node_modules/.bin/mocha",
-    "start": "webpack-dev-server --hot --inline --content-base public",
-    "build": "ncp public/ output/ && webpack -p"
+    "start": "webpack-dev-server --hot --inline --content-base static",
+    "build": "ncp static/ output/ && webpack -p"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
