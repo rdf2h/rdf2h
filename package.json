@@ -13,12 +13,16 @@
   },
   "scripts": {
     "prepublish": "browserify -r rdf-ext -d | exorcist dist/rdf-ext.js.map > dist/rdf-ext.js &&  browserify --external rdf-ext -d -r ./js/rdf2h-core.js:rdf2h ./js/rdf2h-core.js | exorcist dist/rdf2h.js.map > dist/rdf2h.js",
-    "test": "node_modules/.bin/mocha"
+    "test": "node_modules/.bin/mocha",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
   },
   "devDependencies": {
     "browserify": "latest",
     "mocha": "^2.3.3",
-    "rdf-parser-n3-browser": "0.3.0-rc1c"
+    "rdf-parser-n3-browser": "0.3.0-rc1c",
+    "react-scripts": "^1.0.17"
   },
   "license": "Apache-2.0",
   "repository": "https://github.com/rdf2h/rdf2h.git"

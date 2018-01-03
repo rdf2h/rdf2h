@@ -5,7 +5,7 @@ var rdf = require("rdflib");
 var GraphNode = require("rdfgraphnode");
 var Mustache = require("mustache");
 var Logger = require("./logger.js");
-var NodeSet = new Array(); //require("./node-set.js");
+var NodeSet = new Array();
 
 
 function RDF2h(matcherGraph) {
@@ -91,7 +91,7 @@ RDF2h.ns = function(suffix) {
                             }
                         }
                     }
-                    subNode = resolveSection(pathSections[0]);
+                    let subNode = resolveSection(pathSections[0]);
                     if (pathSections.length === 1) {
                         var resultNodes = subNode.nodes;
                         if (resultNodes.length === 0) {
@@ -329,13 +329,13 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
 }
 
 RDF2h.prefixMap = {};
+RDF2h.prefixMap["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+RDF2h.prefixMap["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#";
 RDF2h.prefixMap["r2h"] = "http://rdf2h.github.io/2015/rdf2h#";
 RDF2h.prefixMap["schema"] = "http://schema.org/";
 RDF2h.prefixMap["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
-/*rdf.prefixes.addAll({
-    "s": "http://schema.org/"
-});*/
+
 
 RDF2h.resolveCurie = function (curie) {
     RDF2h.logger.debug("resolving " + curie);

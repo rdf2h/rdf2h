@@ -16,8 +16,7 @@
         <script src="//cdn.jsdelivr.net/bluebird/3.4.7/bluebird.min.js"></script>
 
         <script src="js/libs/jquery/jquery.js"></script>
-        <script src="https://solid.github.io/releases/rdflib.js/rdflib-0.16.2.min.js"></script>
-        <script src="dist/rdf2h.js"></script>
+
         <script>
             if (!String.prototype.endsWith) {
                 String.prototype.endsWith = function (ending) {
@@ -223,6 +222,7 @@
             r2h:template [ 
             r2h:context r2h:Default;
             r2h:mustache """
+            {{@prefix s: <http://schema.org/>}}
             <h1>{{s:givenName}} {{s:additionalName}} {{s:familyName}}</h1>
             {{#+s:knows}}
             <h2>Knows</h2>
@@ -350,6 +350,7 @@
             r2h:template [ 
             r2h:context r2h:Default;
             r2h:mustache """
+            {{@prefix s: <http://schema.org/>}}
             <h1>Showing all instances of type {{.}}</h1>
             {{#rdf:type<-}}
             {{{:render .}}}
@@ -465,6 +466,7 @@
             r2h:template [ 
             r2h:context r2h:Default;
             r2h:mustache """
+            {{@prefix db: <http://dbpedia.org/ontology/>}}
             {{#db:birthPlace<-}}
             <p>Place of Birth of: {{{:render .}}}</p>
             {{/db:birthPlace<-}}
@@ -493,6 +495,7 @@
             r2h:template [ 
             r2h:context r2h:Default;
             r2h:mustache """
+            {{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}
             {{foaf:givenName}}
             """
             ];
