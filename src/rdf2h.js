@@ -208,7 +208,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         if (isThis(s)) {
             if (renderee.graphNode.termType === "Literal") {
                 if (RDF2h.resolveCurie("rdf:type").equals(p)) {
-                    return renderee.graphNode.datatype.equals(o);
+                    return renderee.graphNode.node.datatype.equals(o);
                 }
             }
             return renderee.graphNode.out(p).nodes.some(function (e) {
