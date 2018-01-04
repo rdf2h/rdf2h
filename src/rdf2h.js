@@ -64,7 +64,7 @@ RDF2h.ns = function(suffix) {
         if (this.view instanceof RDF2h.Renderee) {
             var rdf2h = this.view.rdf2h;
             var graphNode = this.view.graphNode;
-            var graph = this.view.graph;
+            var graph = graphNode.graph;
             var context = this.view.context;
             var currentMatcherIndex = this.view.currentMatcherIndex;
             function resolvePath(path) {
@@ -157,10 +157,10 @@ RDF2h.ns = function(suffix) {
             }
             var nodes = resolvePath(name);
             if (nodes.length === 1) {
-                return new RDF2h.Renderee(rdf2h, graph, nodes[0], context);
+                return new RDF2h.Renderee(rdf2h, GraphNode(nodes[0], graph), context);
             } else {
                 return nodes.map(function (node) {
-                    return new RDF2h.Renderee(rdf2h, graph, node, context);
+                    return new RDF2h.Renderee(rdf2h, GraphNode(node, graph), context);
                 });
             }
             /*var node = this.view;
@@ -175,25 +175,23 @@ RDF2h.ns = function(suffix) {
     };
 })();
 
-RDF2h.Renderee = function (rdf2h, graph, node, context) {
-    if (!node) {
-        throw "no node specficied!";
+RDF2h.Renderee = function (rdf2h, graphNode, context) {
+    if (!graphNode.nodes) {
+        throw new Error("second argument must be a GraphNode");
     }
-    if (Object.prototype.toString.call(node) === '[object Array]') {
-        throw "Renderee must be a single node";
+    if (graphNode.nodes.length !== 1) {
+        throw new Error("Renderee must be a single node");
     }
     this.rdf2h = rdf2h;
-    this.graph = graph;
-    this.node = node;
+    this.graphNode = graphNode;
     this.context = context;
-    this.graphNode = GraphNode(node, graph);
 };
 
 RDF2h.Renderee.prototype.toString = function () {
-    if (this.node.value) {
-        return this.node.value;
+    if (this.graphNode.value) {
+        return this.graphNode.value;
     }
-    return this.node.toString();
+    return this.graphNode.toString();
 }
 
 RDF2h.prototype.getRenderer = function (renderee) {
@@ -208,9 +206,9 @@ RDF2h.prototype.getRenderer = function (renderee) {
         var p = cfTriplePattern.out(r2h("predicate")).nodes[0];
         var o = cfTriplePattern.out(r2h("object")).nodes[0];
         if (isThis(s)) {
-            if (renderee.node.termType === "Literal") {
+            if (renderee.graphNode.termType === "Literal") {
                 if (RDF2h.resolveCurie("rdf:type").equals(p)) {
-                    return renderee.node.datatype.equals(o);
+                    return renderee.graphNode.datatype.equals(o);
                 }
             }
             return renderee.graphNode.out(p).nodes.some(function (e) {
@@ -311,7 +309,7 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
         context = RDF2h.ns("Default");
     }
     //wrap all in one object that gets special care by lookup
-    var renderee = new RDF2h.Renderee(this, graph, node, context);
+    var renderee = new RDF2h.Renderee(this, GraphNode(node, graph), context);
     if (!startMatcherIndex) {
         this.startMatcherIndex = 0;
     } else {
