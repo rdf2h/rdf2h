@@ -7,7 +7,7 @@
   "homepage": "http://rdf2h.github.io/rdf2h/",
   "dependencies": {
     "mustache": "*",
-    "rdfgraphnode": "1.0.5",
+    "rdfgraphnode": "1.1.0",
     "rdflib": "^0.16.5"
   },
   "scripts": {
