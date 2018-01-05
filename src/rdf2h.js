@@ -257,7 +257,16 @@ RDF2h.prototype.getRenderer = function (renderee) {
     }
     let types = getTypes(renderee.graphNode).map(t => GraphNode(t, this.matcherGraph));
     let template = getMatchingTemplate(types, renderee.context);
-    return templateRenderer(template.out(vocab.rdf2h("mustache")).value);
+    let mustache = template.out(vocab.rdf2h("mustache"));
+    if (mustache.nodes.length > 0) {
+        return templateRenderer(mustache.value);
+    }
+    let js = template.out(vocab.rdf2h("javaScript"))
+    return function (renderee) {
+        return (new Function("n", "$rdf", js.value))(renderee.graphNode, rdf);
+    };
+    
+    
     /*
     if (this.startMatcherIndex === 0) {
         return templateRenderer('<div class="missingTemplate">No template found for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
