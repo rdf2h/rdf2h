@@ -78,6 +78,29 @@ describe('RDF2h', function () {
       console.log("result: " + renderingResult);
       assert.equal("The title: An example", renderingResult);
     });
+
+    it('With property path', function () {
+      var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
+                <http://example.org/a> foaf:knows <http://example.org/b>. \n\
+                <http://example.org/b> foaf:name "Alice" .';
+      var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+                [ a r2h:Template; \n\
+                  r2h:type rdfs:Resource;\n\
+                  r2h:context r2h:Default;\n\
+                  r2h:mustache "{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}knows: {{foaf:knows/foaf:name}}"\n\
+                ].';
+      RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
+      var matchers = rdf.graph();
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      var data = rdf.graph();
+      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+      var renderingResult = new RDF2h(matchers).render(data, "http://example.org/a");
+      console.log("result: " + renderingResult);
+      assert.equal("knows: Alice", renderingResult);
+    });
 /*
     it('Applying a simple template with inverse property.', function () {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
