@@ -101,32 +101,49 @@ describe('RDF2h', function () {
       console.log("result: " + renderingResult);
       assert.equal("knows: Alice", renderingResult);
     });
-/*
+
     it('Applying a simple template with inverse property.', function () {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
                 @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
                 @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
-                [ a r2h:Matcher ;\n\
-                  r2h:template [ \n\
+                [ a r2h:Template ;\n\
+                    r2h:type rdfs:Resource;\n\
                     r2h:context r2h:Default;\n\
                     r2h:mustache "Known by: {{./^foaf:knows}}"\n\
-                  ]\n\
                 ].';
-      //mimeTypeUtil.parsers.parse('text/turtle', 
       RDF2h.prefixMap['foaf'] = "http://xmlns.com/foaf/0.1/";
       var matchers = rdf.graph();
       rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
       var data = rdf.graph();
       rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
-      //RDF2h.logger.setLevel(Logger.DEBUG);
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
       console.log("result: " + renderingResult);
       assert.equal("Known by: http:&#x2F;&#x2F;example.org&#x2F;a", renderingResult);
     });
 
-    it('Applying a simple template with inverse property using <- syntax.', function () {
+    it('Error message when no matching template found.', function () {
+      var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
+                <http://example.org/a> foaf:knows <http://example.org/b>.';
+      var matchersTurtle = '';
+      var matchers = rdf.graph();
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      var data = rdf.graph();
+      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+      assert.throws(() => {
+        var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
+        console.log("result: " + renderingResult);
+      }, function(err) {
+        let expectedMessage = "No template found with context: <http://rdf2h.github.io/2015/rdf2h#Default> for any of the types <http://www.w3.org/2000/01/rdf-schema#Resource>. The resource <http://example.org/b> could thus not be rendered.";
+        if ((err instanceof Error) && (err.message === expectedMessage)) {
+          return true;
+        }
+      }, "Error thrown");
+    });
+
+/*    it('Applying a simple template with inverse property using <- syntax.', function () {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\

@@ -257,6 +257,10 @@ RDF2h.prototype.getRenderer = function (renderee) {
     }
     let types = getTypes(renderee.graphNode).map(t => GraphNode(t, this.matcherGraph));
     let template = getMatchingTemplate(types, renderee.context);
+    if (!template) {
+        throw Error("No template found with context: "+renderee.context+" for any of the types "+types.map(t => "<"+t.value+">").join()
+                    +". The resource <"+renderee.graphNode.value+"> could thus not be rendered.");
+    }
     let mustache = template.out(vocab.rdf2h("mustache"));
     if (mustache.nodes.length > 0) {
         return templateRenderer(mustache.value);
