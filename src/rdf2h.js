@@ -267,7 +267,15 @@ RDF2h.prototype.getRenderer = function (renderee) {
     }
     let js = template.out(vocab.rdf2h("javaScript"))
     return function (renderee) {
-        return (new Function("n", "$rdf", js.value))(renderee.graphNode, rdf);
+        try {
+            return (new Function("n", "$rdf", js.value))(renderee.graphNode, rdf);
+        } catch(err) {
+            err.message = err.message + " in " + js.value;
+            let stackLines = err.stack.split("\n");
+            let lineWithSelf = stackLines.findIndex(l => l.indexOf("RDF2h.render") > 0);
+            err.stack = stackLines.splice(0, lineWithSelf - 1).join("\n");
+            throw err;
+        }
     };
     
     
