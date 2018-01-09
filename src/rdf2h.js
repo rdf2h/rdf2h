@@ -358,7 +358,7 @@ RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
 RDF2h.resolveCurie = function (curie) {
     if (curie.startsWith("<") && curie.endsWith(">")) {
         //URI, not a curie
-        return rdf.sym(curie.substr(1, curie.length - 2));
+        return rdf.sym(curie.substring(1, curie.length - 1));
     }
     console.debug("resolving " + curie);
     var splits = curie.split(":");
