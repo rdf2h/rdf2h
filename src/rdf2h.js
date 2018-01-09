@@ -238,6 +238,7 @@ RDF2h.Renderee.prototype.toString = function () {
 
 RDF2h.prototype.getRenderer = function (renderee) {
     var r2h = vocab.rdf2h;
+    let tbox = this.tbox;
     function matchesContext(cfTemplate) {
         var contexts = cfTemplate.out(r2h("context")).nodes;
         if (contexts.length === 0) {
@@ -280,8 +281,8 @@ RDF2h.prototype.getRenderer = function (renderee) {
                 if (b.equals(vocab.rdfs("Resource"))) {
                     return -1;
                 }
-                if (this.tbox.match(a, vocab.rdfs("subClassOf"),b).isEmpty()) {
-                    return a.value.localCompare(b.value);
+                if (tbox.match(a, vocab.rdfs("subClassOf"),b).length === 0) {
+                    return a.value.localeCompare(b.value);
                 } else {
                     return -1;
                 }
