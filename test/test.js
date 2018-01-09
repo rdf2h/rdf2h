@@ -257,6 +257,46 @@ describe('RDF2h', function () {
       console.log("result: " + renderingResult);
       assert.equal("Name: AliceAlice on http:&amp;#x2F;&amp;#x2F;www.freenode.net&amp;#x2F;TheAlice on http:&amp;#x2F;&amp;#x2F;www.nerds.play&amp;#x2F;", renderingResult);
     });
+    it('Selection of more specific template.', function () {
+      var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
+      <http://example.org/a>  a foaf:Person;\n\
+      foaf:name "Alice";\n\
+      foaf:account\n\
+      [   a   foaf:OnlineAccount, foaf:OnlineChatAccount;\n\
+      foaf:accountServiceHomepage <http://www.freenode.net/>;\n\
+      foaf:accountName "Alice" ],\n\
+      [   a   foaf:OnlineAccount, foaf:OnlineGamingAccount;\n\
+      foaf:accountServiceHomepage <http://www.nerds.play/>;\n\
+      foaf:accountName "TheAlice" ].';
+      var templatesTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+      @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+      @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+      @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+      @prefix foaf: <http://xmlns.com/foaf/0.1/> .\n\
+      [ a r2h:Template;\n\
+          r2h:type foaf:Person;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}{{#foaf:account}}{{{:render .}}}{{/foaf:account}}"""\n\
+      ].\n\
+      [ a r2h:Template;\n\
+          r2h:type foaf:OnlineAccount;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}Connect with {{foaf:accountName}} on {{foaf:accountServiceHomepage}}\n"""\n\
+      ].\n\
+      [ a r2h:Template;\n\
+          r2h:type foaf:OnlineChatAccount;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}Chat with {{foaf:accountName}} on {{foaf:accountServiceHomepage}}\n\"""\n\
+      ].\n\
+      foaf:OnlineChatAccount rdfs:subClassOf foaf:OnlineAccount.';
+      var templates = rdf.graph();
+      rdf.parse(templatesTurtle, templates, "http://example.org/templates/", "text/turtle");
+      var data = rdf.graph();
+      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+      var renderingResult = (() => { return new RDF2h(templates).render(data, "http://example.org/a"); })();
+      console.log("result: " + renderingResult);
+      assert.equal("Chat with Alice on http:&#x2F;&#x2F;www.freenode.net&#x2F;\nConnect with TheAlice on http:&#x2F;&#x2F;www.nerds.play&#x2F;\n", renderingResult);
+    });
 /*    it('Render datatype using pseudo property.', function () {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
