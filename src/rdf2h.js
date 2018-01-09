@@ -79,10 +79,10 @@ function RDF2h(matcherGraph, tbox) {
                                 return node.in(RDF2h.resolveCurie(section.substring(0, section.length - 2)));
                             } else {
                                 if (section.startsWith("^")) {
-                                return node.in(RDF2h.resolveCurie(section.substring(1)));
-                            } else {
-                                return node.out(RDF2h.resolveCurie(section));
-                            }
+                                    return node.in(RDF2h.resolveCurie(section.substring(1)));
+                                } else {
+                                    return node.out(RDF2h.resolveCurie(section));
+                                }
                             }
                         }
                     }
@@ -106,7 +106,47 @@ function RDF2h(matcherGraph, tbox) {
                     }
                     return resolveSubPath(subNode,pathSections.slice(1))    
                 }
-                var pathSections = path.split("/").filter(function(e) { return e.length > 0})
+                function splitPathSection(string) {
+                    let result = [];
+                    let readingURI = false;
+                    let lastCharLess = false;
+                    let section = "";
+                    function nextSection() {
+                        if (section.length > 0) {
+                            result.push(section);
+                            section = "";    
+                        }
+                    }
+                    for (pos = 0; pos < string.length; pos++) {    
+                        let c = string[pos];
+                        if (lastCharLess) {
+                            if (c !== "-") {
+                                nextSection();
+                                readingURI = true;
+                            }
+                            section += "<";
+                            lastCharLess = false;
+                        }
+                        if (c === "<") {
+                            lastCharLess = true;
+                            continue;
+                        }
+                        if (readingURI && (c == ">")) {
+                            section += c;
+                            nextSection();
+                            readingURI = false;
+                            continue;
+                        }
+                        if (!readingURI && (c == "/")) {
+                            nextSection();
+                            continue;
+                        }
+                        section += c;
+                    }
+                    nextSection();
+                    return result;
+                }
+                var pathSections = splitPathSection(path);// .split("/").filter(function(e) { return e.length > 0})
                 return resolveSubPath(graphNode, pathSections);
             }
             if (name.startsWith("@prefix ")) {
@@ -316,6 +356,10 @@ RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
 
 
 RDF2h.resolveCurie = function (curie) {
+    if (curie.startsWith("<") && curie.endsWith(">")) {
+        //URI, not a curie
+        return rdf.sym(curie.substr(1, curie.length - 2));
+    }
     console.debug("resolving " + curie);
     var splits = curie.split(":");
     var prefix = splits[0];
