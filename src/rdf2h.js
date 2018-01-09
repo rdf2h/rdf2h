@@ -117,7 +117,7 @@ function RDF2h(matcherGraph, tbox) {
                             section = "";    
                         }
                     }
-                    for (pos = 0; pos < string.length; pos++) {    
+                    for (var pos = 0; pos < string.length; pos++) {    
                         let c = string[pos];
                         if (lastCharLess) {
                             if (c !== "-") {
@@ -282,7 +282,11 @@ RDF2h.prototype.getRenderer = function (renderee) {
                     return -1;
                 }
                 if (tbox.match(a, vocab.rdfs("subClassOf"),b).length === 0) {
-                    return a.value.localeCompare(b.value);
+                    if (tbox.match(b, vocab.rdfs("subClassOf"),a).length === 0) {
+                        return a.value.localeCompare(b.value);
+                    } else {
+                        return 1;
+                    }
                 } else {
                     return -1;
                 }
