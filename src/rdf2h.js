@@ -239,33 +239,33 @@ RDF2h.Renderee.prototype.toString = function () {
 RDF2h.prototype.getRenderer = function (renderee) {
     var r2h = vocab.rdf2h;
     let tbox = this.tbox;
-    function matchesContext(cfTemplate) {
-        var contexts = cfTemplate.out(r2h("context")).nodes;
+    function matchesContext(cfRenderer) {
+        var contexts = cfRenderer.out(r2h("context")).nodes;
         if (contexts.length === 0) {
-            console.debug("template "+cfTemplate+" specifies no context, thus accepting it for "+renderee.context);
+            console.debug("renderer "+cfRenderer+" specifies no context, thus accepting it for "+renderee.context);
             return true;
         }
         return contexts.some(function(context) {
             if (renderee.context.equals(context)) {
-                console.debug("template "+cfTemplate+" matches the context "+renderee.context);
+                console.debug("renderer "+cfRenderer+" matches the context "+renderee.context);
                 return true;
             }
         });
     }
-    function resolveTemplateNode(templateURI) {
+    function resolveRendererNode(rendererURI) {
         if (!window) {
-            return "Could not get template: " + templateURI + ", no window object."
+            return "Could not get renderer: " + rendererURI + ", no window object."
         }
         var pageURIPrefix = window.location + "#";
-        if (!templateURI.startsWith(pageURIPrefix)) {
-            return "Could not get template: " + templateURI + ", the prefix must be " + pageURIPrefix + "."
+        if (!rendererURI.startsWith(pageURIPrefix)) {
+            return "Could not get renderer: " + rendererURI + ", the prefix must be " + pageURIPrefix + "."
         }
-        var id = templateURI.substring(pageURIPrefix.length);
+        var id = rendererURI.substring(pageURIPrefix.length);
         return document.getElementById(id).textContent;
     }
-    function templateRenderer(template) {
+    function rendererRenderer(renderer) {
         return function (renderee) {
-            return Mustache.render(template, renderee);
+            return Mustache.render(renderer, renderee);
         };
     }
     function getTypes(graphNode) {
@@ -293,24 +293,24 @@ RDF2h.prototype.getRenderer = function (renderee) {
             }
         ).concat([vocab.rdfs("Resource")]);
     }
-    function getMatchingTemplate(types, context) {
-        function getMatching(templates) {
-            return templates.find(template => context.equals(template.out(vocab.rdf2h("context")).node));
+    function getMatchingRenderer(types, context) {
+        function getMatching(renderers) {
+            return renderers.find(renderer => context.equals(renderer.out(vocab.rdf2h("context")).node));
         }
-        return [false].concat(types).reduce((template, type) => 
-            template ? template : getMatching(type.in(vocab.rdf2h("type")).split()));
+        return [false].concat(types).reduce((renderer, type) => 
+            renderer ? renderer : getMatching(type.in(vocab.rdf2h("type")).split()));
     }
     let types = getTypes(renderee.graphNode).map(t => GraphNode(t, this.matcherGraph));
-    let template = getMatchingTemplate(types, renderee.context);
-    if (!template) {
-        throw Error("No template found with context: "+renderee.context+" for any of the types "+types.map(t => "<"+t.value+">").join()
+    let renderer = getMatchingRenderer(types, renderee.context);
+    if (!renderer) {
+        throw Error("No renderer found with context: "+renderee.context+" for any of the types "+types.map(t => "<"+t.value+">").join()
                     +". The resource <"+renderee.graphNode.value+"> could thus not be rendered.");
     }
-    let mustache = template.out(vocab.rdf2h("mustache"));
+    let mustache = renderer.out(vocab.rdf2h("mustache"));
     if (mustache.nodes.length > 0) {
-        return templateRenderer(mustache.value);
+        return rendererRenderer(mustache.value);
     }
-    let js = template.out(vocab.rdf2h("javaScript"))
+    let js = renderer.out(vocab.rdf2h("javaScript"))
     return function (renderee) {
         try {
             return (new Function("n", "context", "$rdf", "render", js.value))(renderee.graphNode, renderee.context, rdf, (n, context) => {
@@ -328,9 +328,9 @@ RDF2h.prototype.getRenderer = function (renderee) {
     
     /*
     if (this.startMatcherIndex === 0) {
-        return templateRenderer('<div class="missingTemplate">No template found for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
+        return rendererRenderer('<div class="missingRenderer">No renderer found for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
     } else {
-        return templateRenderer('<div class="noMoreTemplate">No more template available for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
+        return rendererRenderer('<div class="noMoreRenderer">No more renderer available for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
     }*/
 
 }
