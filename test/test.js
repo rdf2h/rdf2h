@@ -257,7 +257,7 @@ describe('RDF2h', function () {
       console.log("result: " + renderingResult);
       assert.equal("Name: AliceAlice on http:&#x2F;&#x2F;www.freenode.net&#x2F;TheAlice on http:&#x2F;&#x2F;www.nerds.play&#x2F;", renderingResult);
     });
-    it('Invoking render in javaScripr.', function () {
+    it('Invoking render in javaScript.', function () {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
       <http://example.org/a>  a foaf:Person;\n\
       foaf:name "Alice";\n\
