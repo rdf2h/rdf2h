@@ -313,9 +313,9 @@ RDF2h.prototype.getRenderer = function (renderee) {
     let js = renderer.out(vocab.rdf2h("javaScript"))
     return function (renderee) {
         try {
-            return (new Function("n", "context", "$rdf", "render", js.value))(renderee.graphNode, renderee.context, rdf, (n, context) => {
+            return (new Function("n", "context", "$rdf", "render", "GraphNode", js.value))(renderee.graphNode, renderee.context, rdf, (n, context) => {
                 return renderee.rdf2h.render(n.graph, n.node, context ? context : renderee.context);
-            });
+            }, GraphNode);
         } catch(err) {
             err.message = err.message + " in " + js.value;
             let stackLines = err.stack.split("\n");
