@@ -16,6 +16,7 @@ function RDF2h(matcherGraph, tbox) {
     } else {
         this.tbox = matcherGraph;
     }
+    this.env = {}; //this is to allow shared vars among renderers
     var unorderedMatchers = new Array(); //new NodeSet();
     var rdfTypeProperty = rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
     var matcherType = r2h("Matcher");
@@ -313,9 +314,9 @@ RDF2h.prototype.getRenderer = function (renderee) {
     let js = renderer.out(vocab.rdf2h("javaScript"))
     return function (renderee) {
         try {
-            return (new Function("n", "context", "$rdf", "render", "GraphNode", js.value))(renderee.graphNode, renderee.context, rdf, (n, context) => {
+            return (new Function("n", "context", "$rdf", "render", "GraphNode", "env", js.value))(renderee.graphNode, renderee.context, rdf, (n, context) => {
                 return renderee.rdf2h.render(n.graph, n.node, context ? context : renderee.context);
-            }, GraphNode);
+            }, GraphNode, renderee.rdf2h.env);
         } catch(err) {
             err.message = err.message + " in " + js.value;
             let stackLines = err.stack.split("\n");
