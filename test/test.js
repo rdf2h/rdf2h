@@ -224,30 +224,30 @@ describe('RDF2h', function () {
       <http://example.org/a>  a foaf:Person;\n\
       foaf:name "Alice";\n\
       foaf:account\n\
-      [   a   foaf:OnlineAccount, foaf:OnlineChatAccount;\n\
-      foaf:accountServiceHomepage <http://www.freenode.net/>;\n\
-      foaf:accountName "Alice" ],\n\
-      [   a   foaf:OnlineAccount, foaf:OnlineGamingAccount;\n\
-      foaf:accountServiceHomepage <http://www.nerds.play/>;\n\
-      foaf:accountName "TheAlice" ].';
+          [ a   foaf:OnlineAccount, foaf:OnlineChatAccount;\n\
+            foaf:accountServiceHomepage <http://www.freenode.net/>;\n\
+            foaf:accountName "Alice" ],\n\
+          [ a   foaf:OnlineAccount, foaf:OnlineGamingAccount;\n\
+            foaf:accountServiceHomepage <http://www.nerds.play/>;\n\
+            foaf:accountName "TheAlice" ].';
       var renderersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
       @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
       @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
       @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
       @prefix foaf: <http://xmlns.com/foaf/0.1/> .\n\
       [ a r2h:Renderer;\n\
-      r2h:type foaf:Person;\n\
-      r2h:context r2h:Default;\n\
-      r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}Name: {{foaf:name}}'+
-      '{{#foaf:account}}'+
-      '{{{:render .}}}'+
-      '{{/foaf:account}}"""\n\
-      ].\n\
-      [ a r2h:Renderer;\n\
-      r2h:type foaf:OnlineAccount;\n\
-      r2h:context r2h:Default;\n\
-      r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}'+
-      '{{foaf:accountName}} on {{foaf:accountServiceHomepage}}"""\n\
+        r2h:type foaf:Person;\n\
+        r2h:context r2h:Default;\n\
+        r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}Name: {{foaf:name}}'+
+        '{{#foaf:account}}'+
+        '{{{:render .}}}'+
+        '{{/foaf:account}}"""\n\
+        ].\n\
+        [ a r2h:Renderer;\n\
+        r2h:type foaf:OnlineAccount;\n\
+        r2h:context r2h:Default;\n\
+        r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}'+
+        '{{foaf:accountName}} on {{foaf:accountServiceHomepage}}"""\n\
       ].';
       var renderers = rdf.graph();
       rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle");
