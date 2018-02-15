@@ -263,28 +263,28 @@ describe('RDF2h', function () {
       foaf:name "Alice";\n\
       foaf:account\n\
       [   a   foaf:OnlineAccount, foaf:OnlineChatAccount;\n\
-      foaf:accountServiceHomepage <http://www.freenode.net/>;\n\
-      foaf:accountName "Alice" ],\n\
+        foaf:accountServiceHomepage <http://www.freenode.net/>;\n\
+        foaf:accountName "Alice" ],\n\
       [   a   foaf:OnlineAccount, foaf:OnlineGamingAccount;\n\
-      foaf:accountServiceHomepage <http://www.nerds.play/>;\n\
-      foaf:accountName "TheAlice" ].';
+        foaf:accountServiceHomepage <http://www.nerds.play/>;\n\
+        foaf:accountName "TheAlice" ].';
       var renderersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
       @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
       @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
       @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
       @prefix foaf: <http://xmlns.com/foaf/0.1/> .\n\
       [ a r2h:Renderer;\n\
-      r2h:type foaf:Person;\n\
-      r2h:context r2h:Default;\n\
-      r2h:javaScript """let foaf = suffix => new $rdf.sym("http://xmlns.com/foaf/0.1/"+suffix);\n\
-      return `Name: ${n.out(foaf("name")).value}'+
-      '${n.out(foaf("account")).split().map(n => render(n)).join("")}`"""\n\
+        r2h:type foaf:Person;\n\
+        r2h:context r2h:Default;\n\
+        r2h:javaScript """let foaf = suffix => new $rdf.sym("http://xmlns.com/foaf/0.1/"+suffix);\n\
+        return `Name: ${n.out(foaf("name")).value}\n'+
+        '${n.out(foaf("account")).split().map(n => render(n)).join("")}`"""\n\
       ].\n\
       [ a r2h:Renderer;\n\
-      r2h:type foaf:OnlineAccount;\n\
-      r2h:context r2h:Default;\n\
-      r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}'+
-      '{{foaf:accountName}} on {{foaf:accountServiceHomepage}}"""\n\
+        r2h:type foaf:OnlineAccount;\n\
+        r2h:context r2h:Default;\n\
+        r2h:mustache """{{@prefix foaf: <http://xmlns.com/foaf/0.1/>}}'+
+        '{{foaf:accountName}} on {{foaf:accountServiceHomepage}}\n"""\n\
       ].'; 
       var renderers = rdf.graph();
       rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle");
@@ -292,7 +292,7 @@ describe('RDF2h', function () {
       rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
       var renderingResult = (() => { return new RDF2h(renderers).render(data, "http://example.org/a"); })();
       console.log("result: " + renderingResult);
-      assert.equal("Name: AliceAlice on http:&#x2F;&#x2F;www.freenode.net&#x2F;TheAlice on http:&#x2F;&#x2F;www.nerds.play&#x2F;", renderingResult);
+      assert.equal("Name: Alice\nAlice on http:&#x2F;&#x2F;www.freenode.net&#x2F;\nTheAlice on http:&#x2F;&#x2F;www.nerds.play&#x2F;\n", renderingResult);
     });
     it('Selection of more specific renderer.', function () {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
