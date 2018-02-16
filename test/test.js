@@ -324,8 +324,8 @@ describe('RDF2h', function () {
         r2h:context r2h:Default;\n\
         r2h:javaScript """let foaf = suffix => new $rdf.sym("http://xmlns.com/foaf/0.1/"+suffix);\n\
         if (!env.accountCount) {env.accountCount = 1} else {env.accountCount++}; \n\
-        return `\n${env.accountCount} - ${n.out(foaf("accountName")).value} on '+
-        '${n.out(foaf("accountServiceHomepage")).value}`"""\n\
+        print(`\n${env.accountCount} - ${n.out(foaf("accountName")).value} on '+
+        '${n.out(foaf("accountServiceHomepage")).value}`);"""\n\
       ].';
       var renderers = rdf.graph();
       rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle");

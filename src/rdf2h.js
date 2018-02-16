@@ -314,9 +314,21 @@ RDF2h.prototype.getRenderer = function (renderee) {
     let js = renderer.out(vocab.rdf2h("javaScript"))
     return function (renderee) {
         try {
-            return (new Function("n", "context", "$rdf", "render", "GraphNode", "env", js.value))(renderee.graphNode, renderee.context, rdf, (n, context) => {
+            let render =  (n, context) => {
                 return renderee.rdf2h.render(n.graph, n.node, context ? context : renderee.context);
-            }, GraphNode, renderee.rdf2h.env);
+            };
+            let output = "";
+            let print = (s) => {
+                output += s;
+            };
+            //Also printing return value for now
+            let returnValue = (new Function("n", "context", "$rdf", "render", "print", "GraphNode", "env", js.value)
+                    )(renderee.graphNode, renderee.context, rdf, render, print, GraphNode, renderee.rdf2h.env);
+            if (returnValue) {
+                return output + returnValue;
+            } else {
+                return output;
+            }
         } catch(err) {
             err.message = err.message + " in " + js.value;
             let stackLines = err.stack.split("\n");
