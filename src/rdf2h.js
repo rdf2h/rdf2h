@@ -5,58 +5,18 @@ var vocab = require("./vocab.js");
 var NodeSet = new Array();
 
 
-function RDF2h(matcherGraph, tbox) {
+function RDF2h(rendererGraph, tbox) {
     function r2h(suffix) {
         return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
     }
     console.info("RDF2h created");
-    this.matcherGraph = matcherGraph;
+    this.rendererGraph = rendererGraph;
     if (tbox) {
         this.tbox = tbox;
     } else {
-        this.tbox = matcherGraph;
+        this.tbox = rendererGraph;
     }
     this.env = {}; //this is to allow shared vars among renderers
-    var unorderedMatchers = new Array(); //new NodeSet();
-    var rdfTypeProperty = rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-    var matcherType = r2h("Matcher");
-    var matcherStatements = matcherGraph.statementsMatching(null, rdfTypeProperty, matcherType);
-    matcherStatements.forEach(function(t) {
-        unorderedMatchers.push(t.subject);
-    });
-    /*Sorting:
-     * 
-     * Choose any matcher that is not the object of any before statement . 
-     * Remove all before statements with that matcher as subject. 
-     * Repeat till there are no more matchers that are not the object of a 
-     * before statement. 
-     * If there are matchers left the before statements are circular.
-     */   
-    var beforeProperty = r2h("before");
-    var beforeStatements = matcherGraph.statementsMatching(null,beforeProperty);
-    beforeStatements.forEach(function(t) {
-        unorderedMatchers.push(t.subject);
-        unorderedMatchers.push(t.object);
-    });
-    this.sortedMatchers = [];
-    var self = this;
-    while (unorderedMatchers.length > 0) {
-        if (!unorderedMatchers.some(function(current) {
-            //TODO if (beforeStatements.match(null, beforeProperty, current).length === 0) {
-            if (true) {
-                self.sortedMatchers.push(current);
-                unorderedMatchers = unorderedMatchers.filter(n => !n.equals(current));
-                //FIXME beforeStatements.removeMatches(current, beforeProperty);
-                return true; //stop iteration over unorderedMatchers
-            } else {
-                return false;
-            }
-        })) {
-            console.error("Circle Detected with:\n"+beforeStatements.toString());
-            break;
-        }
-    }
-    console.debug("Constructed RDF2h with the following matchers: ", this.sortedMatchers.map(function(m) {return m.toString();}));
 }
 
 
@@ -69,7 +29,6 @@ function RDF2h(matcherGraph, tbox) {
             var graphNode = this.view.graphNode;
             var graph = graphNode.graph;
             var context = this.view.context;
-            var currentMatcherIndex = this.view.currentMatcherIndex;
             function resolvePath(path) {
                 function resolveSubPath(node, pathSections) {
                     function resolveSection(section) {
@@ -191,7 +150,7 @@ function RDF2h(matcherGraph, tbox) {
                 if (graphNode.nodes.length > 1) {
                     console.warn(":continue invoked in context with more than one node, this shouldn't be possible!")
                 }
-                return rdf2h.render(graph, graphNode.nodes[0], subContext, currentMatcherIndex + 1);
+                return rdf2h.render(graph, graphNode.nodes[0], subContext);
 
             }
             if (name.startsWith("+")) {
@@ -301,7 +260,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         return [false].concat(types).reduce((renderer, type) => 
             renderer ? renderer : getMatching(type.in(vocab.rdf2h("type")).split()));
     }
-    let types = getTypes(renderee.graphNode).map(t => GraphNode(t, this.matcherGraph));
+    let types = getTypes(renderee.graphNode).map(t => GraphNode(t, this.rendererGraph));
     let renderer = getMatchingRenderer(types, renderee.context);
     if (!renderer) {
         throw Error("No renderer found with context: "+renderee.context+" for any of the types "+types.map(t => "<"+t.value+">").join()
@@ -337,18 +296,11 @@ RDF2h.prototype.getRenderer = function (renderee) {
             throw err;
         }
     };
-    
-    
-    /*
-    if (this.startMatcherIndex === 0) {
-        return rendererRenderer('<div class="missingRenderer">No renderer found for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
-    } else {
-        return rendererRenderer('<div class="noMoreRenderer">No more renderer available for &lt;{{.}}&gt; in context &lt;'+renderee.context+'&gt;</div>');
-    }*/
+
 
 }
 
-RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
+RDF2h.prototype.render = function (graph, node, context) {
     if (!node.termType) {
         node = rdf.sym(node);
     }
@@ -357,11 +309,6 @@ RDF2h.prototype.render = function (graph, node, context, startMatcherIndex) {
     }
     //wrap all in one object that gets special care by lookup
     var renderee = new RDF2h.Renderee(this, GraphNode(node, graph), context);
-    if (!startMatcherIndex) {
-        this.startMatcherIndex = 0;
-    } else {
-        this.startMatcherIndex = startMatcherIndex;
-    }
     var renderer = this.getRenderer(renderee);
     return renderer(renderee);
 }
