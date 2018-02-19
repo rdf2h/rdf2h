@@ -9,7 +9,6 @@ function RDF2h(rendererGraph, tbox) {
     function r2h(suffix) {
         return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
     }
-    console.info("RDF2h created");
     this.rendererGraph = rendererGraph;
     if (tbox) {
         this.tbox = tbox;
@@ -327,7 +326,6 @@ RDF2h.resolveCurie = function (curie) {
         //URI, not a curie
         return rdf.sym(curie.substring(1, curie.length - 1));
     }
-    console.debug("resolving " + curie);
     var splits = curie.split(":");
     var prefix = splits[0];
     var suffix = splits[1];
