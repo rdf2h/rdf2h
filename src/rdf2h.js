@@ -262,7 +262,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
     let types = getTypes(renderee.graphNode).map(t => GraphNode(t, this.rendererGraph));
     let renderer = getMatchingRenderer(types, renderee.context);
     if (!renderer) {
-        throw Error("No renderer found with context: "+renderee.context+" for any of the types "+types.map(t => "<"+t.value+">").join()
+        throw Error("No renderer found with context: <"+renderee.context.value+"> for any of the types "+types.map(t => "<"+t.value+">").join()
                     +". The resource <"+renderee.graphNode.value+"> could thus not be rendered.");
     }
     let mustache = renderer.out(vocab.rdf2h("mustache"));
