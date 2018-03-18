@@ -6,8 +6,8 @@ var rdf = require('rdflib');
 //var mimeTypeUtil = require('rdf-mime-type-util');
 
 describe('RDF2h', function () {
-  describe('#render()', function (done) {
-    it('Applying rdf:Resource renderer to untyped resource.', function () {
+  describe('#render()', function () {
+    it('Applying rdf:Resource renderer to untyped resource.', function (done) {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 <http://example.org/> dc:title "An example".';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
