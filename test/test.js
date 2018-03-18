@@ -6,7 +6,7 @@ var rdf = require('rdflib');
 //var mimeTypeUtil = require('rdf-mime-type-util');
 
 describe('RDF2h', function () {
-  describe('#render()', function () {
+  describe('#render()', function (done) {
     it('Applying rdf:Resource renderer to untyped resource.', function () {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 <http://example.org/> dc:title "An example".';
@@ -21,14 +21,18 @@ describe('RDF2h', function () {
                 ].';
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () =>{
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
       console.log("result: " + renderingResult);
       assert.equal("The title: An example", renderingResult);
+          done();
     });
-    it('Applying rdf:Resource renderer to typed resource.', function () {
+      });
+      
+    });
+    it('Applying rdf:Resource renderer to typed resource.', function (done) {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 @prefix schema: <http://schema.org/>. \n\
                 <http://example.org/> dc:title "An example". \n\
@@ -50,14 +54,17 @@ describe('RDF2h', function () {
                 ].';
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
       console.log("result: " + renderingResult);
       assert.equal("The title: An example", renderingResult);
+          done();
     });
-    it('Applying javascript renderer.', function () {
+      });
+    });
+    it('Applying javascript renderer.', function (done) {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 <http://example.org/> dc:title "An example".';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
@@ -71,15 +78,20 @@ describe('RDF2h', function () {
                     return "The title: "+n.out($rdf.sym("http://dublincore.org/2012/06/14/dcelements#title")).value; """\n\
                 ].';
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
       console.log("result: " + renderingResult);
       assert.equal("The title: An example", renderingResult);
+          done();
     });
 
-    it('With property path', function () {
+      });
+      
+    });
+
+    it('With property path', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>. \n\
                 <http://example.org/b> foaf:name "Alice" .';
@@ -94,15 +106,18 @@ describe('RDF2h', function () {
                 ].';
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/a");
       console.log("result: " + renderingResult);
       assert.equal("knows: Alice", renderingResult);
+          done();
+    });
+      });
     });
 
-    it('Applying a simple renderer with inverse property.', function () {
+    it('Applying a simple renderer with inverse property.', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
@@ -116,22 +131,27 @@ describe('RDF2h', function () {
                 ].';
       RDF2h.prefixMap['foaf'] = "http://xmlns.com/foaf/0.1/";
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
       console.log("result: " + renderingResult);
       assert.equal("Known by: http:&#x2F;&#x2F;example.org&#x2F;a", renderingResult);
+          done()
     });
 
-    it('Error message when no matching renderer found.', function () {
+      });
+      
+    });
+
+    it('Error message when no matching renderer found.', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
       var matchersTurtle = '';
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       assert.throws(() => {
         var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
         console.log("result: " + renderingResult);
@@ -141,9 +161,14 @@ describe('RDF2h', function () {
           return true;
         }
       }, "Error thrown");
+          done();
     });
 
-    it('Error message when javaScript-renderer is invalid.', function () {
+      });
+      
+    });
+
+    it('Error message when javaScript-renderer is invalid.', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>. \n\
                 <http://example.org/a> foaf:knows <http://example.org/b>.';
                 var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
@@ -160,9 +185,9 @@ describe('RDF2h', function () {
                     return broken();"""\n\
                 ].';
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       assert.throws(() => {
         var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
         console.log("result: " + renderingResult);
@@ -172,9 +197,13 @@ describe('RDF2h', function () {
           return true;
         }
       }, "Error thrown");
+          done();
+        });
+      });
+      
     });
 
-    it('Applying a simple renderer with inverse property using <- syntax.', function () {
+    it('Applying a simple renderer with inverse property using <- syntax.', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
             <http://example.org/a> foaf:knows <http://example.org/b>.';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
@@ -189,16 +218,21 @@ describe('RDF2h', function () {
       //mimeTypeUtil.parsers.parse('text/turtle', 
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       //RDF2h.logger.setLevel(Logger.DEBUG);
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
       console.log("result: " + renderingResult);
       assert.equal("Known by: http:&#x2F;&#x2F;example.org&#x2F;a", renderingResult);
+          done();
+        });
+        
+      });
+      
     });
 
-    it('Applying a simple renderer with full URI.', function () {
+    it('Applying a simple renderer with full URI.', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
             <http://example.org/b> foaf:name "Bob".\n\
             ';
@@ -212,12 +246,17 @@ describe('RDF2h', function () {
                 r2h:mustache "name: {{<http://xmlns.com/foaf/0.1/name>}}"\n\
             ].';
       var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
+      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/b");
       console.log("result: " + renderingResult);
       assert.equal("name: Bob", renderingResult);
+          done();
+        });
+        
+    });
+      
     });
     it('Invoking render.', function () {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
@@ -250,14 +289,17 @@ describe('RDF2h', function () {
         '{{foaf:accountName}} on {{foaf:accountServiceHomepage}}"""\n\
       ].';
       var renderers = rdf.graph();
-      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle");
+      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = (() => { return new RDF2h(renderers).render(data, "http://example.org/a"); })();
       console.log("result: " + renderingResult);
       assert.equal("Name: AliceAlice on http:&#x2F;&#x2F;www.freenode.net&#x2F;TheAlice on http:&#x2F;&#x2F;www.nerds.play&#x2F;", renderingResult);
     });
-    it('Invoking render in javaScript.', function () {
+      });
+      
+    });
+    it('Invoking render in javaScript.', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
       <http://example.org/a>  a foaf:Person;\n\
       foaf:name "Alice";\n\
@@ -276,7 +318,7 @@ describe('RDF2h', function () {
       [ a r2h:Renderer;\n\
         r2h:type foaf:Person;\n\
         r2h:context r2h:Default;\n\
-        r2h:javaScript """let foaf = suffix => new $rdf.sym("http://xmlns.com/foaf/0.1/"+suffix);\n\
+        r2h:javaScript """let foaf = suffix => $rdf.sym("http://xmlns.com/foaf/0.1/"+suffix);\n\
         return `Name: ${n.out(foaf("name")).value}\n'+
         '${n.out(foaf("account")).split().map(n => render(n)).join("")}`"""\n\
       ].\n\
@@ -287,15 +329,20 @@ describe('RDF2h', function () {
         '{{foaf:accountName}} on {{foaf:accountServiceHomepage}}\n"""\n\
       ].'; 
       var renderers = rdf.graph();
-      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle");
+      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = (() => { return new RDF2h(renderers).render(data, "http://example.org/a"); })();
       console.log("result: " + renderingResult);
       assert.equal("Name: Alice\nAlice on http:&#x2F;&#x2F;www.freenode.net&#x2F;\nTheAlice on http:&#x2F;&#x2F;www.nerds.play&#x2F;\n", renderingResult);
+          done();
+        });
+        
+      });
+      
     });
 
-    it('Accessing environment', function () {
+    it('Accessing environment', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
       <http://example.org/a>  a foaf:Person;\n\
       foaf:name "Alice";\n\
@@ -322,20 +369,25 @@ describe('RDF2h', function () {
       [ a r2h:Renderer;\n\
         r2h:type foaf:OnlineAccount;\n\
         r2h:context r2h:Default;\n\
-        r2h:javaScript """let foaf = suffix => new $rdf.sym("http://xmlns.com/foaf/0.1/"+suffix);\n\
+        r2h:javaScript """let foaf = suffix => $rdf.sym("http://xmlns.com/foaf/0.1/"+suffix);\n\
         if (!env.accountCount) {env.accountCount = 1} else {env.accountCount++}; \n\
         print(`\n${env.accountCount} - ${n.out(foaf("accountName")).value} on '+
         '${n.out(foaf("accountServiceHomepage")).value}`);"""\n\
       ].';
       var renderers = rdf.graph();
-      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle");
+      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = (() => { return new RDF2h(renderers).render(data, "http://example.org/a"); })();
       console.log("result: " + renderingResult);
       assert.equal("Name: Alice\n1 - Alice on http://www.freenode.net/\n2 - TheAlice on http://www.nerds.play/", renderingResult);
+          done()
+        });
+        
+      });
+      
     });
-    it('Selection of more specific renderer.', function () {
+    it('Selection of more specific renderer.', function (done) {
       var dataTurtle = '@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n\
       <http://example.org/a>  a foaf:Person;\n\
       foaf:name "Alice";\n\
@@ -368,12 +420,17 @@ describe('RDF2h', function () {
       ].\n\
       foaf:OnlineChatAccount rdfs:subClassOf foaf:OnlineAccount.';
       var renderers = rdf.graph();
-      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle");
+      rdf.parse(renderersTurtle, renderers, "http://example.org/renderers/", "text/turtle", () => {
       var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+        rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
       var renderingResult = (() => { return new RDF2h(renderers).render(data, "http://example.org/a"); })();
       console.log("result: " + renderingResult);
       assert.equal("Chat with Alice on http:&#x2F;&#x2F;www.freenode.net&#x2F;\nConnect with TheAlice on http:&#x2F;&#x2F;www.nerds.play&#x2F;\n", renderingResult);
+          done();
+        });
+        
+      });
+      
     });
 /*    it('Render datatype using pseudo property.', function () {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
