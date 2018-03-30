@@ -1,6 +1,6 @@
 var assert = require('assert');
 var RDF2h = require('../src/rdf2h.js');
-var rdf = require('rdflib');
+var rdf = require('ext-rdflib');
 //var N3Parser = require('rdf-parser-n3');
 //var clownface = require('clownface');
 //var mimeTypeUtil = require('rdf-mime-type-util');

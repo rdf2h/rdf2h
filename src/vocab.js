@@ -1,4 +1,4 @@
-var $rdf = require("rdflib");
+var $rdf = require("ext-rdflib");
 
 module.exports = {
     schema: function (suffix) {

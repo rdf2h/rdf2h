@@ -1,5 +1,5 @@
-var rdf = require("rdflib");
-var GraphNode = require("rdfgraphnode");
+var rdf = require("ext-rdflib");
+var GraphNode = require("rdfgraphnode-rdfext");
 var Mustache = require("mustache");
 var vocab = require("./vocab.js");
 var NodeSet = new Array();
