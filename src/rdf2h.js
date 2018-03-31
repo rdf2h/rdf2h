@@ -229,28 +229,32 @@ RDF2h.prototype.getRenderer = function (renderee) {
     }
     function getTypes(graphNode) {
         //the array might contain rdfs:Resource twice (at the end)
-        return graphNode.out(vocab.rdf("type")).nodes.sort(
-            (a,b) => {
-                if (a.equals(b)) {
-                    return 0;
-                }
-                if (a.equals(vocab.rdfs("Resource"))) {
-                    return 1;
-                }
-                if (b.equals(vocab.rdfs("Resource"))) {
-                    return -1;
-                }
-                if (tbox.match(a, vocab.rdfs("subClassOf"),b).length === 0) {
-                    if (tbox.match(b, vocab.rdfs("subClassOf"),a).length === 0) {
-                        return a.value.localeCompare(b.value);
-                    } else {
+        if (graphNode.node.termType === "Literal") {
+            return [graphNode.node.datatype];
+        } else {
+            return graphNode.out(vocab.rdf("type")).nodes.sort(
+                (a,b) => {
+                    if (a.equals(b)) {
+                        return 0;
+                    }
+                    if (a.equals(vocab.rdfs("Resource"))) {
                         return 1;
                     }
-                } else {
-                    return -1;
+                    if (b.equals(vocab.rdfs("Resource"))) {
+                        return -1;
+                    }
+                    if (tbox.match(a, vocab.rdfs("subClassOf"),b).length === 0) {
+                        if (tbox.match(b, vocab.rdfs("subClassOf"),a).length === 0) {
+                            return a.value.localeCompare(b.value);
+                        } else {
+                            return 1;
+                        }
+                    } else {
+                        return -1;
+                    }
                 }
-            }
-        ).concat([vocab.rdfs("Resource")]);
+            ).concat([vocab.rdfs("Resource")]);
+        }        
     }
     function getMatchingRenderer(types, context) {
         function getMatching(renderers) {
