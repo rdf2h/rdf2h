@@ -3,4 +3,5 @@ node_modules
 /nbproject/private/
 npm-debug.log
 yarn-error.log
+distribution
 
