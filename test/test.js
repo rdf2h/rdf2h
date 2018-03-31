@@ -431,54 +431,45 @@ describe('RDF2h', function () {
         
       });
       
-    });
-/*    it('Render datatype using pseudo property.', function () {
-      var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
-                <http://example.org/> dc:title "10"^^xsd:integer.';
-      var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
-                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
-                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
-                [ a r2h:Matcher ;\n\
-                  r2h:triplePattern [\n\
-                    r2h:subject r2h:this;\n\
-                    r2h:predicate dc:title;\n\
-                  ];\n\
-                  r2h:renderer [ \n\
-                    r2h:context r2h:Default;\n\
-                    r2h:mustache "The type title: {{{dc:title/rdf:type}}}"\n\
-                  ]\n\
-                ].';
-      //mimeTypeUtil.parsers.parse('text/turtle', 
-      RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
-      var matchers = rdf.graph();
-      rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
-      var data = rdf.graph();
-      rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
-      //RDF2h.logger.setLevel(Logger.DEBUG);
-      var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
-      console.log("result: " + renderingResult);
+      });
+
+      it('Render datatype using pseudo property.', function () {
+          var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#> .\n\
+            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
+            <http://example.org/> dc:title "10"^^xsd:integer.';
+          var templatesTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+            @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+            @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+            [ a r2h:renderer;\n\
+                r2h:type rdfs:Resource;\n\
+                r2h:context r2h:Default;\n\
+                r2h:mustache "The type title: {{{dc:title/rdf:type}}}"\n\
+            ].';
+          var templates = rdf.graph();
+          rdf.parse(templatesTurtle, templates, "http://example.org/templates/", "text/turtle");
+          var data = rdf.graph();
+          rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle");
+          var renderingResult = (() => { return new RDF2h(renderers).render(data, "http://example.org/"); })();
+          console.log("result: " + renderingResult);
       assert.equal("The type title: http://www.w3.org/2001/XMLSchema#integer", renderingResult);
     });
 
-    it('Render language using pseudo property.', function () {
-      var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
+      it('Render language using pseudo property.', function () {
+          var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
                 <http://example.org/> dc:title "Il titilo"@it.';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
-                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
-                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
-                @prefix dct: <http://purl.org/dc/terms/>. \n\
-                [ a r2h:Matcher ;\n\
-                  r2h:triplePattern [\n\
-                    r2h:subject r2h:this;\n\
-                    r2h:predicate dc:title;\n\
-                  ];\n\
-                  r2h:renderer [ \n\
-                    r2h:context r2h:Default;\n\
-                    r2h:mustache "The title language: {{{dc:title/dct:language}}}"\n\
-                  ]\n\
-                ].';
+      @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+      @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+      @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+      @prefix dct: <http://purl.org/dc/terms/>. \n\
+      [ a r2h:renderer;\n\
+          r2h:type rdfs:Resource;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache "The title language: {{{dc:title/dct:language}}}"\n\
+          \n\
+      ].';
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
       rdf.parse(matchersTurtle, matchers, "http://example.org/matchers/", "text/turtle");
@@ -490,48 +481,33 @@ describe('RDF2h', function () {
 
     });
 
+/*
     it('Matching based on  datatype pseudo property.', function () {
       var dataTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
-\n\             @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
+                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
                 <http://example.org/> dc:title "Test"^^xsd:string.\n\
                 <http://example.org/> rdf:value "10"^^xsd:integer.';
       var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
-                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
-                @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
-                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
-                [ a r2h:Matcher ;\n\
-                  r2h:triplePattern [\n\
-                    r2h:subject r2h:this;\n\
-                    r2h:predicate dc:title;\n\
-                  ];\n\
-                  r2h:renderer [ \n\
-                    r2h:context r2h:Default;\n\
-                    r2h:mustache "The value: {{{:render rdf:value}}}, The title: {{{:render dc:title}}}"\n\
-                  ]\n\
-                ].\n\
-                [ a r2h:Matcher ;\n\
-                  r2h:triplePattern [\n\
-                    r2h:subject r2h:this;\n\
-                    r2h:predicate rdf:type;\n\
-                    r2h:object xsd:string\n\
-                  ];\n\
-                  r2h:renderer [ \n\
-                    r2h:context r2h:Default;\n\
-                    r2h:mustache "A String"\n\
-                  ]\n\
-                ].\n\
-                [ a r2h:Matcher ;\n\
-                  r2h:triplePattern [\n\
-                    r2h:subject r2h:this;\n\
-                    r2h:predicate rdf:type;\n\
-                    r2h:object xsd:integer\n\
-                  ];\n\
-                  r2h:renderer [ \n\
-                    r2h:context r2h:Default;\n\
-                    r2h:mustache "An Integer"\n\
-                  ]\n\
-                ].';
+      @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+      @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+      @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+      @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\
+      [ a r2h:renderer ;\n\
+          r2h:type rdfs:Resource;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache "The value: {{{:render rdf:value}}}, The title: {{{:render dc:title}}}"\n\
+      ].\n\
+      [ a r2h:renderer ;\n\
+          r2h:type rdf:type;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache "A String"\n\
+      ].\n\
+      [ a r2h:renderer ;\n\
+          r2h:type rdfs:Resource;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache "An Integer"\n\
+      ].';
       //mimeTypeUtil.parsers.parse('text/turtle', 
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
@@ -541,24 +517,20 @@ describe('RDF2h', function () {
       var renderingResult = new RDF2h(matchers).render(data, "http://example.org/");
       console.log("result: " + renderingResult);
       assert.equal("The value: An Integer, The title: A String", renderingResult);
-    });
+    }); */
 
     it('Once again but with a newline in data', function () {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 <http://example.org/> dc:title "\\nAn example".';
-      var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
-                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
-                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
-                [ a r2h:Matcher ;\n\
-                  r2h:triplePattern [\n\
-                    r2h:subject r2h:this;\n\
-                    r2h:predicate dc:title;\n\
-                  ];\n\
-                  r2h:renderer [ \n\
-                    r2h:context r2h:Default;\n\
-                    r2h:mustache "The title: {{dc:title}}"\n\
-                  ]\n\
-                ].';
+      var matchersTurtle = '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+      @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+      @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+      @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+      [ a r2h:renderer ;\n\
+          r2h:type rdfs:Resource;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache "The title: {{dc:title}}"\n\
+      ].';
       //mimeTypeUtil.parsers.parse('text/turtle', 
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
@@ -574,19 +546,15 @@ describe('RDF2h', function () {
     it('Once again but with a newline in renderer', function () {
       var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
                 <http://example.org/> dc:title "An example".';
-      var matchersTurtle = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
-                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
-                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
-                [ a r2h:Matcher ;\n\
-                  r2h:triplePattern [\n\
-                    r2h:subject r2h:this;\n\
-                    r2h:predicate dc:title;\n\
-                  ];\n\
-                  r2h:renderer [ \n\
-                    r2h:context r2h:Default;\n\
-                    r2h:mustache "The title: \\n{{dc:title}}"\n\
-                  ]\n\
-                ].';
+      var matchersTurtle = '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+      @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+      @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+      @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+      [ a r2h:renderer ;\n\
+          r2h:type rdfs:Resource;\n\
+          r2h:context r2h:Default;\n\
+          r2h:mustache "The title: \\n{{dc:title}}"\n\
+      ].';
       //mimeTypeUtil.parsers.parse('text/turtle', 
       RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
       var matchers = rdf.graph();
@@ -643,7 +611,6 @@ describe('RDF2h', function () {
       console.log("result: "+renderingResult);
       assert.equal("The title: \nAn example", renderingResult);
     });
-    */
     /*UNFINISHED: problem with rdflib turtle parser not supporting list syntax
     it('list rendering', function () {
       var dataTurtle = '@base <http://example.org/> .\n\
