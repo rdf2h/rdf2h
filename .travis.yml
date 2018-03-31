@@ -38,5 +38,5 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: bash .travis_publish
-    on:
-      tags: true
+#   on:
+#    tags: true
