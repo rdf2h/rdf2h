@@ -28,7 +28,7 @@ deploy:
       tags: true
   - provider: releases
     api_key: $GITHUB_TOKEN
-    file: output/js/rdf2h.js
+    file: distribution/latest/rdf2h.js
     on:
       tags: true
   - provider: script
