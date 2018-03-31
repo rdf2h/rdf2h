@@ -29,6 +29,10 @@ deploy:
   - provider: releases
     api_key:
       secure: "1tzocH0kAeIPMFMC8/zzknlUb26i93OPPJZ6OaWlhsU7e6ICKJErqhTID7i8wwlqmOrwjjrQd0h1z+4CPSTMdKfeoSu1Se9qg2MNFaHQWv7du463koS97b7H6IK32ZPgialEzMvPMcmdGxVDcfyU3Wb46AD/ohNukMlCtBIreMX7xJE5cmg8g0bPgSBo4vACaIrdf52Ez4HUIiYLgCuh+5+5gOdmXbIBJlamWEfrUHmBXuH18ewWJklY7HNkn4rgNjVQYfPQRTmOEsNnFLIe91U/HWEuCZGRRIgZxiv5ayMaRoVjUxYhxf0s4WhQTo6d+yEZUaG1lGDctSrj50YP9+/zsxJ9KiBz2Yqc/kGTpSnWGznVWduQbcdhUSCda9RnXfgV4sE54tvZRYmPH9gGIeANK2h/HZM8Njj7vOHY2BO+JyAXuVMnrsbiHbwI/xECEmVuLtYUqbc1/caFj6G1s2eaNgzEtHFUNL8ey82yTVrvg3qWOF5GSIBRLZl1SSmP+Lkf+tnZ2L9GoU3/E8vodPU9l0WWPFGaaxvaDaHqKYKYz8BAq9HCbNZVSVwcN1nWGlk5l0+8B02kbqlMWd+rjje9D/u73KzwolVLXHwRSUoh49b66hqdv1+NvVdEiIZDQ4DdkVvqkBrmynmDxe/Ez1Htrxsq6+k/MgDXM/mkntc="
-    file: dist/rdf2h.js
+    file: output/js/rdf2h.js
+    on:
+      tags: true
+  - provider: script
+    script: bash .travis_publish
     on:
       tags: true

@@ -12,13 +12,13 @@
   },
   "scripts": {
     "test": "node_modules/.bin/mocha",
-    "start": "webpack-dev-server --hot --inline --content-base static",
-    "build": "ncp static/ output/ && webpack -p"
+    "build": "cross-var \"webpack -p && ncp distribution/latest distribution/$npm_package_version\""
   },
   "devDependencies": {
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
     "html-webpack-plugin": "^3.0.6",
+    "cross-var": "^1.1.0",
     "mocha": "^2.3.3",
     "ncp": "^2.0.0",
     "uglifyjs-webpack-plugin": "^1.2.4",

@@ -6,11 +6,11 @@ const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 module.exports = {
    entry: path.resolve(__dirname, 'src', 'rdf2h.js'),
    output: {
-      path: path.resolve(__dirname, 'output'),
-      filename: 'js/rdf2h.js',
+      path: path.resolve(__dirname, 'distribution', 'latest'),
+      filename: 'rdf2h.js',
       libraryTarget: 'var',
       library: 'rdf2h'
-   }
+   },
    module: {
       rules: [
          {
@@ -26,7 +26,7 @@ module.exports = {
    externals: {
      'node-fetch': 'fetch',
      'xmldom': 'window',
-     'rdflib': "$rdf"
+     'ext-rdflib': "$rdf"
    },
    devtool: 'source-map',
    plugins: [
