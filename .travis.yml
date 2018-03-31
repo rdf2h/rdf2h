@@ -15,10 +15,12 @@ before_install:
   - export PATH=$HOME/.yarn/bin:$PATH
 cache:
   yarn: true
+script:
+  - yarn test
+  - yarn build
 branches:
-  only: 
+  except: 
     - gh-pages
-    - /.*/ 
 deploy:
   - provider: npm
     skip_cleanup: true
