@@ -4054,7 +4054,7 @@ rdf-sink@^1.0.0:
     rdf-ext "^1.1.0"
     readable-stream "^2.3.5"
 
-rdfgraphnode-rdfext@^1.2.3:
+rdfgraphnode-rdfext@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/rdfgraphnode-rdfext/-/rdfgraphnode-rdfext-1.2.4.tgz#0ef88ee6c8d9e245bfd3a832506c4976354a390b"
   dependencies:

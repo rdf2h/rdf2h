@@ -8,7 +8,7 @@
   "dependencies": {
     "ext-rdflib": "^0.0.2",
     "mustache": "*",
-    "rdfgraphnode-rdfext": "^1.2.3"
+    "rdfgraphnode-rdfext": "^1.2.4"
   },
   "scripts": {
     "test": "node_modules/.bin/mocha",
