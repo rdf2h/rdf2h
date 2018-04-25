@@ -3,8 +3,7 @@ RDF2h [![Build Status](https://travis-ci.org/rdf2h/rdf2h.svg)](https://travis-ci
 
 RDF2h is a tool for rendering RDF resources using mustache templates.
 
-<a href="http://rdf2h.github.io/rdf2h">Try it out online</a> and read the 
-<a href="http://rdf2h.github.io/rdf2h/manual.html">manual</a> to learn 
+<a href="https://rdf2h.github.io/rdf2h-documentation/">Try it out online and read the manual</a> to learn 
 more.
 
 Install:
