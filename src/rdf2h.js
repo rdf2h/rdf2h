@@ -5,15 +5,18 @@ var vocab = require("./vocab.js");
 var NodeSet = new Array();
 
 
-function RDF2h(rendererGraph, tbox) {
+function RDF2h(rendererGraphs, tbox) {
     function r2h(suffix) {
         return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
     }
-    this.rendererGraph = rendererGraph;
+    if (!Array.isArray(rendererGraphs)) {
+        rendererGraphs = [rendererGraphs];
+    }
+    this.rendererGraphs = rendererGraphs;
     if (tbox) {
         this.tbox = tbox;
     } else {
-        this.tbox = rendererGraph;
+        this.tbox = rendererGraphs[0];
     }
     this.env = {}; //this is to allow shared vars among renderers
 }
@@ -256,14 +259,20 @@ RDF2h.prototype.getRenderer = function (renderee) {
             ).concat([vocab.rdfs("Resource")]);
         }        
     }
+    let self = this;
     function getMatchingRenderer(types, context) {
         function getMatching(renderers) {
             return renderers.find(renderer => context.equals(renderer.out(vocab.rdf2h("context")).node));
         }
-        return [false].concat(types).reduce((renderer, type) => 
-            renderer ? renderer : getMatching(type.in(vocab.rdf2h("type")).split()));
+        let reverseGraphs = self.rendererGraphs.reverse();
+        return types.reduce((renderer, type) => {
+            return renderer ? renderer : reverseGraphs.reduce((renderer, graph) => {
+                type =  GraphNode(type, graph);
+                return renderer ? renderer : getMatching(type.in(vocab.rdf2h("type")).split());
+            }, null);
+        }, null);
     }
-    let types = getTypes(renderee.graphNode).map(t => GraphNode(t, this.rendererGraph));
+    let types = getTypes(renderee.graphNode);
     let renderer = getMatchingRenderer(types, renderee.context);
     if (!renderer) {
         throw Error("No renderer found with context: <"+renderee.context.value+"> for any of the types "+types.map(t => "<"+t.value+">").join()
