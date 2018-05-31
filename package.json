@@ -6,9 +6,9 @@
   "main": "src/rdf2h.js",
   "homepage": "http://rdf2h.github.io/rdf2h/",
   "dependencies": {
-    "ext-rdflib": "^0.1.1",
+    "ext-rdflib": "^0.2.0",
     "mustache": "^2.3.0",
-    "rdfgraphnode-rdfext": "^1.3.1"
+    "rdfgraphnode-rdfext": "^1.4.0"
   },
   "scripts": {
     "test": "node_modules/.bin/mocha",
