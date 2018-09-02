@@ -666,6 +666,72 @@ describe('RDF2h', function () {
       });
     });
 
+    it('Delegation with multiple renderer graphs', function (done) {
+      var dataTurtle = '@prefix dc: <http://dublincore.org/2012/06/14/dcelements#>. \n\
+                @prefix schema: <http://schema.org/>. \n\
+                <http://example.org/> dc:title "An example". \n\
+                <http://example.org/> a schema:Article .';
+      var renderersTurtle1 = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+                @prefix schema: <http://schema.org/>. \n\
+                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+                [ a r2h:Renderer; \n\
+                  r2h:type rdfs:Resource;\n\
+                  r2h:context r2h:Tail;\n\
+                  r2h:mustache "Wrong Tail"\n\
+                ].';
+      var renderersTurtle2 = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+                @prefix schema: <http://schema.org/>. \n\
+                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+                [ a r2h:Renderer; \n\
+                  r2h:type rdfs:Resource;\n\
+                  r2h:context r2h:Default;\n\
+                  r2h:mustache "This must not be chosen"\n\
+                ].\n\
+                [ a r2h:Renderer; \n\
+                  r2h:type schema:Article;\n\
+                  r2h:context r2h:Generic;\n\
+                  r2h:mustache "{{{@prefix r2h: <http://rdf2h.github.io/2015/rdf2h#>}}}And Back -> {{{:render . r2h:Tail}}}"\n\
+                ].';
+        var renderersTurtle3 = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n\
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n\
+                @prefix r2h: <http://rdf2h.github.io/2015/rdf2h#> .\n\
+                @prefix schema: <http://schema.org/>. \n\
+                @prefix dc: <http://dublincore.org/2012/06/14/dcelements#>.\n\
+                [ a r2h:Renderer; \n\
+                  r2h:type rdfs:Resource;\n\
+                  r2h:context r2h:Tail;\n\
+                  r2h:mustache "Right Tail"\n\
+                ].\n\
+                [ a r2h:Renderer; \n\
+                  r2h:type schema:Article;\n\
+                  r2h:context r2h:Default;\n\
+                  r2h:mustache "{{{@prefix r2h: <http://rdf2h.github.io/2015/rdf2h#>}}}Article -> {{{:render . r2h:Generic}}}"\n\
+                ].';
+      RDF2h.prefixMap['dc'] = "http://dublincore.org/2012/06/14/dcelements#";
+      var rendererGraphs = new Array();
+      rendererGraphs[0] = rdf.graph();
+      rdf.parse(renderersTurtle1, rendererGraphs[0], "http://example.org/renderers/", "text/turtle", () => {
+        rendererGraphs[1] = rdf.graph();
+        rdf.parse(renderersTurtle2, rendererGraphs[1], "http://example.org/renderers/", "text/turtle", () => {
+          rendererGraphs[2] = rdf.graph();
+          rdf.parse(renderersTurtle3, rendererGraphs[2], "http://example.org/renderers/", "text/turtle", () => {
+            var data = rdf.graph();
+            rdf.parse(dataTurtle, data, "http://example.org/data", "text/turtle", () => {
+              var renderingResult = new RDF2h(rendererGraphs).render(data, "http://example.org/");
+              console.log("result: " + renderingResult);
+              assert.equal("Article -> And Back -> Right Tail", renderingResult);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+
 
     /*UNFINISHED: problem with rdflib turtle parser not supporting list syntax
     it('list rendering', function () {
