@@ -731,7 +731,26 @@ describe('RDF2h', function () {
       });
     });
 
-
+/* Testing with resources from the web, commented out not to depend on stability of URIs
+    it('Test with remote resources', function (done) {
+      let rendererGraphUris = new Array();
+      rendererGraphUris[0] = "https://rdf2h.github.io/renderers/0.0.2/fallback-renderers.ttl";
+      rendererGraphUris[1] = "https://rawgit.com/rdf2h/renderers/master/schema-org-renderers.ttl";
+      rendererGraphUris[2] = "https://farewellutopia.com/renderers.ttl";
+      let graphPromises = ["https://farewellutopia.com/schema-article-term.ttl"]
+        .concat(rendererGraphUris).map(uri =>
+          rdf.rdfFetch(uri).then(r => r.graph())
+        );
+      Promise.all(graphPromises).then(graphs => {
+        let data = graphs.shift();
+        let rendererGraphs = graphs;
+        let renderingResult = new RDF2h(rendererGraphs).render(data, "https://farewellutopia.com/schema-article-term");
+        console.log("result: " + renderingResult);
+        assert(renderingResult.indexOf("See also") > 0);
+        done();
+      });
+    });
+*/
 
     /*UNFINISHED: problem with rdflib turtle parser not supporting list syntax
     it('list rendering', function () {
