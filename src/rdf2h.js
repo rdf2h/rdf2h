@@ -12,12 +12,12 @@ function RDF2h(rendererGraphs, tbox) {
     if (!Array.isArray(rendererGraphs)) {
         rendererGraphs = [rendererGraphs];
     }
-    this.rendererGraphs = rendererGraphs;
     if (tbox) {
         this.tbox = tbox;
     } else {
         this.tbox = rendererGraphs[0];
     }
+    this.rendererGraphs = rendererGraphs.reverse();
     this.env = {}; //this is to allow shared vars among renderers
 }
 
@@ -264,7 +264,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
         function getMatching(renderers) {
             return renderers.find(renderer => context.equals(renderer.out(vocab.rdf2h("context")).node));
         }
-        let reverseGraphs = self.rendererGraphs.reverse();
+        let reverseGraphs = self.rendererGraphs;
         return types.reduce((renderer, type) => {
             return renderer ? renderer : reverseGraphs.reduce((renderer, graph) => {
                 type =  GraphNode(type, graph);
