@@ -2003,9 +2003,9 @@ expand-tilde@^2.0.0, expand-tilde@^2.0.2:
   dependencies:
     homedir-polyfill "^1.0.1"
 
-ext-rdflib@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/ext-rdflib/-/ext-rdflib-0.2.0.tgz#5b8debede4bbfbc1fbe2aebbd09d8560541ac798"
+ext-rdflib@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/ext-rdflib/-/ext-rdflib-0.2.2.tgz#3fb9a6cd7182cfd6698d2d6b00226843b63ef16b"
   dependencies:
     node-fetch "^1.7.3"
     rdf-ext "^1.1.0"
@@ -3555,6 +3555,10 @@ node-fetch@^1.7.3:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
+node-fetch@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.2.0.tgz#4ee79bde909262f9775f731e3656d0db55ced5b5"
+
 node-forge@^0.7.1:
   version "0.7.5"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.7.5.tgz#6c152c345ce11c52f465c2abd957e8639cd674df"
@@ -4192,12 +4196,12 @@ rdf-sink@^1.0.0:
     rdf-ext "^1.1.0"
     readable-stream "^2.3.5"
 
-rdfgraphnode-rdfext@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/rdfgraphnode-rdfext/-/rdfgraphnode-rdfext-1.4.0.tgz#5d577e359b8d462f8bfb3111952ff257a7f68836"
+rdfgraphnode-rdfext@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/rdfgraphnode-rdfext/-/rdfgraphnode-rdfext-1.4.2.tgz#ffae3a0e9b86c71efd55dbac2217aaf7d51c5c5e"
   dependencies:
-    ext-rdflib "^0.2.0"
-    node-fetch "^1.7.3"
+    ext-rdflib "^0.2.2"
+    node-fetch "^2.2.0"
 
 read-chunk@^2.1.0:
   version "2.1.0"
