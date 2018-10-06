@@ -2,6 +2,13 @@
 # yarn lockfile v1
 
 
+"@factsmission/rdfa-parser@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@factsmission/rdfa-parser/-/rdfa-parser-0.0.6.tgz#167501cdcb17507debb492cb2dad25b042b48a3f"
+  dependencies:
+    "@nleanba/ndjs" "^1.0.2"
+    "@rdfjs/data-model" "^1.1.0"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -9,9 +16,59 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
+"@nleanba/ndjs@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@nleanba/ndjs/-/ndjs-1.0.2.tgz#cbaa12c44e9d457f782e300a1d1d8feefd60ea0d"
+
 "@nodelib/fs.stat@^1.0.1":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.0.tgz#50c1e2260ac0ed9439a181de3725a0168d59c48a"
+
+"@rdfjs/data-model@^1.0.1", "@rdfjs/data-model@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@rdfjs/data-model/-/data-model-1.1.0.tgz#15d9c5b7b8166893696565aefb65bad95da3fd99"
+
+"@rdfjs/parser-jsonld@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@rdfjs/parser-jsonld/-/parser-jsonld-1.1.1.tgz#adfc0666335bc50a5d79f4ed7a9fbd7c30fda8a9"
+  dependencies:
+    "@rdfjs/data-model" "^1.0.1"
+    "@rdfjs/sink" "^1.0.2"
+    concat-stream "^1.6.2"
+    jsonld "^1.0.2"
+    readable-stream "^2.3.6"
+
+"@rdfjs/parser-n3@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@rdfjs/parser-n3/-/parser-n3-1.1.2.tgz#0f6cd61af53007a9081f67e1620c7329342ec8f6"
+  dependencies:
+    "@rdfjs/data-model" "^1.0.1"
+    "@rdfjs/sink" "^1.0.2"
+    n3 "^1.0.0-beta.1"
+    readable-stream "^2.3.6"
+
+"@rdfjs/serializer-jsonld@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@rdfjs/serializer-jsonld/-/serializer-jsonld-1.1.3.tgz#f42b3a1b97b270e39d83a7bc111f4b7b8353160e"
+  dependencies:
+    "@rdfjs/sink" "^1.0.2"
+    readable-stream "^2.3.6"
+
+"@rdfjs/serializer-ntriples@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@rdfjs/serializer-ntriples/-/serializer-ntriples-1.0.1.tgz#3be0aa826e5d7a12b5182a8ece2b58da836396f7"
+  dependencies:
+    "@rdfjs/sink" "^1.0.2"
+    "@rdfjs/to-ntriples" "^1.0.0"
+    readable-stream "^2.3.6"
+
+"@rdfjs/sink@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@rdfjs/sink/-/sink-1.0.2.tgz#81a77509682d5759d107e63ee5d4b48c53bf2992"
+
+"@rdfjs/to-ntriples@^1.0.0", "@rdfjs/to-ntriples@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@rdfjs/to-ntriples/-/to-ntriples-1.0.1.tgz#53e768b3883a196801583c62d163af3f1b16484c"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
@@ -1050,7 +1107,7 @@ bindings@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.3.0.tgz#b346f6ecf6a95f5a815c5839fc7cdb22502f1ed7"
 
-bluebird@^3.5.0, bluebird@^3.5.1:
+bluebird@^3.5.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
@@ -1466,7 +1523,7 @@ concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
 
-concat-stream@^1.5.0, concat-stream@^1.5.1:
+concat-stream@^1.5.0, concat-stream@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.6.2.tgz#904bdf194cd3122fc675c77fc4ac3d4ff0fd1a34"
   dependencies:
@@ -1840,12 +1897,6 @@ emojis-list@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-2.1.0.tgz#4daa4d9db00f9819880c79fa457ae5b09a1fd389"
 
-encoding@^0.1.11:
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/encoding/-/encoding-0.1.12.tgz#538b66f3ee62cd1ab51ec323829d1f9480c74beb"
-  dependencies:
-    iconv-lite "~0.4.13"
-
 end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/end-of-stream/-/end-of-stream-1.4.1.tgz#ed29634d19baba463b6ce6b80a37213eab71ec43"
@@ -1904,10 +1955,6 @@ es-to-primitive@^1.1.1:
     is-callable "^1.1.1"
     is-date-object "^1.0.1"
     is-symbol "^1.0.1"
-
-es6-promise@^2.0.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-2.3.0.tgz#96edb9f2fdb01995822b263dd8aadab6748181bc"
 
 escape-string-regexp@1.0.2:
   version "1.0.2"
@@ -2003,14 +2050,21 @@ expand-tilde@^2.0.0, expand-tilde@^2.0.2:
   dependencies:
     homedir-polyfill "^1.0.1"
 
-ext-rdflib@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/ext-rdflib/-/ext-rdflib-0.2.2.tgz#3fb9a6cd7182cfd6698d2d6b00226843b63ef16b"
+ext-rdflib@^0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/ext-rdflib/-/ext-rdflib-0.3.4.tgz#4a4ef680407996849349c15a14ed4f7f94406a02"
   dependencies:
-    node-fetch "^1.7.3"
-    rdf-ext "^1.1.0"
-    rdf-formats-common "^1.4.0"
-    string-to-stream "^1.1.0"
+    "@factsmission/rdfa-parser" "^0.0.6"
+    "@rdfjs/data-model" "^1.1.0"
+    "@rdfjs/parser-jsonld" "^1.1.1"
+    "@rdfjs/parser-n3" "^1.1.2"
+    "@rdfjs/serializer-jsonld" "^1.1.3"
+    "@rdfjs/serializer-ntriples" "^1.0.1"
+    node-fetch "^2.2.0"
+    rdf-data-model "^1.0.0"
+    rdf-ext "^1.1.2"
+    string-to-stream "^1.1.1"
+    xmldom "^0.1.27"
 
 extend-shallow@^2.0.1:
   version "2.0.1"
@@ -2569,7 +2623,7 @@ https-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
 
-iconv-lite@^0.4.17, iconv-lite@^0.4.4, iconv-lite@~0.4.13:
+iconv-lite@^0.4.17, iconv-lite@^0.4.4:
   version "0.4.23"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.23.tgz#297871f63be507adcfbfca715d0cd0eed84e9a63"
   dependencies:
@@ -2876,7 +2930,7 @@ is-scoped@^1.0.0:
   dependencies:
     scoped-regex "^1.0.0"
 
-is-stream@^1.0.0, is-stream@^1.0.1, is-stream@^1.1.0:
+is-stream@^1.0.0, is-stream@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
 
@@ -3028,18 +3082,9 @@ json5@^0.5.0, json5@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
 
-jsonld@^0.4.11:
-  version "0.4.12"
-  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-0.4.12.tgz#a02f205d5341414df1b6d8414f1b967a712073e8"
-  dependencies:
-    es6-promise "^2.0.0"
-    pkginfo "~0.4.0"
-    request "^2.61.0"
-    xmldom "0.1.19"
-
-jsonld@^1.0.1:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-1.0.2.tgz#c08118a4fa4a8457bf98891653ed1f1613eb6152"
+jsonld@^1.0.2:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/jsonld/-/jsonld-1.1.0.tgz#afcb168c44557a7bddead4d4513c3cbcae3bc5b9"
   dependencies:
     rdf-canonize "^0.2.1"
     request "^2.83.0"
@@ -3493,9 +3538,9 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-n3@^0.11.2:
-  version "0.11.3"
-  resolved "https://registry.yarnpkg.com/n3/-/n3-0.11.3.tgz#8e587495240dd21408c2c3aae385ec1651a837f8"
+n3@^1.0.0-beta.1:
+  version "1.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/n3/-/n3-1.0.0-beta.2.tgz#fc5cce503fce06048cbc1cd804ba086f2f643a41"
 
 nan@^2.10.0, nan@^2.9.2:
   version "2.10.0"
@@ -3547,13 +3592,6 @@ no-case@^2.2.0:
 node-dir@0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/node-dir/-/node-dir-0.1.8.tgz#55fb8deb699070707fb67f91a460f0448294c77d"
-
-node-fetch@^1.7.3:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-1.7.3.tgz#980f6f72d85211a5347c6b2bc18c5b84c3eb47ef"
-  dependencies:
-    encoding "^0.1.11"
-    is-stream "^1.0.1"
 
 node-fetch@^2.2.0:
   version "2.2.0"
@@ -3959,10 +3997,6 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-pkginfo@~0.4.0:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/pkginfo/-/pkginfo-0.4.1.tgz#b5418ef0439de5425fc4995042dced14fb2a84ff"
-
 posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
@@ -4124,83 +4158,24 @@ rdf-dataset-simple@^1.0.0:
   dependencies:
     readable-stream "^2.2.9"
 
-rdf-ext@^1.0.0, rdf-ext@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/rdf-ext/-/rdf-ext-1.1.0.tgz#1baf035568f981579f98aff3a17bff9b1bde5aa3"
+rdf-ext@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/rdf-ext/-/rdf-ext-1.1.2.tgz#8c7553d2666d884407377c8b6fd43c9b2fdc0cf5"
   dependencies:
-    rdf-data-model "^1.0.0"
+    "@rdfjs/data-model" "^1.1.0"
+    "@rdfjs/to-ntriples" "^1.0.1"
     rdf-dataset-simple "^1.0.0"
     rdf-normalize "^1.0.0"
-
-rdf-formats-common@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/rdf-formats-common/-/rdf-formats-common-1.4.0.tgz#d911c60bff32912b584333565209534a06845c2a"
-  dependencies:
-    rdf-ext "^1.0.0"
-    rdf-parser-jsonld "^1.0.0"
-    rdf-parser-n3 "^1.0.0"
-    rdf-serializer-jsonld-ext "^1.0.0"
-    rdf-serializer-ntriples "^1.0.0"
 
 rdf-normalize@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/rdf-normalize/-/rdf-normalize-1.0.0.tgz#53496baf362cce9d9fca1f2216c6c30007f99cca"
 
-rdf-parser-jsonld@^1.0.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/rdf-parser-jsonld/-/rdf-parser-jsonld-1.1.0.tgz#d93a271d9a9e34b60cd95a0209525ff8018bada2"
+rdfgraphnode-rdfext@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/rdfgraphnode-rdfext/-/rdfgraphnode-rdfext-1.5.0.tgz#fd9eee4a930aaed60ba83b2929f2f966f0d91ecf"
   dependencies:
-    concat-stream "^1.5.1"
-    jsonld "^0.4.11"
-    rdf-data-model "^1.0.0"
-    rdf-sink "^1.0.0"
-    readable-stream "^2.2.9"
-
-rdf-parser-n3@^1.0.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/rdf-parser-n3/-/rdf-parser-n3-1.1.1.tgz#af748c6031676e245f21d84ddf0d21623cee7650"
-  dependencies:
-    n3 "^0.11.2"
-    rdf-data-model "^1.0.0"
-    rdf-sink "^1.0.0"
-    readable-stream "^2.2.9"
-
-rdf-serializer-jsonld-ext@^1.0.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/rdf-serializer-jsonld-ext/-/rdf-serializer-jsonld-ext-1.4.0.tgz#f4b2e34503cc64c4633917b22c784eabed5c2de4"
-  dependencies:
-    bluebird "^3.5.0"
-    jsonld "^1.0.1"
-    rdf-serializer-jsonld "^1.1.2"
-    rdf-sink "^1.0.0"
-    readable-stream "^2.2.9"
-
-rdf-serializer-jsonld@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/rdf-serializer-jsonld/-/rdf-serializer-jsonld-1.1.2.tgz#cca2f378d574e83a808816a2543efc66805036f2"
-  dependencies:
-    rdf-sink "^1.0.0"
-    readable-stream "^2.2.6"
-
-rdf-serializer-ntriples@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/rdf-serializer-ntriples/-/rdf-serializer-ntriples-1.0.0.tgz#5e66d7c990a94ea2bdf8291781d4960137faf315"
-  dependencies:
-    rdf-sink "^1.0.0"
-    readable-stream "^2.2.6"
-
-rdf-sink@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/rdf-sink/-/rdf-sink-1.0.1.tgz#e82f760233165f1cc7c58e55a1c6345644b31d78"
-  dependencies:
-    rdf-ext "^1.1.0"
-    readable-stream "^2.3.5"
-
-rdfgraphnode-rdfext@^1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/rdfgraphnode-rdfext/-/rdfgraphnode-rdfext-1.4.2.tgz#ffae3a0e9b86c71efd55dbac2217aaf7d51c5c5e"
-  dependencies:
-    ext-rdflib "^0.2.2"
+    ext-rdflib "^0.3.4"
     node-fetch "^2.2.0"
 
 read-chunk@^2.1.0:
@@ -4225,7 +4200,7 @@ read-pkg@^3.0.0:
     normalize-package-data "^2.3.2"
     path-type "^3.0.0"
 
-"readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.4, readable-stream@^2.0.6, readable-stream@^2.1.0, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.2.6, readable-stream@^2.2.9, readable-stream@^2.3.3, readable-stream@^2.3.5, readable-stream@^2.3.6:
+"readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.4, readable-stream@^2.0.6, readable-stream@^2.1.0, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.2.9, readable-stream@^2.3.3, readable-stream@^2.3.5, readable-stream@^2.3.6:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.6.tgz#b11c27d88b8ff1fbe070643cf94b0c79ae1b0aaf"
   dependencies:
@@ -4367,7 +4342,7 @@ replace-ext@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/replace-ext/-/replace-ext-1.0.0.tgz#de63128373fcbf7c3ccfa4de5a480c45a67958eb"
 
-request@^2.61.0, request@^2.83.0:
+request@^2.83.0:
   version "2.87.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.87.0.tgz#32f00235cd08d482b4d0d68db93a829c0ed5756e"
   dependencies:
@@ -4760,7 +4735,7 @@ string-template@~0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/string-template/-/string-template-0.2.1.tgz#42932e598a352d01fc22ec3367d9d84eec6c9add"
 
-string-to-stream@^1.1.0:
+string-to-stream@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/string-to-stream/-/string-to-stream-1.1.1.tgz#aba78f73e70661b130ee3e1c0192be4fef6cb599"
   dependencies:
@@ -5302,6 +5277,10 @@ write-file-atomic@^1.2.0:
 xmldom@0.1.19:
   version "0.1.19"
   resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.19.tgz#631fc07776efd84118bf25171b37ed4d075a0abc"
+
+xmldom@^0.1.27:
+  version "0.1.27"
+  resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.27.tgz#d501f97b3bdb403af8ef9ecc20573187aadac0e9"
 
 xtend@^4.0.0, xtend@~4.0.0, xtend@~4.0.1:
   version "4.0.1"
