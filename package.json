@@ -15,15 +15,19 @@
     "build": "cross-var \"webpack -p && ncp distribution/latest distribution/$npm_package_version\""
   },
   "devDependencies": {
-    "babel-loader": "^7.1.4",
-    "babel-preset-env": "^1.6.1",
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.5.0",
+    "@babel/preset-env": "^7.5.0",
+    "@babel/register": "^7.4.4",
+    "babel-loader": "^8.0.6",
     "cross-var": "^1.1.0",
     "html-webpack-plugin": "^3.0.6",
     "mocha": "^2.3.3",
     "ncp": "^2.0.0",
-    "uglifyjs-webpack-plugin": "^1.2.4",
-    "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.11"
+    "uglifyjs-webpack-plugin": "^2.1.3",
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.5",
+    "webpack-dev-server": "^3.7.2"
   },
   "license": "Apache-2.0",
   "repository": "https://github.com/rdf2h/rdf2h.git"
