@@ -3,7 +3,7 @@
   "version": "2.1.4",
   "author": "Reto Gmür",
   "description": "Library to render RDF resources.",
-  "main": "src/rdf2h.js",
+  "main": "lib/rdf2h.js",
   "homepage": "http://rdf2h.github.io/rdf2h/",
   "dependencies": {
     "ext-rdflib": "^0.4.2",
@@ -11,6 +11,7 @@
     "rdfgraphnode-rdfext": "^1.6.0"
   },
   "scripts": {
+    "prepublishOnly": "yarn && babel --no-babelrc src --out-dir lib -s --presets=@babel/preset-env",
     "test": "node_modules/.bin/mocha",
     "build": "cross-var \"webpack -p && ncp distribution/latest distribution/$npm_package_version\""
   },
