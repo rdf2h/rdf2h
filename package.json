@@ -7,7 +7,7 @@
   "homepage": "http://rdf2h.github.io/rdf2h/",
   "dependencies": {
     "ext-rdflib": "^0.4.2",
-    "mustache": "^2.3.0",
+    "mustache": "^3.0.1",
     "rdfgraphnode-rdfext": "^1.6.0"
   },
   "scripts": {
