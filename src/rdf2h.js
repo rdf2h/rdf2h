@@ -267,8 +267,8 @@ RDF2h.prototype.getRenderer = function (renderee) {
         let reverseGraphs = self.rendererGraphs;
         return types.reduce((renderer, type) => {
             return renderer ? renderer : reverseGraphs.reduce((renderer, graph) => {
-                type =  GraphNode(type, graph);
-                return renderer ? renderer : getMatching(type.in(vocab.rdf2h("type")).split());
+                let typeGN =  GraphNode(type, graph);
+                return renderer ? renderer : getMatching(typeGN.in(vocab.rdf2h("type")).split());
             }, null);
         }, null);
     }
