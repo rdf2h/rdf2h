@@ -1,9 +1,8 @@
 import { equal, throws } from 'assert';
-import RDF2h, { prefixMap } from '../src/rdf2h.js';
+import RDF2h from '../src/rdf2h.js';
 import { graph, parse } from 'ext-rdflib';
-//var N3Parser = require('rdf-parser-n3');
-//var clownface = require('clownface');
-//var mimeTypeUtil = require('rdf-mime-type-util');
+
+const prefixMap = RDF2h.prefixMap;
 
 describe('RDF2h', function () {
   describe('#render()', function () {

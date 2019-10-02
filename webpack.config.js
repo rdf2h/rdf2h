@@ -8,8 +8,9 @@ module.exports = {
    output: {
       path: path.resolve(__dirname, 'distribution', 'latest'),
       filename: 'rdf2h.js',
-      libraryTarget: 'var',
-      library: 'rdf2h'
+      libraryTarget: 'umd',
+      libraryExport: "default",
+      library:'rdf2h'
    },
    module: {
       rules: [

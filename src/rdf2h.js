@@ -350,10 +350,4 @@ RDF2h.resolveCurie = function (curie) {
 
 };
 
-if (typeof window !== 'undefined') {
-    window.RDF2h = RDF2h;
-}
-
-if (typeof module !== 'undefined') {
-    module.exports = RDF2h;
-}
+export default RDF2h;
