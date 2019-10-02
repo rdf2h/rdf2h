@@ -6,29 +6,29 @@
   "main": "lib/rdf2h.js",
   "homepage": "http://rdf2h.github.io/rdf2h/",
   "dependencies": {
-    "ext-rdflib": "^0.4.2",
-    "mustache": "^3.0.1",
-    "rdfgraphnode-rdfext": "^1.6.0"
+    "ext-rdflib": "^0.5.2",
+    "mustache": "^3.1.0",
+    "rdfgraphnode-rdfext": "^1.6.1"
   },
   "scripts": {
     "prepublishOnly": "npm i && babel --no-babelrc src --out-dir lib -s --presets=@babel/preset-env",
-    "test": "node_modules/.bin/mocha",
+    "test": "node_modules/.bin/mocha --require @babel/register",
     "build": "cross-var \"webpack -p && ncp distribution/latest distribution/$npm_package_version\""
   },
   "devDependencies": {
-    "@babel/cli": "^7.5.0",
-    "@babel/core": "^7.5.0",
-    "@babel/preset-env": "^7.5.0",
-    "@babel/register": "^7.4.4",
+    "@babel/cli": "^7.6.2",
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "@babel/register": "^7.6.2",
     "babel-loader": "^8.0.6",
     "cross-var": "^1.1.0",
     "html-webpack-plugin": "^3.2.0",
-    "mocha": "^6.1.4",
+    "mocha": "^6.2.1",
     "ncp": "^2.0.0",
-    "uglifyjs-webpack-plugin": "^2.1.3",
-    "webpack": "^4.35.2",
-    "webpack-cli": "^3.3.5",
-    "webpack-dev-server": "^3.7.2"
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.1"
   },
   "license": "Apache-2.0",
   "repository": "https://github.com/rdf2h/rdf2h.git"

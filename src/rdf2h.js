@@ -1,13 +1,13 @@
-var rdf = require("ext-rdflib");
-var GraphNode = require("rdfgraphnode-rdfext");
-var Mustache = require("mustache");
-var vocab = require("./vocab.js");
+import rdf, { sym, literal } from "ext-rdflib";
+import GraphNode from "rdfgraphnode-rdfext";
+import { Context, render as _render } from "mustache";
+import { rdf2h as _rdf2h, rdf as _rdf, rdfs } from "./vocab.js";
 var NodeSet = new Array();
 
 
 function RDF2h(rendererGraphs, tbox) {
     function r2h(suffix) {
-        return rdf.sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
+        return sym("http://rdf2h.github.io/2015/rdf2h#"+suffix);
     }
     if (!Array.isArray(rendererGraphs)) {
         rendererGraphs = [rendererGraphs];
@@ -23,9 +23,9 @@ function RDF2h(rendererGraphs, tbox) {
 
 
 (function () {
-    var r2h = vocab.rdf2h;
-    var origLokup = Mustache.Context.prototype.lookup;
-    Mustache.Context.prototype.lookup = function (name) {
+    var r2h = _rdf2h;
+    var origLokup = Context.prototype.lookup;
+    Context.prototype.lookup = function (name) {
         if (this.view instanceof RDF2h.Renderee) {
             var rdf2h = this.view.rdf2h;
             var graphNode = this.view.graphNode;
@@ -199,7 +199,7 @@ RDF2h.Renderee.prototype.toString = function () {
 }
 
 RDF2h.prototype.getRenderer = function (renderee) {
-    var r2h = vocab.rdf2h;
+    var r2h = _rdf2h;
     let tbox = this.tbox;
     function matchesContext(cfRenderer) {
         var contexts = cfRenderer.out(r2h("context")).nodes;
@@ -227,7 +227,7 @@ RDF2h.prototype.getRenderer = function (renderee) {
     }
     function rendererRenderer(renderer) {
         return function (renderee) {
-            return Mustache.render(renderer, renderee);
+            return _render(renderer, renderee);
         };
     }
     function getTypes(graphNode) {
@@ -235,19 +235,19 @@ RDF2h.prototype.getRenderer = function (renderee) {
         if (graphNode.node.termType === "Literal") {
             return [graphNode.node.datatype];
         } else {
-            return graphNode.out(vocab.rdf("type")).nodes.sort(
+            return graphNode.out(_rdf("type")).nodes.sort(
                 (a,b) => {
                     if (a.equals(b)) {
                         return 0;
                     }
-                    if (a.equals(vocab.rdfs("Resource"))) {
+                    if (a.equals(rdfs("Resource"))) {
                         return 1;
                     }
-                    if (b.equals(vocab.rdfs("Resource"))) {
+                    if (b.equals(rdfs("Resource"))) {
                         return -1;
                     }
-                    if (tbox.match(a, vocab.rdfs("subClassOf"),b).length === 0) {
-                        if (tbox.match(b, vocab.rdfs("subClassOf"),a).length === 0) {
+                    if (tbox.match(a, rdfs("subClassOf"),b).length === 0) {
+                        if (tbox.match(b, rdfs("subClassOf"),a).length === 0) {
                             return a.value.localeCompare(b.value);
                         } else {
                             return 1;
@@ -256,19 +256,19 @@ RDF2h.prototype.getRenderer = function (renderee) {
                         return -1;
                     }
                 }
-            ).concat([vocab.rdfs("Resource")]);
+            ).concat([rdfs("Resource")]);
         }        
     }
     let self = this;
     function getMatchingRenderer(types, context) {
         function getMatching(renderers) {
-            return renderers.find(renderer => context.equals(renderer.out(vocab.rdf2h("context")).node));
+            return renderers.find(renderer => context.equals(renderer.out(_rdf2h("context")).node));
         }
         let reverseGraphs = self.rendererGraphs;
         return types.reduce((renderer, type) => {
             return renderer ? renderer : reverseGraphs.reduce((renderer, graph) => {
                 let typeGN =  GraphNode(type, graph);
-                return renderer ? renderer : getMatching(typeGN.in(vocab.rdf2h("type")).split());
+                return renderer ? renderer : getMatching(typeGN.in(_rdf2h("type")).split());
             }, null);
         }, null);
     }
@@ -278,11 +278,11 @@ RDF2h.prototype.getRenderer = function (renderee) {
         throw Error("No renderer found with context: <"+renderee.context.value+"> for any of the types "+types.map(t => "<"+t.value+">").join()
                     +". The resource <"+renderee.graphNode.value+"> could thus not be rendered.");
     }
-    let mustache = renderer.out(vocab.rdf2h("mustache"));
+    let mustache = renderer.out(_rdf2h("mustache"));
     if (mustache.nodes.length > 0) {
         return rendererRenderer(mustache.value);
     }
-    let js = renderer.out(vocab.rdf2h("javaScript"))
+    let js = renderer.out(_rdf2h("javaScript"))
     return function (renderee) {
         try {
             let render =  (n, context) => {
@@ -314,10 +314,10 @@ RDF2h.prototype.getRenderer = function (renderee) {
 
 RDF2h.prototype.render = function (graph, node, context) {
     if (!node.termType) {
-        node = rdf.sym(node);
+        node = sym(node);
     }
     if (!context) {
-        context = vocab.rdf2h("Default");
+        context = _rdf2h("Default");
     }
     //wrap all in one object that gets special care by lookup
     var renderee = new RDF2h.Renderee(this, GraphNode(node, graph), context);
@@ -337,15 +337,15 @@ RDF2h.prefixMap["dct"] = "http://purl.org/dc/terms/";
 RDF2h.resolveCurie = function (curie) {
     if (curie.startsWith("<") && curie.endsWith(">")) {
         //URI, not a curie
-        return rdf.sym(curie.substring(1, curie.length - 1));
+        return sym(curie.substring(1, curie.length - 1));
     }
     var splits = curie.split(":");
     var prefix = splits[0];
     var suffix = splits[1];
     if (RDF2h.prefixMap[prefix]) {
-        return rdf.sym(RDF2h.prefixMap[prefix] + suffix);
+        return sym(RDF2h.prefixMap[prefix] + suffix);
     } else {
-        return rdf.sym(curie);
+        return sym(curie);
     }
 
 };
